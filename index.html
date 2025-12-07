@@ -49,6 +49,28 @@
         header {
             text-align: center;
             padding: 40px 0;
+            position: relative;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #00d4ff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .language-selector:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.5);
+            transform: translateY(-1px);
         }
 
         header h1 {
@@ -154,6 +176,30 @@
         .question-number {
             color: #00d4ff;
             font-size: 0.9rem;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .exit-button {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exit-button:hover {
+            background: rgba(255, 107, 107, 0.3);
+            border-color: rgba(255, 107, 107, 0.5);
+            transform: translateY(-1px);
         }
 
         .timer {
@@ -474,6 +520,7 @@
 
     <div class="container">
         <header>
+            <button class="language-selector" onclick="toggleLanguage()">🌐 한국어</button>
             <h1>IQZone</h1>
             <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
         </header>
@@ -519,7 +566,7 @@
         <!-- 시작 화면 -->
         <div class="intro-section" id="intro">
             <h2>IQ 테스트 시작</h2>
-            <p>CHC 이론 기반 5개 인지 영역을 측정하는 25문항 과학적 IQ 평가입니다. 문제당 60초 제한시간이 있습니다.</p>
+            <p>CHC 이론 기반 5개 인지 영역을 측정하는 40문항 과학적 IQ 평가입니다. 문제당 60초 제한시간이 있습니다.</p>
 
             <!-- 사용자 정보 입력 -->
             <div style="background: rgba(0, 212, 255, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(0, 212, 255, 0.2);">
@@ -617,7 +664,10 @@
                         <span class="category-badge" id="categoryBadge">패턴 인식</span>
                         <span class="difficulty-badge" id="difficultyBadge">쉬움</span>
                     </div>
-                    <span class="timer" id="timer">60초</span>
+                    <div class="header-controls">
+                        <button class="exit-button" onclick="exitTest()">종료</button>
+                        <span class="timer" id="timer">60초</span>
+                    </div>
                 </div>
 
                 <div id="questionContent">
@@ -715,7 +765,7 @@
                 <div class="ranking-header">
                     <h3>🌟 역대 최고 기록</h3>
                     <div id="expandAllTimeBtn" style="text-align: center; margin-top: 20px;">
-                        <button class="btn" onclick="expandAllTimeRanking()" style="font-size: 0.9rem; padding: 8px 16px;">더 많은 랭킹 보기 ▼</button>
+                        <button class="btn" onclick="expandAllTimeRanking()" style="font-size: 0.8rem; padding: 6px 12px;">더 많은 랭킹 보기 ▼</button>
                     </div>
                 </div>
                 <div id="allTimeRankingList" class="ranking-list"></div>
@@ -811,6 +861,188 @@
             }
         }
     </style>
+</head>
+
+<body>
+    <!-- Brain Animation Container -->
+    <div class="brain-container">
+        <canvas id="brainCanvas"></canvas>
+    </div>
+
+    <div class="container">
+        <header>
+            <button class="language-selector" onclick="toggleLanguage()">🌐 한국어</button>
+            <h1>IQZone</h1>
+            <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
+        </header>
+
+        <!-- 랭킹 & 게시판 섹션 -->
+        <div class="main-grid" id="mainDashboard" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+
+            <!-- 좌측: IQ 랭킹 -->
+            <div class="intro-section" style="margin-bottom: 0;">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    🏆 IQ 랭킹 TOP 10
+                    <button onclick="refreshRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+                </h2>
+                <div id="rankingList">
+                    <!-- 랭킹 목록이 여기에 표시됨 -->
+                </div>
+                <div id="rankingEmpty" style="text-align: center; color: #999999; padding: 20px;">
+                    <p>🎯 아직 랭킹이 없습니다</p>
+                    <p>첫 번째 랭커가 되어보세요!</p>
+                </div>
+            </div>
+
+            <!-- 우측: 주간 랭킹 -->
+            <div class="intro-section" style="margin-bottom: 0;">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    📅 이번 주 랭킹
+                    <button onclick="refreshWeeklyRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+                </h2>
+                <div id="weeklyRankingList">
+                    <!-- 주간 랭킹이 여기에 표시됨 -->
+                </div>
+                <div id="weeklyRankingEmpty" style="text-align: center; color: #999999; padding: 20px;">
+                    <p>📊 아직 이번 주 랭킹이 없습니다</p>
+                    <p>첫 번째 주간 챔피언이 되어보세요!</p>
+                </div>
+                <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #666666;">
+                    <span id="weeklyResetInfo">매주 월요일 자정에 초기화</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 내 랭킹 조회 버튼들 (작은 크기) -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <button onclick="showMyRankInAllTime()" style="background: rgba(0, 212, 255, 0.1); border: 1px solid #00d4ff; border-radius: 8px; padding: 8px 16px; margin: 0 8px; cursor: pointer; color: #00d4ff; font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease;">
+                🎯 내 전체 순위
+            </button>
+            <button onclick="showMyRankInWeekly()" style="background: rgba(0, 212, 255, 0.1); border: 1px solid #00d4ff; border-radius: 8px; padding: 8px 16px; margin: 0 8px; cursor: pointer; color: #00d4ff; font-size: 0.85rem; font-weight: 500; transition: all 0.3s ease;">
+                📅 내 주간 순위
+            </button>
+        </div>
+
+        <!-- IQ 테스트 시작 섹션 -->
+        <div class="intro-section">
+            <h2>🧠 IQ 테스트 시작</h2>
+            <p>CHC 이론 기반 5개 인지 영역을 측정하는 40문항 과학적 IQ 평가입니다. 문항당 60초 제한시간이 주어집니다.</p>
+
+            <!-- 테스트 정보 입력 -->
+            <div style="background: rgba(0, 0, 0, 0.02); border-radius: 15px; padding: 30px; margin: 30px 0;">
+                <h4 style="color: #00d4ff; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    📝 테스트 정보 입력
+                </h4>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label for="mainNickname" style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">닉네임 *</label>
+                        <input type="text"
+                               id="mainNickname"
+                               placeholder="예: 아인슈타인"
+                               maxlength="12"
+                               style="width: 100%; padding: 12px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;">
+                    </div>
+                    <div>
+                        <label for="mainAge" style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">나이 *</label>
+                        <input type="number"
+                               id="mainAge"
+                               placeholder="예: 25"
+                               min="13"
+                               max="80"
+                               style="width: 100%; padding: 12px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;">
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button onclick="startTest()"
+                            style="background: linear-gradient(90deg, #00d4ff, #7b2cbf); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);">
+                        🧠 테스트 시작
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 평가 방식 설명 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+            <div style="background: rgba(0, 0, 0, 0.02); border-radius: 15px; padding: 25px;">
+                <h4 style="color: #00d4ff; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    📊 다차원 분석
+                </h4>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.6;">
+                    CHC 이론 기반 5개 영역: ①지각 추론 및 유동성 지능 ②수리 논리 및 패턴 인식 ③시공간 처리 능력 ④언어 및 논리 추론 ⑤언어 유추를 종합 평가합니다.
+                </p>
+            </div>
+
+            <div style="background: rgba(0, 0, 0, 0.02); border-radius: 15px; padding: 25px;">
+                <h4 style="color: #00d4ff; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    🧮 IRT 기반 평가
+                </h4>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.6;">
+                    문항반응이론(IRT) 3모수 로지스틱 모형과 최우도추정(MLE)을 활용하여 과학적으로 능력을 측정합니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 평가 기준 -->
+        <div style="background: rgba(0, 0, 0, 0.02); border-radius: 15px; padding: 25px; margin-bottom: 30px;">
+            <h4 style="color: #00d4ff; margin-bottom: 20px;">📋 평가 기준</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div style="padding: 15px; border-radius: 10px; background: rgba(255, 255, 255, 0.7);">
+                    <div style="font-weight: bold; color: #059669; margin-bottom: 5px;">130+ 매우 우수</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">상위 2% (영재 수준)</div>
+                </div>
+                <div style="padding: 15px; border-radius: 10px; background: rgba(255, 255, 255, 0.7);">
+                    <div style="font-weight: bold; color: #d97706; margin-bottom: 5px;">120-129 우수</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">상위 9% (우수함)</div>
+                </div>
+                <div style="padding: 15px; border-radius: 10px; background: rgba(255, 255, 255, 0.7);">
+                    <div style="font-weight: bold; color: #8b5cf6; margin-bottom: 5px;">110-119 평균상</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">상위 25% (평균 이상)</div>
+                </div>
+                <div style="padding: 15px; border-radius: 10px; background: rgba(255, 255, 255, 0.7);">
+                    <div style="font-weight: bold; color: #6b7280; margin-bottom: 5px;">90-109 평균</div>
+                    <div style="font-size: 0.85rem; color: #6b7280;">중간 50% (보통)</div>
+                </div>
+            </div>
+        </div>
+
+    <!-- 면책 조항 -->
+    <div style="background: #f8f9fa; border-top: 1px solid #e9ecef; padding: 30px 0; margin-top: 50px;">
+        <div style="max-width: 900px; margin: 0 auto; padding: 0 20px;">
+
+            <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #f59e0b; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    ⚠️ 중요 안내
+                </h3>
+                <div style="color: #6b7280; font-size: 0.95rem; line-height: 1.6;">
+                    <p style="margin-bottom: 12px;"><strong>본 IQZone 테스트 결과는 공신력이 없습니다.</strong></p>
+                    <p style="margin-bottom: 12px;">본 테스트는 교육적 목적과 재미를 위한 비공식 평가 도구입니다. 정확한 IQ 측정을 위해서는 전문기관에서 실시하는 공인된 검사를 받으시기 바랍니다.</p>
+                </div>
+            </div>
+
+            <div style="color: #6b7280; font-size: 0.85rem; line-height: 1.5;">
+                <h4 style="color: #374151; margin-bottom: 12px;">📄 면책 조항</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 8px;">• 본 테스트는 오락 및 교육적 목적으로만 제공됩니다</li>
+                    <li style="margin-bottom: 8px;">• 결과는 학술적, 임상적, 또는 진단적 목적으로 사용될 수 없습니다</li>
+                    <li style="margin-bottom: 8px;">• 정확한 인지능력 평가는 자격을 갖춘 전문가와 표준화된 도구를 통해서만 가능합니다</li>
+                    <li style="margin-bottom: 8px;">• 본 결과로 인한 어떠한 결정이나 행동에 대한 책임을 지지 않습니다</li>
+                    <li style="margin-bottom: 8px;">• 개인정보는 수집되지 않으며, 입력된 나이 정보는 저장되지 않습니다</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                <p style="color: #9ca3af; font-size: 0.8rem;">
+                    © 2024 IQZone - 비공식 인지능력 평가 도구 | 교육 및 오락 목적
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    </div>
 
     <script>
         // ============================================
@@ -1051,19 +1283,6 @@
                     correct: 0,
                     explanation: '각 행에서 첫 번째와 두 번째 도형을 겹쳤을 때 겹치는 부분은 사라지고 겹치지 않는 부분만 남습니다.'
                 },
-                // 문항 1-3: 다중 변환 (난이도: 최상, IRT b = +2.5)
-                {
-                    id: 'pr3',
-                    category: 'perceptual',
-                    categoryName: '지각 추론',
-                    difficulty: 5,
-                    irtB: 2.5,
-                    question: '3가지 속성이 독립적으로 변하는 패턴을 분석하세요.',
-                    matrix: ['○¹', '△²', '□³', '△²', '□³', '○¹', '□³', '○¹', '?'],
-                    options: ['△²', '○¹', '□³', '◇⁴'],
-                    correct: 0,
-                    explanation: '각 행은 라틴 스퀘어 규칙을 따릅니다. 모양과 숫자가 각 행마다 한 번씩만 등장해야 합니다.'
-                },
                 // 문항 1-4: 패턴 증가 (난이도: 중, IRT b = 0.0)
                 {
                     id: 'pr4',
@@ -1089,6 +1308,32 @@
                     options: ['◊', '◇', '♦', '○'],
                     correct: 0,
                     explanation: '각 행에서 중간 기호를 축으로 좌우가 대칭입니다.'
+                },
+                // 문항 1-6: 색상 변화 규칙 (난이도: 중, IRT b = +0.3)
+                {
+                    id: 'pr6',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
+                    difficulty: 2,
+                    irtB: 0.3,
+                    question: '색상 변화 규칙을 찾아 다음에 올 색상을 선택하세요.',
+                    sequence: ['🔴', '🟡', '🔵', '🔴', '🟡', '🔵', '🔴', '🟡', '?'],
+                    options: ['🔴', '🟡', '🔵', '🟢'],
+                    correct: 2,
+                    explanation: '3가지 색상이 순환하는 패턴입니다: 빨강→노랑→파랑→빨강...'
+                },
+                // 문항 1-8: 방향 회전 규칙 (난이도: 상, IRT b = +0.8)
+                {
+                    id: 'pr8',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
+                    difficulty: 3,
+                    irtB: 0.8,
+                    question: '화살표 방향의 회전 규칙을 찾으세요.',
+                    matrix: ['↑', '→', '↓', '→', '↓', '←', '↓', '←', '?'],
+                    options: ['↑', '→', '↓', '←'],
+                    correct: 0,
+                    explanation: '각 행에서 첫 번째에서 두 번째로 시계방향 90도 회전, 두 번째에서 세 번째로 시계방향 90도 회전하는 규칙입니다.'
                 }
             ],
 
@@ -1304,49 +1549,58 @@
                     correct: 3,
                     explanation: 'D > A > B > C 순서이므로 D가 가장 큽니다.'
                 },
+                // 문항 2-8: 배수 규칙 (난이도: 하, IRT b = -0.5)
                 {
-                    id: 'n6',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 4,
-                    question: '고난도 수열의 패턴을 찾으세요.',
-                    sequence: [1, 11, 21, 1211, 111221, '?'],
-                    options: ['312211', '31121211', '3112221', '211213'],
-                    correct: 0,
-                    explanation: '룩앤세이 수열: 각 항은 이전 항을 읽은 것입니다. "하나의 3, 하나의 1, 두 개의 2, 두 개의 1"'
+                    id: 'qr8',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 1,
+                    irtB: -0.5,
+                    question: '3의 배수 규칙을 찾아 다음 수를 구하세요.',
+                    sequence: [3, 6, 9, 12, 15, '?'],
+                    options: ['16', '17', '18', '19'],
+                    correct: 2,
+                    explanation: '3씩 증가하는 3의 배수 수열입니다.'
                 },
+                // 문항 2-9: 거듭제곱 규칙 (난이도: 중, IRT b = +0.2)
                 {
-                    id: 'n7',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 4,
-                    question: '소수 기반 수열의 다음 항을 구하세요.',
-                    sequence: [2, 6, 30, 210, 2310, '?'],
-                    options: ['30030', '23100', '46200', '25410'],
-                    correct: 0,
-                    explanation: '연속 소수의 곱: 2, 2×3, 2×3×5, 2×3×5×7, 2×3×5×7×11, 2×3×5×7×11×13'
+                    id: 'qr9',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 2,
+                    irtB: 0.2,
+                    question: '거듭제곱의 규칙을 찾으세요.',
+                    sequence: [1, 4, 9, 16, 25, '?'],
+                    options: ['30', '35', '36', '49'],
+                    correct: 2,
+                    explanation: '완전제곱수 수열입니다: 1², 2², 3², 4², 5², 6² = 36'
                 },
+                // 문항 2-10: 조건부 규칙 (난이도: 상, IRT b = +1.0)
                 {
-                    id: 'n8',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 5,
-                    question: '최고 난이도 수학 수열을 해결하세요.',
-                    sequence: [1, 4, 14, 44, 124, '?'],
-                    options: ['334', '344', '354', '364'],
-                    correct: 1,
-                    explanation: '각 항 = 3×이전항 + 2×(n-1): 1, 4, 3×4+2×1=14, 3×14+2×2=46이 아닌 다른 패턴'
+                    id: 'qr10',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 3,
+                    irtB: 1.0,
+                    question: '조건에 따른 변화 규칙을 찾으세요.',
+                    sequence: [2, 6, 3, 9, 4, 12, 5, '?'],
+                    options: ['13', '14', '15', '16'],
+                    correct: 2,
+                    explanation: '홀수 위치: 1씩 증가 (2,3,4,5), 짝수 위치: 홀수 위치×3 (6,9,12,15)'
                 },
+                // 문항 2-11: 약수 규칙 (난이도: 상, IRT b = +1.3)
                 {
-                    id: 'n9',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 5,
-                    question: '카탈란 수 기반 수열을 분석하세요.',
-                    sequence: [1, 1, 2, 5, 14, 42, '?'],
-                    options: ['132', '126', '128', '134'],
-                    correct: 0,
-                    explanation: '카탈란 수: C(n) = (2n)!/(n+1)!n! 패턴'
+                    id: 'qr11',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 3,
+                    irtB: 1.3,
+                    question: '약수의 개수 규칙을 찾으세요.',
+                    note: '각 수의 약수 개수: 1(1개), 2(2개), 4(3개), 6(4개), 12(6개), ?',
+                    sequence: [1, 2, 4, 6, 12, '?'],
+                    options: ['16', '18', '20', '24'],
+                    correct: 3,
+                    explanation: '약수 개수가 1,2,3,4,6,8개인 수들의 수열입니다. 24의 약수는 8개입니다.'
                 }
             ],
 
@@ -1561,6 +1815,42 @@
                     options: ['포함한다', '포함하지 않는다', '모순이다', '정의할 수 없다'],
                     correct: 2,
                     explanation: 'R이 자신을 포함한다면 정의에 모순, 포함하지 않는다면 자신을 포함해야 하므로 모순입니다.'
+                },
+                // 문항 4-11: 명제 논리 규칙 (난이도: 중, IRT b = +0.4)
+                {
+                    id: 'lg11',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 2,
+                    irtB: 0.4,
+                    question: '논리 규칙: "모든 새는 날 수 있다. 펭귄은 새다. 펭귄은 날 수 있다." 이 추론의 문제점은?',
+                    options: ['참인 결론', '거짓 전제', '논리 오류', '판단 불가'],
+                    correct: 1,
+                    explanation: '첫 번째 전제 "모든 새는 날 수 있다"가 거짓이므로 거짓 전제입니다.'
+                },
+                // 문항 4-12: 순서 규칙 (난이도: 중, IRT b = +0.6)
+                {
+                    id: 'lg12',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 2,
+                    irtB: 0.6,
+                    question: '순서 규칙: A>B, B>C, C>D일 때 올바른 순서는?',
+                    options: ['A>B>C>D', 'D>C>B>A', 'A=B=C=D', 'B>A>D>C'],
+                    correct: 0,
+                    explanation: '주어진 조건에 따라 A가 가장 크고 D가 가장 작습니다.'
+                },
+                // 문항 4-13: 문자 패턴 규칙 (난이도: 상, IRT b = +1.1)
+                {
+                    id: 'lg13',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 3,
+                    irtB: 1.1,
+                    question: '문자 변환 규칙: ABCD→BCDE→CDEF→?',
+                    options: ['DEFG', 'ABEF', 'CDFG', 'EFGH'],
+                    correct: 0,
+                    explanation: '각 문자가 알파벳 순서로 하나씩 뒤로 이동하는 패턴입니다.'
                 }
             ],
 
@@ -1614,17 +1904,6 @@
                     options: ['학교', '무지', '책', '공부'],
                     correct: 1,
                     explanation: '빛의 반대가 어둠이듯, 지식의 반대는 무지입니다.'
-                },
-                {
-                    id: 'v5',
-                    category: 'verbal',
-                    categoryName: '언어 유추',
-                    difficulty: 3,
-                    question: '씨앗 : 나무 = 유충 : ?',
-                    analogy: ['씨앗', '나무', '유충', '?'],
-                    options: ['알', '나비', '벌레', '꽃'],
-                    correct: 1,
-                    explanation: '씨앗이 자라면 나무가 되듯, 유충이 자라면 나비가 됩니다.'
                 },
                 {
                     id: 'v6',
@@ -1731,16 +2010,16 @@
             userAge = age;
 
             // 모든 카테고리에서 문제 수집 및 섞기
+            // 종류별로 모아서 출제: 도형 → 숫자/논리 순서
             allQuestions = [
+                // 1. 도형 관련 문제들 (지각 추론 + 시공간 처리)
                 ...shuffleArray(questions.perceptual),
-                ...shuffleArray(questions.quantitative),
                 ...shuffleArray(questions.spatial),
+                // 2. 숫자/논리 관련 문제들 (수리 논리 + 논리 추론 + 언어)
+                ...shuffleArray(questions.quantitative),
                 ...shuffleArray(questions.logical),
                 ...shuffleArray(questions.verbal)
             ];
-
-            // 카테고리별로 섞이도록 전체 재배열
-            allQuestions = shuffleArray(allQuestions);
 
             // 답변 배열 초기화
             answers = new Array(allQuestions.length).fill(null);
@@ -1925,6 +2204,25 @@
                 loadQuestion(currentQuestionIndex + 1);
             } else {
                 showResults();
+            }
+        }
+
+        function exitTest() {
+            clearInterval(timer);
+
+            if (confirm('테스트를 종료하시겠습니까?\n현재까지의 진행 상황은 저장되지 않습니다.')) {
+                // 메인 화면으로 돌아가기
+                document.getElementById('testContainer').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+
+                // 테스트 데이터 초기화
+                currentQuestionIndex = 0;
+                userAnswers = [];
+                responseTimes = [];
+                testStartTime = 0;
+
+                // 프로그레스 바 초기화
+                document.getElementById('progress').style.width = '0%';
             }
         }
 
@@ -2363,10 +2661,10 @@
             weeklyRankingList.style.display = 'block';
             weeklyRankingEmpty.style.display = 'none';
 
-            // 상위 5명만 표시
-            const top5 = currentWeekRankings.slice(0, 5);
+            // 상위 10명만 표시
+            const top10 = currentWeekRankings.slice(0, 10);
 
-            weeklyRankingList.innerHTML = top5.map((rank, index) => {
+            weeklyRankingList.innerHTML = top10.map((rank, index) => {
                 const ranking = index + 1;
                 const medalIcon = ranking <= 3 ? ['🥇', '🥈', '🥉'][ranking - 1] : `${ranking}위`;
 
@@ -2496,7 +2794,7 @@
                 html += `
                     <div style="border-top: 2px dashed #e0e0e0; margin: 15px 0; padding-top: 15px;">
                         <div style="text-align: center; margin-bottom: 10px;">
-                            <button onclick="toggleMoreRankings()" style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 5px; padding: 8px 16px; cursor: pointer; color: #00d4ff; font-size: 0.9rem;">
+                            <button onclick="toggleMoreRankings()" style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 5px; padding: 6px 12px; cursor: pointer; color: #00d4ff; font-size: 0.8rem;">
                                 더 많은 랭킹 보기 (${remaining.length}명)
                             </button>
                         </div>
@@ -2860,7 +3158,8 @@
             const myRankSection = document.getElementById('myAllTimeRank');
 
             if (rankings.length === 0) {
-                rankingList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">아직 등록된 랭킹이 없습니다.</div>';
+                const lang = window.currentLang || languages.ko;
+                rankingList.innerHTML = `<div style="text-align: center; color: #999; padding: 40px;">${lang.noAllTimeRanking}</div>`;
                 myRankSection.style.display = 'none';
                 return;
             }
@@ -2911,7 +3210,8 @@
             const myRankSection = document.getElementById('myWeeklyRank');
 
             if (currentWeekRankings.length === 0) {
-                rankingList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">이번 주 아직 등록된 랭킹이 없습니다.</div>';
+                const lang = window.currentLang || languages.ko;
+                rankingList.innerHTML = `<div style="text-align: center; color: #999; padding: 40px;">${lang.noThisWeekRanking}</div>`;
                 myRankSection.style.display = 'none';
                 return;
             }
@@ -2970,11 +3270,12 @@
             const myRank = rankings[myRankIndex];
             const ranking = myRankIndex + 1;
 
+            const lang = window.currentLang || languages.ko;
             myRankSection.style.display = 'block';
             myRankSection.innerHTML = `
-                <h4>🎯 내 전체 순위</h4>
+                <h4>${lang.myAllTimeRank}</h4>
                 <div style="font-size: 1.1rem;">
-                    <strong>${ranking}위</strong> / ${rankings.length}명 중
+                    <strong>${ranking}${lang.ranking}</strong> / ${rankings.length}${lang.outOf}
                     <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
                 </div>
             `;
@@ -3002,11 +3303,12 @@
             const myRank = currentWeekRankings[myRankIndex];
             const ranking = myRankIndex + 1;
 
+            const lang = window.currentLang || languages.ko;
             myRankSection.style.display = 'block';
             myRankSection.innerHTML = `
-                <h4>📅 내 주간 순위</h4>
+                <h4>${lang.myWeeklyRank}</h4>
                 <div style="font-size: 1.1rem;">
-                    <strong>${ranking}위</strong> / ${currentWeekRankings.length}명 중
+                    <strong>${ranking}${lang.ranking}</strong> / ${currentWeekRankings.length}${lang.outOf}
                     <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
                 </div>
             `;
@@ -3153,6 +3455,358 @@
             securityLog.log('REPORT', '정기 보안 리포트 생성', report);
         }, 60 * 60 * 1000);
 
+        // 언어 선택 기능
+        let currentLanguage = 'ko';
+        const languages = {
+            ko: {
+                flag: '🇰🇷',
+                name: '한국어',
+                // 헤더
+                title: 'IQZone',
+                subtitle: '과학적 문제 설계 기반 종합 인지능력 평가',
+                // 메인 섹션
+                startTest: 'IQ 테스트 시작',
+                description: 'CHC 이론 기반 5개 인지 영역을 측정하는 40문항 과학적 IQ 평가입니다. 문제당 60초 제한시간이 있습니다.',
+                testInfo: '📝 테스트 정보 입력',
+                nickname: '닉네임',
+                nicknamePlaceholder: '예: 김지능',
+                age: '나이',
+                agePlaceholder: '예: 25',
+                startButton: '🧠 테스트 시작',
+                // 랭킹 섹션
+                topRecords: '🌟 역대 최고 기록',
+                allTimeRanking: '전체 랭킹',
+                weeklyRanking: '주간 랭킹',
+                thisWeekRanking: '📅 이번 주 랭킹',
+                weeklyResetInfo: '매주 월요일 자정에 초기화',
+                noWeeklyRanking: '📊 아직 이번 주 랭킹이 없습니다',
+                firstWeeklyChampion: '첫 번째 주간 챔피언이 되어보세요!',
+                moreRankings: '더 많은 랭킹 보기',
+                noRanking: '🎯 아직 랭킹이 없습니다',
+                firstRanker: '첫 번째 랭커가 되어보세요!',
+                weeklyStartsMonday: '매주 월요일 새롭게 시작됩니다',
+                noAllTimeRanking: '아직 등록된 랭킹이 없습니다.',
+                noThisWeekRanking: '이번 주 아직 등록된 랭킹이 없습니다.',
+                desiredNickname: '원하는 닉네임',
+                // 평가 기준
+                evaluationCriteria: '📋 평가 기준',
+                veryExcellent: '매우 우수',
+                excellent: '우수',
+                aboveAverage: '평균상',
+                average: '평균',
+                // 설명
+                cognitiveAreas: '📊 다차원 분석',
+                areasDescription: 'CHC 이론 기반 5개 영역: ①지각 추론 및 유동성 지능 ②수리 논리 및 패턴 인식 ③시공간 처리 능력 ④언어 및 논리 추론 ⑤언어 유추를 종합 평가합니다.',
+                irtEvaluation: '🧮 IRT 기반 평가',
+                irtDescription: '문항반응이론(IRT) 3모수 로지스틱 모형과 최우도추정(MLE)을 활용하여 과학적으로 능력을 측정합니다.',
+                // 테스트 중
+                exitButton: '종료',
+                skipButton: '건너뛰기',
+                nextButton: '다음',
+                seconds: '초',
+                // 결과
+                backToMain: '🏠 메인으로 돌아가기',
+                myAllTimeRank: '🎯 내 전체 순위',
+                myWeeklyRank: '📅 내 주간 순위',
+                outOf: '명 중',
+                ranking: '위',
+                // 면책 조항
+                importantNotice: '⚠️ 중요 안내',
+                noAuthority: '본 IQZone 테스트 결과는 공신력이 없습니다.',
+                educationalPurpose: '본 테스트는 교육적 목적과 재미를 위한 비공식 평가 도구입니다. 정확한 IQ 측정을 위해서는 전문기관에서 실시하는 공인된 검사를 받으시기 바랍니다.',
+                disclaimer: '📄 면책 조항',
+                entertainmentOnly: '• 본 테스트는 오락 및 교육적 목적으로만 제공됩니다',
+                notForDiagnosis: '• 결과는 학술적, 임상적, 또는 진단적 목적으로 사용될 수 없습니다',
+                professionalRequired: '• 정확한 인지능력 평가는 자격을 갖춘 전문가와 표준화된 도구를 통해서만 가능합니다',
+                noResponsibility: '• 본 결과로 인한 어떠한 결정이나 행동에 대한 책임을 지지 않습니다',
+                noPersonalData: '• 개인정보는 수집되지 않으며, 입력된 나이 정보는 저장되지 않습니다',
+                copyright: '© 2024 IQZone - 비공식 인지능력 평가 도구 | 교육 및 오락 목적'
+            },
+            en: {
+                flag: '🇺🇸',
+                name: 'English',
+                // 헤더
+                title: 'IQZone',
+                subtitle: 'Scientific Problem-Based Comprehensive Cognitive Assessment',
+                // 메인 섹션
+                startTest: 'Start IQ Test',
+                description: 'Scientific IQ evaluation with 40 items measuring 5 cognitive domains based on CHC theory. 60 seconds time limit per question.',
+                testInfo: '📝 Test Information',
+                nickname: 'Nickname',
+                nicknamePlaceholder: 'e.g. Einstein',
+                age: 'Age',
+                agePlaceholder: 'e.g. 25',
+                startButton: '🧠 Start Test',
+                // 랭킹 섹션
+                topRecords: '🌟 All-Time Best Records',
+                allTimeRanking: 'All-Time Ranking',
+                weeklyRanking: 'Weekly Ranking',
+                thisWeekRanking: '📅 This Week\'s Ranking',
+                weeklyResetInfo: 'Resets every Monday at midnight',
+                noWeeklyRanking: '📊 No rankings this week yet',
+                firstWeeklyChampion: 'Be the first weekly champion!',
+                moreRankings: 'Show More Rankings',
+                noRanking: '🎯 No rankings yet',
+                firstRanker: 'Be the first ranker!',
+                weeklyStartsMonday: 'Starts fresh every Monday',
+                noAllTimeRanking: 'No rankings registered yet.',
+                noThisWeekRanking: 'No rankings for this week yet.',
+                desiredNickname: 'Desired nickname',
+                // 평가 기준
+                evaluationCriteria: '📋 Evaluation Criteria',
+                veryExcellent: 'Very Excellent',
+                excellent: 'Excellent',
+                aboveAverage: 'Above Average',
+                average: 'Average',
+                // 설명
+                cognitiveAreas: '📊 Multidimensional Analysis',
+                areasDescription: '5 Cognitive Areas Based on CHC Theory: ①Perceptual Reasoning & Fluid Intelligence ②Quantitative Logic & Pattern Recognition ③Visual-Spatial Processing ④Verbal & Logical Reasoning ⑤Verbal Analogies for comprehensive assessment.',
+                irtEvaluation: '🧮 IRT-Based Evaluation',
+                irtDescription: 'Scientific ability measurement using Item Response Theory (IRT) 3-parameter logistic model and Maximum Likelihood Estimation (MLE).',
+                // 테스트 중
+                exitButton: 'Exit',
+                skipButton: 'Skip',
+                nextButton: 'Next',
+                seconds: 'sec',
+                // 결과
+                backToMain: '🏠 Back to Main',
+                myAllTimeRank: '🎯 My All-Time Rank',
+                myWeeklyRank: '📅 My Weekly Rank',
+                outOf: ' out of',
+                ranking: '',
+                // 면책 조항
+                importantNotice: '⚠️ Important Notice',
+                noAuthority: 'This IQZone test result has no official authority.',
+                educationalPurpose: 'This test is an informal assessment tool for educational and entertainment purposes only. For accurate IQ measurement, please take an official test administered by a professional institution.',
+                disclaimer: '📄 Disclaimer',
+                entertainmentOnly: '• This test is provided for entertainment and educational purposes only',
+                notForDiagnosis: '• Results cannot be used for academic, clinical, or diagnostic purposes',
+                professionalRequired: '• Accurate cognitive ability assessment is only possible through qualified professionals and standardized tools',
+                noResponsibility: '• We assume no responsibility for any decisions or actions based on these results',
+                noPersonalData: '• No personal information is collected, and entered age information is not stored',
+                copyright: '© 2024 IQZone - Informal Cognitive Assessment Tool | For Educational and Entertainment Purposes'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ko' ? 'en' : 'ko';
+            const lang = languages[currentLanguage];
+
+            // 언어 버튼 업데이트
+            const languageSelector = document.querySelector('.language-selector');
+            if (languageSelector) {
+                languageSelector.innerHTML = `🌐 ${lang.name}`;
+            }
+
+            // 헤더 업데이트
+            const headerTitle = document.querySelector('header h1');
+            const headerSubtitle = document.querySelector('header p');
+            if (headerTitle) headerTitle.textContent = lang.title;
+            if (headerSubtitle) headerSubtitle.textContent = lang.subtitle;
+
+            // 시작 섹션 업데이트
+            const startTitle = document.querySelector('.intro-section h2');
+            const startDescription = document.querySelector('.intro-section p');
+            if (startTitle) startTitle.textContent = lang.startTest;
+            if (startDescription) startDescription.textContent = lang.description;
+
+            // 테스트 정보 입력 섹션
+            const testInfoTitles = document.querySelectorAll('h4[style*="color: #00d4ff"]');
+            testInfoTitles.forEach(title => {
+                if (title.textContent.includes('📝')) {
+                    title.textContent = lang.testInfo;
+                }
+            });
+
+            // 입력 필드 라벨 및 플레이스홀더
+            const nicknameLabel = document.querySelector('label[for="mainNickname"]');
+            const ageLabel = document.querySelector('label[for="mainAge"]');
+            if (nicknameLabel) {
+                nicknameLabel.textContent = `${lang.nickname} *`;
+            }
+            if (ageLabel) {
+                ageLabel.textContent = `${lang.age} *`;
+            }
+
+            const nicknameInput = document.getElementById('mainNickname');
+            const ageInput = document.getElementById('mainAge');
+            if (nicknameInput) nicknameInput.placeholder = lang.nicknamePlaceholder;
+            if (ageInput) ageInput.placeholder = lang.agePlaceholder;
+
+            // 시작 버튼
+            const startButton = document.querySelector('button[onclick="startTest()"]');
+            if (startButton) startButton.textContent = lang.startButton;
+
+            // 랭킹 섹션 제목들 - 모든 h2, h3 요소 확인
+            const allH2s = document.querySelectorAll('h2');
+            const allH3s = document.querySelectorAll('h3');
+
+            allH2s.forEach(h2 => {
+                if (h2.textContent.includes('🌟') && (h2.textContent.includes('역대') || h2.textContent.includes('Best'))) {
+                    h2.textContent = lang.topRecords;
+                } else if (h2.innerHTML.includes('📅') && (h2.innerHTML.includes('이번') || h2.innerHTML.includes('This Week'))) {
+                    h2.innerHTML = `${lang.thisWeekRanking} <button onclick="refreshWeeklyRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>`;
+                }
+            });
+
+            allH3s.forEach(h3 => {
+                if (h3.textContent.includes('🌟') && (h3.textContent.includes('역대') || h3.textContent.includes('Best'))) {
+                    h3.textContent = lang.topRecords;
+                } else if (h3.textContent.includes('📅') && (h3.textContent.includes('이번') || h3.textContent.includes('This Week'))) {
+                    h3.textContent = lang.thisWeekRanking;
+                }
+            });
+
+            // 랭킹 탭 업데이트
+            const allTimeTab = document.getElementById('allTimeTab');
+            const weeklyTab = document.getElementById('weeklyTab');
+            if (allTimeTab) allTimeTab.textContent = lang.allTimeRanking;
+            if (weeklyTab) weeklyTab.textContent = lang.weeklyRanking;
+
+            // 주간 랭킹 빈 상태 메시지
+            const weeklyEmpty = document.getElementById('weeklyRankingEmpty');
+            if (weeklyEmpty) {
+                weeklyEmpty.innerHTML = `
+                    <p>${lang.noWeeklyRanking}</p>
+                    <p>${lang.firstWeeklyChampion}</p>
+                `;
+            }
+
+            // 주간 리셋 정보
+            const weeklyResetInfo = document.getElementById('weeklyResetInfo');
+            if (weeklyResetInfo) {
+                weeklyResetInfo.textContent = lang.weeklyResetInfo;
+            }
+
+            // 더 많은 랭킹 보기 버튼들
+            const moreRankingBtns = document.querySelectorAll('button');
+            moreRankingBtns.forEach(btn => {
+                if (btn.textContent.includes('더 많은 랭킹') || btn.textContent.includes('Show More') || btn.textContent.includes('More Rankings')) {
+                    const count = btn.textContent.match(/\((\d+)/);
+                    if (count) {
+                        btn.textContent = `${lang.moreRankings} (${count[1]}명)`;
+                    } else if (btn.textContent.includes('▼')) {
+                        btn.textContent = `${lang.moreRankings} ▼`;
+                    }
+                }
+            });
+
+            // 설명 섹션들 - 각각 고유하게 식별
+            const allH4s = document.querySelectorAll('h4');
+            const allPs = document.querySelectorAll('p[style*="line-height: 1.5"]');
+
+            // 평가 기준 섹션
+            allH4s.forEach(h4 => {
+                if (h4.textContent.includes('📋') && h4.textContent.includes('평가')) {
+                    h4.textContent = lang.evaluationCriteria;
+                }
+                if (h4.textContent.includes('📊') && h4.textContent.includes('다차원')) {
+                    h4.textContent = lang.cognitiveAreas;
+                }
+                if (h4.textContent.includes('🧮') && h4.textContent.includes('IRT')) {
+                    h4.textContent = lang.irtEvaluation;
+                }
+            });
+
+            // 설명 텍스트들
+            allPs.forEach(p => {
+                if (p.textContent.includes('CHC 이론 기반') && p.textContent.includes('①')) {
+                    p.textContent = lang.areasDescription;
+                }
+                if (p.textContent.includes('문항반응이론') && p.textContent.includes('IRT')) {
+                    p.textContent = lang.irtDescription;
+                }
+            });
+
+            // 평가 기준 등급들
+            const evaluationItems = document.querySelectorAll('div[style*="color: #059669"], div[style*="color: #d97706"], div[style*="color: #8b5cf6"], div[style*="color: #6b7280"]');
+            evaluationItems.forEach((item, index) => {
+                const text = item.innerHTML;
+                if (text.includes('130+')) {
+                    item.innerHTML = text.replace(/매우 우수|Very Excellent/g, lang.veryExcellent);
+                } else if (text.includes('120-129')) {
+                    item.innerHTML = text.replace(/우수|Excellent/g, lang.excellent);
+                } else if (text.includes('110-119')) {
+                    item.innerHTML = text.replace(/평균상|Above Average/g, lang.aboveAverage);
+                } else if (text.includes('90-109')) {
+                    item.innerHTML = text.replace(/평균|Average/g, lang.average);
+                }
+            });
+
+            // 테스트 중 버튼들
+            const exitButton = document.querySelector('.exit-button');
+            if (exitButton) exitButton.textContent = lang.exitButton;
+
+            // 뒤로 가기 버튼
+            const backButton = document.querySelector('button[onclick="goBackToMain()"]');
+            if (backButton) backButton.textContent = lang.backToMain;
+
+            // 모든 p 태그에서 하드코딩된 텍스트 찾아서 변경
+            const allParagraphs = document.querySelectorAll('p');
+            allParagraphs.forEach(p => {
+                const text = p.textContent;
+                if (text.includes('🎯 아직 랭킹이 없습니다') || text.includes('🎯 No rankings yet')) {
+                    p.textContent = lang.noRanking;
+                } else if (text.includes('첫 번째 랭커가 되어보세요') || p.includes('Be the first ranker')) {
+                    p.textContent = lang.firstRanker;
+                } else if (text.includes('매주 월요일 새롭게 시작됩니다') || text.includes('Starts fresh every Monday')) {
+                    p.textContent = lang.weeklyStartsMonday;
+                }
+            });
+
+            // placeholder 텍스트 변경
+            const nicknameInput = document.getElementById('mainNickname');
+            if (nicknameInput && (nicknameInput.placeholder.includes('원하는') || nicknameInput.placeholder.includes('Desired'))) {
+                nicknameInput.placeholder = lang.desiredNickname;
+            }
+
+            // 면책 조항 섹션 업데이트
+            const disclaimerTitle = document.querySelector('h3[style*="color: #f59e0b"]');
+            if (disclaimerTitle && disclaimerTitle.textContent.includes('⚠️')) {
+                disclaimerTitle.textContent = lang.importantNotice;
+            }
+
+            const disclaimerStrongText = document.querySelector('div[style*="color: #6b7280"] p strong');
+            if (disclaimerStrongText) {
+                disclaimerStrongText.textContent = lang.noAuthority;
+            }
+
+            const disclaimerMainText = document.querySelector('div[style*="color: #6b7280"] p:not(:first-child)');
+            if (disclaimerMainText && !disclaimerMainText.querySelector('strong')) {
+                disclaimerMainText.textContent = lang.educationalPurpose;
+            }
+
+            const disclaimerSectionTitle = document.querySelector('h4[style*="color: #374151"]');
+            if (disclaimerSectionTitle && disclaimerSectionTitle.textContent.includes('📄')) {
+                disclaimerSectionTitle.textContent = lang.disclaimer;
+            }
+
+            // 면책 조항 리스트 항목들
+            const disclaimerItems = document.querySelectorAll('ul[style*="list-style: none"] li');
+            if (disclaimerItems.length >= 5) {
+                disclaimerItems[0].textContent = lang.entertainmentOnly;
+                disclaimerItems[1].textContent = lang.notForDiagnosis;
+                disclaimerItems[2].textContent = lang.professionalRequired;
+                disclaimerItems[3].textContent = lang.noResponsibility;
+                disclaimerItems[4].textContent = lang.noPersonalData;
+            }
+
+            // 저작권 표시
+            const copyrightText = document.querySelector('p[style*="color: #9ca3af"]');
+            if (copyrightText) {
+                copyrightText.textContent = lang.copyright;
+            }
+
+            // 동적 생성되는 텍스트들도 변경하기 위한 함수들 갱신
+            window.currentLang = lang; // 전역 변수로 현재 언어 저장
+
+            console.log(`언어가 ${lang.name}로 변경되었습니다.`);
+
+            // 랭킹 새로고침으로 변경사항 적용
+            if (typeof refreshRanking === 'function') refreshRanking();
+            if (typeof refreshWeeklyRanking === 'function') refreshWeeklyRanking();
+        }
+
         // 전역 보안 함수 노출 (개발자 도구에서 사용 가능)
         window.IQZoneSecurity = {
             getSecurityLog: () => securityLog.events,
@@ -3161,45 +3815,14 @@
             clearLog: () => securityLog.events = []
         };
 
+        // 언어 초기화
+        window.currentLang = languages.ko; // 기본 언어 설정
+
         window.addEventListener('resize', () => { resize(); initParticles(); });
         resize();
         initParticles();
         animate();
     </script>
-
-    <!-- 면책 조항 -->
-    <div style="background: #f8f9fa; border-top: 1px solid #e9ecef; padding: 30px 0; margin-top: 50px;">
-        <div style="max-width: 900px; margin: 0 auto; padding: 0 20px;">
-
-            <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
-                <h3 style="color: #f59e0b; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                    ⚠️ 중요 안내
-                </h3>
-                <div style="color: #6b7280; font-size: 0.95rem; line-height: 1.6;">
-                    <p style="margin-bottom: 12px;"><strong>본 IQZone 테스트 결과는 공신력이 없습니다.</strong></p>
-                    <p style="margin-bottom: 12px;">본 테스트는 교육적 목적과 재미를 위한 비공식 평가 도구입니다. 정확한 IQ 측정을 위해서는 전문기관에서 실시하는 공인된 검사를 받으시기 바랍니다.</p>
-                </div>
-            </div>
-
-            <div style="color: #6b7280; font-size: 0.85rem; line-height: 1.5;">
-                <h4 style="color: #374151; margin-bottom: 12px;">📄 면책 조항</h4>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="margin-bottom: 8px;">• 본 테스트는 오락 및 교육적 목적으로만 제공됩니다</li>
-                    <li style="margin-bottom: 8px;">• 결과는 학술적, 임상적, 또는 진단적 목적으로 사용될 수 없습니다</li>
-                    <li style="margin-bottom: 8px;">• 정확한 인지능력 평가는 자격을 갖춘 전문가와 표준화된 도구를 통해서만 가능합니다</li>
-                    <li style="margin-bottom: 8px;">• 본 결과로 인한 어떠한 결정이나 행동에 대한 책임을 지지 않습니다</li>
-                    <li style="margin-bottom: 8px;">• 개인정보는 수집되지 않으며, 입력된 나이 정보는 저장되지 않습니다</li>
-                </ul>
-            </div>
-
-            <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e9ecef;">
-                <p style="color: #9ca3af; font-size: 0.8rem;">
-                    © 2024 IQZone - 비공식 인지능력 평가 도구 | 교육 및 오락 목적
-                </p>
-            </div>
-
-        </div>
-    </div>
 
 </body>
 
