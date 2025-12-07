@@ -3367,7 +3367,7 @@
         function performSecurityChecks() {
             // 1. 도메인 검증
             const currentDomain = window.location.hostname;
-            const allowedDomains = ['cattowel39200.github.io', 'localhost', '127.0.0.1'];
+            const allowedDomains = ['cattowel39200.github.io', 'localhost', '127.0.0.1', 'zrr.kr'];
 
             if (!allowedDomains.includes(currentDomain)) {
                 securityLog.log('SECURITY_VIOLATION', '승인되지 않은 도메인에서 접근', {domain: currentDomain});
