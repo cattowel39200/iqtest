@@ -166,6 +166,29 @@
             color: #7b2cbf;
         }
 
+        .difficulty-badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .difficulty-easy {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
+        }
+
+        .difficulty-medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #d97706;
+        }
+
+        .difficulty-hard {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+        }
+
         .question-text {
             font-size: 1.3rem;
             margin-bottom: 30px;
@@ -463,7 +486,10 @@
             <div class="question-card">
                 <div class="question-header">
                     <span class="question-number" id="questionNum">문제 1/25</span>
-                    <span class="category-badge" id="categoryBadge">패턴 인식</span>
+                    <div>
+                        <span class="category-badge" id="categoryBadge">패턴 인식</span>
+                        <span class="difficulty-badge" id="difficultyBadge">쉬움</span>
+                    </div>
                     <span class="timer" id="timer">60초</span>
                 </div>
 
@@ -919,6 +945,13 @@
             document.getElementById('progress').style.width = `${((index + 1) / allQuestions.length) * 100}%`;
             document.getElementById('questionNum').textContent = `문제 ${index + 1}/${allQuestions.length}`;
             document.getElementById('categoryBadge').textContent = q.categoryName;
+
+            // 난이도 표시 업데이트
+            const difficultyBadge = document.getElementById('difficultyBadge');
+            const difficultyText = q.difficulty === 1 ? '쉬움' : q.difficulty === 2 ? '보통' : '어려움';
+            const difficultyClass = q.difficulty === 1 ? 'difficulty-easy' : q.difficulty === 2 ? 'difficulty-medium' : 'difficulty-hard';
+            difficultyBadge.textContent = difficultyText;
+            difficultyBadge.className = `difficulty-badge ${difficultyClass}`;
 
             // 문제 내용 렌더링
             const contentDiv = document.getElementById('questionContent');
