@@ -1732,15 +1732,17 @@
 
             // 모든 카테고리에서 문제 수집 및 섞기
             allQuestions = [
+                // 1. 도형 관련 문제들 (지각 추론 + 시공간 처리)
                 ...shuffleArray(questions.perceptual),
-                ...shuffleArray(questions.quantitative),
                 ...shuffleArray(questions.spatial),
+                // 2. 숫자/논리 관련 문제들 (수리 논리 + 논리 추론 + 언어)
+                ...shuffleArray(questions.quantitative),
                 ...shuffleArray(questions.logical),
                 ...shuffleArray(questions.verbal)
             ];
 
-            // 카테고리별로 섞이도록 전체 재배열
-            allQuestions = shuffleArray(allQuestions);
+            // 정확히 40문항으로 제한
+            allQuestions = allQuestions.slice(0, 40);
 
             // 답변 배열 초기화
             answers = new Array(allQuestions.length).fill(null);
