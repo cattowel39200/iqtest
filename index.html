@@ -817,9 +817,11 @@
         // Firebase 클라우드 동기화 설정
         // ============================================
 
-        // Firebase 실제 설정
+        // Firebase 보안 강화 설정
+        // ⚠️ 보안 공지: API 키는 클라이언트 사이드에서 완전히 숨길 수 없음
+        // Firebase 보안 규칙을 통한 데이터 접근 제어가 핵심
         const firebaseConfig = {
-            apiKey: "AIzaSyCh8Mz5MhNVq6GFg21N42tQZ5KamMJ94eE",
+            apiKey: "AIzaSyCh8Mz5MhNVq6GFg21N42tQZ5KamMJ94eE", // 클라이언트용 공개 키
             authDomain: "iqzone-rankings.firebaseapp.com",
             projectId: "iqzone-rankings",
             storageBucket: "iqzone-rankings.firebasestorage.app",
@@ -828,17 +830,44 @@
             measurementId: "G-L95JEJC6JC"
         };
 
+        // 보안: Firebase 접근 제한 및 검증
+        function validateFirebaseAccess() {
+            // 도메인 검증 (특정 도메인에서만 접근 허용)
+            const allowedDomains = [
+                'cattowel39200.github.io',
+                'localhost',
+                '127.0.0.1',
+                'zrr.kr'
+            ];
+
+            const currentDomain = window.location.hostname;
+            if (!allowedDomains.includes(currentDomain)) {
+                console.warn(`🔒 보안 차단: 허용되지 않은 도메인 ${currentDomain}`);
+                return false;
+            }
+
+            return true;
+        }
+
         // Firebase 초기화
         let db = null;
         let isFirebaseEnabled = false;
 
         function initializeFirebase() {
             try {
+                // 보안 검증 먼저 수행
+                if (!validateFirebaseAccess()) {
+                    console.warn("🔒 Firebase 접근이 보안상 차단되었습니다.");
+                    isFirebaseEnabled = false;
+                    return;
+                }
+
                 if (typeof firebase !== 'undefined') {
                     firebase.initializeApp(firebaseConfig);
                     db = firebase.firestore();
                     isFirebaseEnabled = true;
                     console.log("✅ Firebase 연결 성공 - 클라우드 동기화 활성화");
+                    console.log("🔒 보안: 승인된 도메인에서 접근 중");
                 } else {
                     console.warn("⚠️ Firebase 라이브러리 로드 실패 - 로컬 저장소 사용");
                 }

@@ -1,0 +1,36 @@
+# 보안 관련 파일들
+.env
+.env.local
+.env.production
+config.js
+firebase-config.js
+
+# Claude 설정 파일 (로컬 개발용)
+.claude/settings.local.json
+
+# 시스템 파일
+.DS_Store
+Thumbs.db
+*.log
+
+# 임시 파일
+*.tmp
+*.temp
+backup/
+old/
+test/
+
+# IDE 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node.js (미래 확장용)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 빌드 파일
+dist/
+build/
