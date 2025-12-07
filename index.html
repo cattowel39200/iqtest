@@ -49,28 +49,6 @@
         header {
             text-align: center;
             padding: 40px 0;
-            position: relative;
-        }
-
-        .language-selector {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            color: #00d4ff;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .language-selector:hover {
-            background: rgba(0, 212, 255, 0.2);
-            border-color: rgba(0, 212, 255, 0.5);
-            transform: translateY(-1px);
         }
 
         header h1 {
@@ -496,7 +474,6 @@
 
     <div class="container">
         <header>
-            <button class="language-selector" onclick="toggleLanguage()">🌐 한국어</button>
             <h1>IQZone</h1>
             <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
         </header>
@@ -3183,49 +3160,6 @@
             generateReport: generateSecurityReport,
             clearLog: () => securityLog.events = []
         };
-
-        // ============================================
-        // 언어 전환 시스템
-        // ============================================
-
-        let currentLanguage = 'ko';
-        const languages = {
-            ko: {
-                name: '한국어',
-                title: 'IQZone',
-                subtitle: '과학적 문제 설계 기반 종합 인지능력 평가'
-            },
-            en: {
-                name: 'English',
-                title: 'IQZone',
-                subtitle: 'Scientific Problem-Based Comprehensive Cognitive Assessment'
-            }
-        };
-
-        function toggleLanguage() {
-            try {
-                currentLanguage = currentLanguage === 'ko' ? 'en' : 'ko';
-                const lang = languages[currentLanguage];
-
-                console.log(`언어를 ${lang.name}로 변경 중...`);
-
-                // 언어 버튼 업데이트
-                const languageSelector = document.querySelector('.language-selector');
-                if (languageSelector) {
-                    languageSelector.innerHTML = `🌐 ${lang.name}`;
-                }
-
-                // 헤더 업데이트
-                const headerTitle = document.querySelector('header h1');
-                const headerSubtitle = document.querySelector('header p');
-                if (headerTitle) headerTitle.textContent = lang.title;
-                if (headerSubtitle) headerSubtitle.textContent = lang.subtitle;
-
-                console.log(`언어가 ${lang.name}로 변경되었습니다.`);
-            } catch (error) {
-                console.error('언어 변경 중 오류 발생:', error);
-            }
-        }
 
         window.addEventListener('resize', () => { resize(); initParticles(); });
         resize();
