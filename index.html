@@ -1341,11 +1341,7 @@
                     <strong>⚠️</strong> <span data-t="disclaimer">본 테스트는 참고용이며 공인된 IQ 검사를 대체하지 않습니다.</span>
                 </div>
 
-                <div class="btn-center">
-                    <button class="btn btn-primary" id="startBtn" onclick="startBasicTest()" disabled>
-                        <span data-t="btn.start">영역을 선택하세요</span> <span>→</span>
-                    </button>
-                </div>
+
             </div>
         </div>
 
@@ -1831,7 +1827,19 @@
 
         // ========== UTILS ==========
         function shuffle(a) { const n = [...a]; for (let i = n.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[n[i], n[j]] = [n[j], n[i]]; } return n; }
-        function show(id) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
+        function show(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+
+            // Hide brain animation on test pages
+            const brainContainer = document.querySelector('.brain-container');
+            if (id === 'introSection') {
+                brainContainer.style.display = 'block';
+            } else {
+                brainContainer.style.display = 'none';
+            }
+        }
         function genCode() { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r = 'CQ-'; for (let i = 0; i < 8; i++)r += c[Math.floor(Math.random() * c.length)]; return r; }
         function fmtDate(d) { return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; }
         function getLoc(o) { return typeof o === 'string' ? o : (o[lang] || o.ko || o); }
