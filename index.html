@@ -2698,6 +2698,150 @@
             toggleMoreRankings();
         }
 
+        // ============================================
+        // 자동 보안 모니터링 시스템
+        // ============================================
+
+        // 보안 이벤트 로깅
+        const securityLog = {
+            events: [],
+            maxEvents: 100,
+
+            log: function(type, message, data = null) {
+                const event = {
+                    timestamp: new Date().toISOString(),
+                    type: type,
+                    message: message,
+                    data: data,
+                    domain: window.location.hostname,
+                    userAgent: navigator.userAgent
+                };
+
+                this.events.unshift(event);
+                if (this.events.length > this.maxEvents) {
+                    this.events.pop();
+                }
+
+                // 심각한 보안 이벤트는 콘솔에 경고 출력
+                if (type === 'SECURITY_VIOLATION' || type === 'SUSPICIOUS_ACTIVITY') {
+                    console.warn(`🚨 보안 경고 [${type}]: ${message}`, data);
+                }
+
+                // 로컬 스토리지에 보안 로그 저장 (최근 50개만)
+                try {
+                    const recentLogs = this.events.slice(0, 50);
+                    localStorage.setItem('iqzone_security_log', JSON.stringify(recentLogs));
+                } catch(e) {
+                    console.warn("보안 로그 저장 실패:", e);
+                }
+            },
+
+            getStats: function() {
+                const now = Date.now();
+                const oneHour = 60 * 60 * 1000;
+                const recentEvents = this.events.filter(e =>
+                    now - new Date(e.timestamp).getTime() < oneHour
+                );
+
+                return {
+                    totalEvents: this.events.length,
+                    recentEvents: recentEvents.length,
+                    securityViolations: recentEvents.filter(e => e.type === 'SECURITY_VIOLATION').length,
+                    suspiciousActivity: recentEvents.filter(e => e.type === 'SUSPICIOUS_ACTIVITY').length
+                };
+            }
+        };
+
+        // 자동 보안 체크 함수들
+        function performSecurityChecks() {
+            // 1. 도메인 검증
+            const currentDomain = window.location.hostname;
+            const allowedDomains = ['cattowel39200.github.io', 'localhost', '127.0.0.1'];
+
+            if (!allowedDomains.includes(currentDomain)) {
+                securityLog.log('SECURITY_VIOLATION', '승인되지 않은 도메인에서 접근', {domain: currentDomain});
+            }
+
+            // 2. Firebase 연결 상태 확인
+            if (isFirebaseEnabled) {
+                securityLog.log('INFO', 'Firebase 클라우드 동기화 활성');
+            } else {
+                securityLog.log('WARNING', 'Firebase 연결 실패 - 로컬 모드로 동작');
+            }
+
+            // 3. 브라우저 환경 확인
+            if (window.location.protocol === 'file:') {
+                securityLog.log('WARNING', '로컬 파일로 실행됨');
+            }
+
+            // 4. 랭킹 데이터 무결성 기본 검사
+            const rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+            if (rankings.length > 1000) {
+                securityLog.log('SUSPICIOUS_ACTIVITY', '비정상적으로 많은 랭킹 데이터', {count: rankings.length});
+            }
+        }
+
+        // 의심스러운 활동 감지
+        let rapidSubmissionCount = 0;
+        let lastSubmissionTime = 0;
+
+        function detectSuspiciousActivity() {
+            const now = Date.now();
+
+            // 너무 빠른 연속 제출 감지
+            if (now - lastSubmissionTime < 5000) { // 5초 이내 재제출
+                rapidSubmissionCount++;
+                if (rapidSubmissionCount > 3) {
+                    securityLog.log('SUSPICIOUS_ACTIVITY', '비정상적으로 빠른 연속 제출 시도', {
+                        count: rapidSubmissionCount,
+                        timeDiff: now - lastSubmissionTime
+                    });
+                }
+            } else {
+                rapidSubmissionCount = 0;
+            }
+
+            lastSubmissionTime = now;
+        }
+
+        // 보안 통계 리포트 생성
+        function generateSecurityReport() {
+            const stats = securityLog.getStats();
+            const report = {
+                reportDate: new Date().toISOString(),
+                domain: window.location.hostname,
+                firebaseStatus: isFirebaseEnabled ? 'Connected' : 'Disconnected',
+                stats: stats,
+                recentEvents: securityLog.events.slice(0, 10)
+            };
+
+            console.log('📊 보안 리포트:', report);
+            return report;
+        }
+
+        // 초기 보안 검사 실행
+        setTimeout(() => {
+            performSecurityChecks();
+            securityLog.log('SYSTEM', 'IQZone 보안 모니터링 시작');
+        }, 2000);
+
+        // 정기 보안 검사 (10분마다)
+        setInterval(performSecurityChecks, 10 * 60 * 1000);
+
+        // 1시간마다 보안 리포트 생성
+        setInterval(() => {
+            const report = generateSecurityReport();
+            securityLog.log('REPORT', '정기 보안 리포트 생성', report);
+        }, 60 * 60 * 1000);
+
+        // 전역 보안 함수 노출 (개발자 도구에서 사용 가능)
+        window.IQZoneSecurity = {
+            getSecurityLog: () => securityLog.events,
+            getSecurityStats: () => securityLog.getStats(),
+            generateReport: generateSecurityReport,
+            clearLog: () => securityLog.events = []
+        };
+
         window.addEventListener('resize', () => { resize(); initParticles(); });
         resize();
         initParticles();
