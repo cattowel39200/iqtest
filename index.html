@@ -539,8 +539,9 @@
                 </p>
             </div>
 
-            <div style="text-align: center; margin-top: 30px;">
+            <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn" onclick="startTest()">🧠 테스트 시작하기</button>
+                <button class="btn" onclick="showRankingPage()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">📊 랭킹 보기</button>
             </div>
         </div>
 
@@ -689,11 +690,123 @@
                 </div>
             </div>
 
-            <div style="text-align: center; margin-top: 30px;">
+            <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn" onclick="location.reload()">다시 테스트하기</button>
+                <button class="btn" onclick="showRankingPage()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">랭킹 보기</button>
+            </div>
+        </div>
+
+        <!-- 랭킹 페이지 -->
+        <div class="ranking-page" id="rankingPage" style="display: none;">
+            <h2>🏆 IQ 랭킹</h2>
+
+            <!-- 랭킹 탭 메뉴 -->
+            <div style="display: flex; justify-content: center; margin-bottom: 30px; gap: 10px; flex-wrap: wrap;">
+                <button id="allTimeTab" class="ranking-tab active" onclick="showAllTimeRanking()">전체 랭킹</button>
+                <button id="weeklyTab" class="ranking-tab" onclick="showWeeklyRanking()">주간 랭킹</button>
+            </div>
+
+            <!-- 전체 랭킹 섹션 -->
+            <div id="allTimeRanking" class="ranking-section">
+                <div class="ranking-header">
+                    <h3>🌟 역대 최고 기록</h3>
+                    <div id="expandAllTimeBtn" style="text-align: center; margin-top: 20px;">
+                        <button class="btn" onclick="expandAllTimeRanking()" style="font-size: 0.9rem; padding: 8px 16px;">더 많은 랭킹 보기 ▼</button>
+                    </div>
+                </div>
+                <div id="allTimeRankingList" class="ranking-list"></div>
+                <div id="myAllTimeRank" class="my-rank-section"></div>
+            </div>
+
+            <!-- 주간 랭킹 섹션 -->
+            <div id="weeklyRankingSection" class="ranking-section" style="display: none;">
+                <div class="ranking-header">
+                    <h3>📅 이번 주 랭킹</h3>
+                    <p style="font-size: 0.9rem; color: #666; text-align: center; margin-bottom: 20px;">매주 월요일 새롭게 시작됩니다</p>
+                </div>
+                <div id="weeklyRankingList" class="ranking-list"></div>
+                <div id="myWeeklyRank" class="my-rank-section"></div>
+            </div>
+
+            <!-- 뒤로 가기 버튼 -->
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn" onclick="goBackToMain()" style="background: #6c757d; color: white;">🏠 메인으로 돌아가기</button>
             </div>
         </div>
     </div>
+
+    <style>
+        .ranking-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ranking-tab {
+            padding: 12px 24px;
+            border: none;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 25px;
+            cursor: pointer;
+            color: #00d4ff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-tab.active {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .ranking-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .ranking-section {
+            background: rgba(0, 212, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .ranking-header h3 {
+            text-align: center;
+            color: #00d4ff;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+        }
+
+        .my-rank-section {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            text-align: center;
+        }
+
+        .my-rank-section h4 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .ranking-page {
+                padding: 15px;
+            }
+
+            .ranking-section {
+                padding: 20px;
+            }
+
+            .ranking-tab {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 
     <script>
         // ============================================
@@ -2212,6 +2325,229 @@
             refreshRanking();
             refreshWeeklyRanking();
         });
+
+        // ============================================
+        // 랭킹 페이지 네비게이션 함수들
+        // ============================================
+
+        // 랭킹 페이지 표시
+        function showRankingPage() {
+            // 모든 섹션 숨기기
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('evaluationSection').style.display = 'none';
+            document.getElementById('test').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+
+            // 랭킹 페이지 표시
+            document.getElementById('rankingPage').style.display = 'block';
+
+            // 기본적으로 전체 랭킹 표시
+            showAllTimeRanking();
+        }
+
+        // 메인으로 돌아가기
+        function goBackToMain() {
+            // 랭킹 페이지 숨기기
+            document.getElementById('rankingPage').style.display = 'none';
+
+            // 메인 요소들 표시
+            document.getElementById('intro').style.display = 'block';
+            document.getElementById('mainDashboard').style.display = 'grid';
+            document.getElementById('evaluationSection').style.display = 'block';
+        }
+
+        // 전체 랭킹 탭 표시
+        function showAllTimeRanking() {
+            // 탭 활성화 상태 변경
+            document.getElementById('allTimeTab').classList.add('active');
+            document.getElementById('weeklyTab').classList.remove('active');
+
+            // 섹션 표시/숨기기
+            document.getElementById('allTimeRanking').style.display = 'block';
+            document.getElementById('weeklyRankingSection').style.display = 'none';
+
+            // 전체 랭킹 데이터 새로 고침
+            refreshAllTimeRankingPage();
+        }
+
+        // 주간 랭킹 탭 표시
+        function showWeeklyRanking() {
+            // 탭 활성화 상태 변경
+            document.getElementById('allTimeTab').classList.remove('active');
+            document.getElementById('weeklyTab').classList.add('active');
+
+            // 섹션 표시/숨기기
+            document.getElementById('allTimeRanking').style.display = 'none';
+            document.getElementById('weeklyRankingSection').style.display = 'block';
+
+            // 주간 랭킹 데이터 새로 고침
+            refreshWeeklyRankingPage();
+        }
+
+        // 전체 랭킹 페이지용 데이터 새로고침
+        function refreshAllTimeRankingPage() {
+            const rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+            const rankingList = document.getElementById('allTimeRankingList');
+            const myRankSection = document.getElementById('myAllTimeRank');
+
+            if (rankings.length === 0) {
+                rankingList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">아직 등록된 랭킹이 없습니다.</div>';
+                myRankSection.style.display = 'none';
+                return;
+            }
+
+            // TOP 10만 표시
+            const top10 = rankings.slice(0, 10);
+
+            rankingList.innerHTML = top10.map((rank, index) => {
+                const ranking = index + 1;
+                const isTopThree = ranking <= 3;
+                const medal = ranking === 1 ? '🥇' : ranking === 2 ? '🥈' : ranking === 3 ? '🥉' : `${ranking}위`;
+
+                return `
+                    <div style="display: flex; align-items: center; padding: 12px 15px; margin-bottom: 8px; background: ${getRankingBg(index)}; border-radius: 12px; border: 1px solid ${getRankingBorder(index)}; box-shadow: ${isTopThree ? '0 4px 12px rgba(0, 212, 255, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.05)'};">
+                        <div style="width: 50px; text-align: center; font-size: ${isTopThree ? '1.4rem' : '1rem'}; font-weight: ${isTopThree ? 'bold' : 'normal'};">
+                            ${medal}
+                        </div>
+                        <div style="flex: 1; margin-left: 12px;">
+                            <div style="font-weight: 700; color: #333333; font-size: 1.1rem;">
+                                🧠 ${rank.nickname}
+                            </div>
+                            <div style="color: #666; font-size: 0.9rem; margin-top: 2px;">
+                                ${rank.classification} • ${rank.age}세
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: ${getIQTextColor(rank.iq)}; font-size: 1.2rem;">
+                                IQ ${rank.iq}
+                            </div>
+                            <div style="color: #999; font-size: 0.8rem;">
+                                ${new Date(rank.date).toLocaleDateString()}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 내 순위 표시
+            showMyRankInAllTime();
+        }
+
+        // 주간 랭킹 페이지용 데이터 새로고침
+        function refreshWeeklyRankingPage() {
+            const weekStart = getWeekStart();
+            const weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+            const currentWeekRankings = weeklyRankings[weekStart] || [];
+            const rankingList = document.getElementById('weeklyRankingList');
+            const myRankSection = document.getElementById('myWeeklyRank');
+
+            if (currentWeekRankings.length === 0) {
+                rankingList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">이번 주 아직 등록된 랭킹이 없습니다.</div>';
+                myRankSection.style.display = 'none';
+                return;
+            }
+
+            rankingList.innerHTML = currentWeekRankings.map((rank, index) => {
+                const ranking = index + 1;
+                const isTopThree = ranking <= 3;
+                const medal = ranking === 1 ? '🥇' : ranking === 2 ? '🥈' : ranking === 3 ? '🥉' : `${ranking}위`;
+
+                return `
+                    <div style="display: flex; align-items: center; padding: 12px 15px; margin-bottom: 8px; background: ${getWeeklyRankingBg(index)}; border-radius: 12px; border: 1px solid ${getWeeklyRankingBorder(index)}; box-shadow: ${isTopThree ? '0 4px 12px rgba(0, 212, 255, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.05)'};">
+                        <div style="width: 50px; text-align: center; font-size: ${isTopThree ? '1.4rem' : '1rem'}; font-weight: ${isTopThree ? 'bold' : 'normal'};">
+                            ${medal}
+                        </div>
+                        <div style="flex: 1; margin-left: 12px;">
+                            <div style="font-weight: 700; color: #333333; font-size: 1.1rem;">
+                                🧠 ${rank.nickname}
+                            </div>
+                            <div style="color: #666; font-size: 0.9rem; margin-top: 2px;">
+                                ${rank.classification} • ${rank.age}세
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: ${getIQTextColor(rank.iq)}; font-size: 1.2rem;">
+                                IQ ${rank.iq}
+                            </div>
+                            <div style="color: #999; font-size: 0.8rem;">
+                                ${new Date(rank.date).toLocaleDateString()}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 내 순위 표시
+            showMyRankInWeekly();
+        }
+
+        // 전체 랭킹에서 내 순위 표시
+        function showMyRankInAllTime() {
+            const myRankSection = document.getElementById('myAllTimeRank');
+
+            if (!userNickname) {
+                myRankSection.style.display = 'none';
+                return;
+            }
+
+            const rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+            const myRankIndex = rankings.findIndex(rank => rank.nickname === userNickname);
+
+            if (myRankIndex === -1) {
+                myRankSection.style.display = 'none';
+                return;
+            }
+
+            const myRank = rankings[myRankIndex];
+            const ranking = myRankIndex + 1;
+
+            myRankSection.style.display = 'block';
+            myRankSection.innerHTML = `
+                <h4>🎯 내 전체 순위</h4>
+                <div style="font-size: 1.1rem;">
+                    <strong>${ranking}위</strong> / ${rankings.length}명 중
+                    <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
+                </div>
+            `;
+        }
+
+        // 주간 랭킹에서 내 순위 표시
+        function showMyRankInWeekly() {
+            const myRankSection = document.getElementById('myWeeklyRank');
+
+            if (!userNickname) {
+                myRankSection.style.display = 'none';
+                return;
+            }
+
+            const weekStart = getWeekStart();
+            const weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+            const currentWeekRankings = weeklyRankings[weekStart] || [];
+            const myRankIndex = currentWeekRankings.findIndex(rank => rank.nickname === userNickname);
+
+            if (myRankIndex === -1) {
+                myRankSection.style.display = 'none';
+                return;
+            }
+
+            const myRank = currentWeekRankings[myRankIndex];
+            const ranking = myRankIndex + 1;
+
+            myRankSection.style.display = 'block';
+            myRankSection.innerHTML = `
+                <h4>📅 내 주간 순위</h4>
+                <div style="font-size: 1.1rem;">
+                    <strong>${ranking}위</strong> / ${currentWeekRankings.length}명 중
+                    <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
+                </div>
+            `;
+        }
+
+        // 전체 랭킹 더 보기 기능 (기존 코드와 연동)
+        function expandAllTimeRanking() {
+            toggleMoreRankings();
+        }
 
         window.addEventListener('resize', () => { resize(); initParticles(); });
         resize();
