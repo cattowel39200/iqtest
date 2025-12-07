@@ -1746,6 +1746,10 @@
             answers = new Array(allQuestions.length).fill(null);
             responseTimes = new Array(allQuestions.length).fill(null);
 
+            // 디버깅: 문제 로드 확인
+            console.log('총 문제 개수:', allQuestions.length);
+            console.log('첫 번째 문제:', allQuestions[0]);
+
             document.getElementById('intro').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'none';
             document.getElementById('evaluationSection').style.display = 'none';
