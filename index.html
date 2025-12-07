@@ -1267,7 +1267,7 @@
         <div class="top-bar">
             <div class="logo" onclick="goHome()">
                 <div class="logo-icon" id="logoIcon">🧠</div>
-                <span class="logo-text">COGNIQ</span>
+                <span class="logo-text">IQZone</span>
             </div>
             <div class="top-controls">
                 <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
@@ -1869,13 +1869,11 @@
         function confirmExit() { closeModal(); clearInterval(bTimer); clearInterval(mTimer); restart(); }
         function restart() {
             clearInterval(bTimer); clearInterval(mTimer); selectedCat = null;
-            document.querySelectorAll('.select-card').forEach(c => c.classList.remove('selected'));
-            document.getElementById('selectedInfo').style.display = 'none';
             document.getElementById('bgPattern').classList.remove('mensa');
             document.getElementById('logoIcon').classList.remove('gold');
-            document.getElementById('mainTitle').textContent = lang === 'ko' ? '인지능력 측정 테스트' : 'Cognitive Intelligence Test';
+            document.getElementById('mainTitle').textContent = 'IQZone';
             document.getElementById('mainTitle').classList.remove('gold');
-            document.getElementById('mainSubtitle').textContent = lang === 'ko' ? '5가지 영역 중 1가지를 선택하여 도전하세요' : 'Select 1 of 5 categories to challenge';
+            document.getElementById('mainSubtitle').textContent = 'Official Intelligence Quotient Test';
             updateStartBtn();
             show('introSection');
         }
