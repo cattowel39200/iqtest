@@ -2124,6 +2124,136 @@
             loadPosts();
         }
 
+        // 샘플 데이터 생성 함수
+        function generateSampleData() {
+            // 기존 데이터가 있으면 생성하지 않음
+            const existingRankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+            if (existingRankings.length > 0) return;
+
+            const nicknames = [
+                '천재소녀', '브레인킹', 'IQ마스터', '퍼즐러버', '로직박사',
+                '멘사급재능', '아인슈타인2', '수학천재', '추론전문가', '패턴찾기달인',
+                '논리왕', '창의적사고', '분석의달인', '문제해결자', '지능검사맨',
+                '똑똑한너구리', '머리회전빠름', '사고력대장', '인텔리언스', '브레인파워',
+                '지적호기심', '학습몬스터', '문제풀이킹', '추상사고력', '공간지각능력자',
+                '수리논리왕', '언어감각자', '시각추론가', '개념이해력', '종합사고력',
+                '정보처리속도', '기억력천재', '집중력대마왕', '인지능력자', '학습능력최고',
+                '사고의마술사', '논리적추론', '창의적문제해결', '지능지수높음', '멘탈파워',
+                '브레인스톰', '아이큐킹', '스마트브레인', '지능형인간', '사고력엔진',
+                '퍼즐마스터', '로직퍼즐러', '브레인게임러', '지적게임러', 'IQ테스터',
+                '인지심리학도', '뇌과학도', '논리학도', '수학과학생', '철학과학생',
+                '공학도브레인', '의대생두뇌', '법대생논리', '경영학도', '심리학전공',
+                '뇌공학자', '인공지능전공', '데이터사이언티스트', '시스템분석가', '알고리즘마스터',
+                '코딩천재', '개발자브레인', 'IT엔지니어', '소프트웨어아키텍트', '풀스택개발자',
+                '머신러닝엔지니어', '빅데이터전문가', '클라우드아키텍트', '보안전문가'
+            ];
+
+            const messages = [
+                '와! 드디어 목표 점수 달성했어요! 🎯',
+                '생각보다 어려웠는데 재미있었어요 😊',
+                '논리 문제가 특히 어려웠네요 🤔',
+                '패턴 인식이 제일 쉬웠어요! ✨',
+                '수학 문제에서 시간이 많이 걸렸어요 ⏰',
+                '공간 추론이 제일 재미있었어요! 🔄',
+                '언어 유추 문제가 흥미로웠네요 📚',
+                '처음 해봤는데 생각보다 높게 나왔어요! 🚀',
+                '친구들과 같이 해봤는데 저만 이 점수 나왔어요 😎',
+                '다음에는 더 높은 점수 도전해볼게요! 💪',
+                '집중력이 떨어져서 아쉬웠어요 😅',
+                '시간 제한이 있어서 더 긴장됐어요 ⏱️',
+                '문제 유형이 다양해서 좋았어요! 👍',
+                'IQ 테스트 처음인데 재미있네요 🎮',
+                '학교에서 배운 내용이 도움됐어요 📖',
+                '논리적 사고를 기를 수 있어서 좋아요 🧠',
+                '가족들과 함께 해봤는데 제가 1등! 🏆',
+                '스트레스 받았지만 보람있었어요 😤',
+                '다음에는 더 차분하게 풀어볼게요 🧘',
+                '문제가 창의적이어서 인상깊었어요 💡'
+            ];
+
+            const rankings = [];
+            const posts = [];
+            const currentTime = Date.now();
+
+            // IQ 점수 분포 (현실적인 분포)
+            const iqScores = [];
+            // 천재급 (140+): 3명
+            for(let i = 0; i < 3; i++) iqScores.push(140 + Math.floor(Math.random() * 20));
+            // 매우 우수 (130-139): 8명
+            for(let i = 0; i < 8; i++) iqScores.push(130 + Math.floor(Math.random() * 10));
+            // 우수 (120-129): 12명
+            for(let i = 0; i < 12; i++) iqScores.push(120 + Math.floor(Math.random() * 10));
+            // 평균상 (110-119): 20명
+            for(let i = 0; i < 20; i++) iqScores.push(110 + Math.floor(Math.random() * 10));
+            // 평균 (90-109): 22명
+            for(let i = 0; i < 22; i++) iqScores.push(90 + Math.floor(Math.random() * 20));
+            // 평균하 (80-89): 4명
+            for(let i = 0; i < 4; i++) iqScores.push(80 + Math.floor(Math.random() * 10));
+
+            // 점수 내림차순 정렬
+            iqScores.sort((a, b) => b - a);
+
+            // 69명의 데이터 생성
+            for(let i = 0; i < 69; i++) {
+                const nickname = nicknames[i];
+                const iq = iqScores[i];
+                const classification = getIQClassificationLabel(iq);
+                const age = 15 + Math.floor(Math.random() * 50); // 15-65세
+
+                // 날짜를 최근 30일 내 랜덤으로
+                const daysAgo = Math.floor(Math.random() * 30);
+                const timestamp = new Date(currentTime - daysAgo * 24 * 60 * 60 * 1000).toLocaleString('ko-KR');
+
+                // 랭킹 데이터
+                rankings.push({
+                    nickname: nickname,
+                    iq: iq,
+                    classification: classification,
+                    timestamp: timestamp,
+                    age: age
+                });
+
+                // 게시글 데이터 (60% 확률로 게시글 작성)
+                if(Math.random() < 0.6) {
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    posts.push({
+                        id: currentTime + i,
+                        nickname: nickname,
+                        message: message,
+                        iq: iq,
+                        classification: classification,
+                        timestamp: timestamp,
+                        age: age
+                    });
+                }
+            }
+
+            // 게시글을 최신순으로 정렬
+            posts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            // 로컬스토리지에 저장
+            localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
+            localStorage.setItem('iqTestPosts', JSON.stringify(posts));
+
+            console.log(`샘플 데이터 생성 완료: 랭킹 ${rankings.length}명, 게시글 ${posts.length}개`);
+        }
+
+        function getIQClassificationLabel(iq) {
+            if (iq >= 140) return '천재';
+            if (iq >= 130) return '매우 우수';
+            if (iq >= 120) return '우수';
+            if (iq >= 110) return '평균상';
+            if (iq >= 90) return '평균';
+            return '평균하';
+        }
+
+        // 데이터 초기화 함수 (개발용)
+        function resetAllData() {
+            localStorage.removeItem('iqTestRankings');
+            localStorage.removeItem('iqTestPosts');
+            console.log('모든 데이터가 삭제되었습니다. 페이지를 새로고침하면 새로운 샘플 데이터가 생성됩니다.');
+        }
+
         // 글자 수 카운터
         document.addEventListener('DOMContentLoaded', function() {
             const messageTextarea = document.getElementById('message');
@@ -2144,8 +2274,9 @@
             }
         });
 
-        // 페이지 로드 시 모든 데이터 불러오기
+        // 페이지 로드 시 샘플 데이터 생성 및 모든 데이터 불러오기
         window.addEventListener('load', () => {
+            generateSampleData(); // 샘플 데이터 생성
             loadPosts();
             refreshRanking();
             loadMainPosts();
