@@ -1,273 +1,1255 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COGNIQ - IQ Assessment & Mensa Challenge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a25;
-            --bg-elevated: #222230;
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-            --accent-danger: #ef4444;
-            --accent-gold: #fbbf24;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-elevated: #f1f5f9;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #7c3aed;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --accent-danger: #dc2626;
+            --accent-gold: #d97706;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
             --text-muted: #64748b;
-            --border-subtle: rgba(255,255,255,0.06);
-            --border-medium: rgba(255,255,255,0.12);
-            --glow-primary: rgba(99, 102, 241, 0.4);
-            --glow-gold: rgba(251, 191, 36, 0.4);
+            --border-subtle: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --glow-primary: rgba(79, 70, 229, 0.15);
+            --glow-gold: rgba(217, 119, 6, 0.15);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Outfit', 'Noto Sans KR', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
         }
+
         .bg-pattern {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.4;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
             background: radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
         }
+
         .bg-pattern.mensa {
             background: radial-gradient(ellipse at 20% 20%, rgba(251, 191, 36, 0.15) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
         }
-        .container { max-width: 960px; margin: 0 auto; padding: 16px; }
-        
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px; }
-        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .logo-icon.gold { background: linear-gradient(135deg, var(--accent-gold), #f59e0b); }
-        .logo-text { font-size: 1.4rem; font-weight: 800; }
-        .lang-select { background: var(--bg-elevated); border: 1px solid var(--border-medium); border-radius: 8px; padding: 8px 12px; color: var(--text-primary); font-family: inherit; font-size: 0.85rem; cursor: pointer; }
-        
-        header { text-align: center; padding: 32px 0 24px; }
-        header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        header h1.gold { background: linear-gradient(135deg, var(--accent-gold), #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        header p { color: var(--text-secondary); font-size: 1rem; }
-        
-        .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 32px; margin-bottom: 20px; }
-        .card-glow { box-shadow: 0 0 50px -15px var(--glow-primary); }
-        .card-gold { border-color: rgba(251, 191, 36, 0.3); box-shadow: 0 0 50px -15px var(--glow-gold); }
-        .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-        
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logo-icon.gold {
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .lang-select {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-medium);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        header {
+            text-align: center;
+            padding: 32px 0 24px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header h1.gold {
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+
+        .card-glow {
+            box-shadow: 0 0 50px -15px var(--glow-primary);
+        }
+
+        .card-gold {
+            border-color: rgba(251, 191, 36, 0.3);
+            box-shadow: 0 0 50px -15px var(--glow-gold);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         /* Selection Grid */
-        .select-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
-        .select-card {
-            background: var(--bg-secondary); border: 2px solid var(--border-subtle);
-            border-radius: 14px; padding: 20px; cursor: pointer; transition: all 0.3s;
+        .select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
         }
-        .select-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
-        .select-card.selected { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.1); }
-        .select-card .header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .select-card .icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .select-card:nth-child(1) .icon { background: rgba(99, 102, 241, 0.2); }
-        .select-card:nth-child(2) .icon { background: rgba(139, 92, 246, 0.2); }
-        .select-card:nth-child(3) .icon { background: rgba(236, 72, 153, 0.2); }
-        .select-card:nth-child(4) .icon { background: rgba(16, 185, 129, 0.2); }
-        .select-card:nth-child(5) .icon { background: rgba(245, 158, 11, 0.2); }
-        .select-card .title { font-weight: 700; font-size: 1rem; }
-        .select-card .desc { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 12px; }
-        .select-card .example { background: var(--bg-elevated); border-radius: 8px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary); }
-        .select-card .check { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-primary); display: none; align-items: center; justify-content: center; color: white; font-size: 14px; }
-        .select-card.selected .check { display: flex; }
-        .select-card { position: relative; }
-        
+
+        .select-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .select-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .select-card.selected {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .select-card .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .select-card .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .select-card:nth-child(1) .icon {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .select-card:nth-child(2) .icon {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .select-card:nth-child(3) .icon {
+            background: rgba(236, 72, 153, 0.2);
+        }
+
+        .select-card:nth-child(4) .icon {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .select-card:nth-child(5) .icon {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .select-card .title {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .select-card .desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .select-card .example {
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+        }
+
+        .select-card .check {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .select-card.selected .check {
+            display: flex;
+        }
+
+        .select-card {
+            position: relative;
+        }
+
         /* Info Boxes */
-        .info-box { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 14px; padding: 20px; margin: 20px 0; }
-        .info-box.gold { background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1)); border-color: rgba(251, 191, 36, 0.3); }
-        .info-box.highlight { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); border-color: rgba(16, 185, 129, 0.3); }
-        .info-row { display: flex; gap: 24px; flex-wrap: wrap; }
-        .info-item { display: flex; align-items: center; gap: 8px; }
-        .info-item .label { color: var(--text-muted); font-size: 0.8rem; }
-        .info-item .value { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
-        
-        .highlight-text { color: var(--accent-success); font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
-        
-        .instructions { background: var(--bg-secondary); border-radius: 12px; padding: 16px 20px; margin: 20px 0; }
-        .instructions h4 { color: var(--accent-primary); margin-bottom: 10px; font-size: 0.95rem; }
-        .instructions ul { list-style: none; color: var(--text-secondary); font-size: 0.9rem; }
-        .instructions li { padding: 6px 0 6px 24px; position: relative; }
-        .instructions li::before { content: "✓"; position: absolute; left: 0; color: var(--accent-success); }
-        
+        .info-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box.gold {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .info-box.highlight {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .info-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-item .label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .info-item .value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .highlight-text {
+            color: var(--accent-success);
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instructions {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .instructions h4 {
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .instructions ul {
+            list-style: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .instructions li {
+            padding: 6px 0 6px 24px;
+            position: relative;
+        }
+
+        .instructions li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent-success);
+        }
+
         /* Buttons */
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; font-size: 0.95rem; font-weight: 600; font-family: inherit; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; box-shadow: 0 6px 24px var(--glow-primary); }
-        .btn-primary:hover { transform: translateY(-2px); }
-        .btn-gold { background: linear-gradient(135deg, var(--accent-gold), #f59e0b); color: #1a1a25; box-shadow: 0 6px 24px var(--glow-gold); }
-        .btn-secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border-medium); }
-        .btn-ghost { background: transparent; color: var(--text-secondary); }
-        .btn-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-center { display: flex; justify-content: center; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
-        
-        .form-input { width: 100%; background: var(--bg-elevated); border: 2px solid var(--border-medium); border-radius: 10px; padding: 12px 16px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; }
-        .form-input:focus { outline: none; border-color: var(--accent-primary); }
-        .input-row { display: flex; gap: 10px; }
-        .input-row .form-input { flex: 1; }
-        
-        .mensa-box { background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 16px; padding: 24px; margin: 20px 0; }
-        .mensa-box h4 { color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .mensa-box p { color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; font-size: 0.9rem; }
-        .code-error { color: var(--accent-danger); margin-top: 10px; display: none; font-size: 0.85rem; }
-        
-        .disclaimer { background: var(--bg-secondary); border-radius: 10px; padding: 14px 18px; margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
-        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: 0 6px 24px var(--glow-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+            color: #1a1a25;
+            box-shadow: 0 6px 24px var(--glow-gold);
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-medium);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-center {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-medium);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-row .form-input {
+            flex: 1;
+        }
+
+        .mensa-box {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(245, 158, 11, 0.05));
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .mensa-box h4 {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mensa-box p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .code-error {
+            color: var(--accent-danger);
+            margin-top: 10px;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        .disclaimer {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
         /* Progress & Test */
-        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-        .progress-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .question-counter { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-secondary); }
-        .question-counter strong { color: var(--text-primary); font-size: 1rem; }
-        .badge { padding: 5px 12px; border-radius: 16px; font-size: 0.75rem; font-weight: 600; }
-        .badge-category { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
-        .badge-category.gold { background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); }
-        .badge-easy { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .badge-medium { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .badge-hard { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .badge-extreme { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
-        
-        .timer-area { display: flex; align-items: center; gap: 12px; }
-        .exit-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
-        .timer-ring { width: 48px; height: 48px; position: relative; }
-        .timer-ring svg { transform: rotate(-90deg); }
-        .timer-ring circle { fill: none; stroke-width: 4; }
-        .timer-ring .bg { stroke: var(--bg-elevated); }
-        .timer-ring .progress { stroke: var(--accent-primary); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
-        .timer-ring.gold .progress { stroke: var(--accent-gold); }
-        .timer-ring.warning .progress { stroke: var(--accent-warning); }
-        .timer-ring.danger .progress { stroke: var(--accent-danger); }
-        .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; }
-        
-        .progress-bar { height: 5px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); border-radius: 3px; transition: width 0.4s; }
-        .progress-fill.gold { background: linear-gradient(90deg, var(--accent-gold), #f59e0b); }
-        
-        .question-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; }
-        .question-content { padding: 32px; }
-        .question-text { font-size: 1.15rem; font-weight: 500; line-height: 1.6; margin-bottom: 20px; }
-        
-        .visual-area { display: flex; justify-content: center; margin: 20px 0; }
-        .matrix-box { background: var(--bg-secondary); border-radius: 14px; padding: 20px; }
-        .matrix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .matrix-cell { width: 72px; height: 72px; background: var(--bg-elevated); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-        .matrix-cell.empty { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border: 2px dashed var(--accent-primary); }
-        .matrix-cell.empty.gold { background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1)); border-color: var(--accent-gold); }
-        .matrix-cell.empty::after { content: '?'; font-size: 1.8rem; color: var(--accent-primary); font-weight: 700; }
-        .matrix-cell.empty.gold::after { color: var(--accent-gold); }
-        
-        .sequence-box { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .seq-item { width: 56px; height: 56px; background: var(--bg-elevated); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 600; }
-        .seq-item.unknown { background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)); border: 2px solid var(--accent-primary); color: var(--accent-primary); }
-        .seq-arrow { color: var(--text-muted); font-size: 1.1rem; }
-        
-        .analogy-box { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        .analogy-item { padding: 12px 20px; background: var(--bg-elevated); border-radius: 10px; font-size: 1.05rem; font-weight: 500; }
-        .analogy-item.unknown { background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)); border: 2px solid var(--accent-primary); color: var(--accent-primary); }
-        .analogy-sep { font-size: 1.2rem; color: var(--text-muted); font-weight: 600; }
-        
-        .options-area { padding: 24px 32px 32px; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); }
-        .options-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
-        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
-        .option { background: var(--bg-card); border: 2px solid var(--border-subtle); border-radius: 10px; padding: 14px 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
-        .option:hover { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.05); }
-        .option.gold:hover { border-color: var(--accent-gold); background: rgba(251, 191, 36, 0.05); }
-        .option.selected { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.1); }
-        .option.selected.gold { border-color: var(--accent-gold); background: rgba(251, 191, 36, 0.1); }
-        .option-marker { width: 28px; height: 28px; border-radius: 6px; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
-        .option.selected .option-marker { background: var(--accent-primary); color: white; }
-        .option.selected.gold .option-marker { background: var(--accent-gold); color: var(--bg-primary); }
-        .option-text { font-size: 0.95rem; font-weight: 500; }
-        
-        .nav-buttons { display: flex; justify-content: space-between; padding: 0 32px 24px; background: var(--bg-secondary); }
-        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .question-counter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .question-counter strong {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-category {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        .badge-category.gold {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--accent-gold);
+        }
+
+        .badge-easy {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .badge-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .badge-hard {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .badge-extreme {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .timer-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .exit-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .timer-ring {
+            width: 48px;
+            height: 48px;
+            position: relative;
+        }
+
+        .timer-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .timer-ring circle {
+            fill: none;
+            stroke-width: 4;
+        }
+
+        .timer-ring .bg {
+            stroke: var(--bg-elevated);
+        }
+
+        .timer-ring .progress {
+            stroke: var(--accent-primary);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .timer-ring.gold .progress {
+            stroke: var(--accent-gold);
+        }
+
+        .timer-ring.warning .progress {
+            stroke: var(--accent-warning);
+        }
+
+        .timer-ring.danger .progress {
+            stroke: var(--accent-danger);
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: var(--bg-elevated);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 3px;
+            transition: width 0.4s;
+        }
+
+        .progress-fill.gold {
+            background: linear-gradient(90deg, var(--accent-gold), #f59e0b);
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .question-content {
+            padding: 32px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .visual-area {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .matrix-box {
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .matrix-cell {
+            width: 72px;
+            height: 72px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        .matrix-cell.empty {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 2px dashed var(--accent-primary);
+        }
+
+        .matrix-cell.empty.gold {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
+            border-color: var(--accent-gold);
+        }
+
+        .matrix-cell.empty::after {
+            content: '?';
+            font-size: 1.8rem;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .matrix-cell.empty.gold::after {
+            color: var(--accent-gold);
+        }
+
+        .sequence-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .seq-item {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .seq-item.unknown {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .seq-arrow {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .analogy-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .analogy-item {
+            padding: 12px 20px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .analogy-item.unknown {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .analogy-sep {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .options-area {
+            padding: 24px 32px 32px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .options-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option {
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .option.gold:hover {
+            border-color: var(--accent-gold);
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .option.selected {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .option.selected.gold {
+            border-color: var(--accent-gold);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .option-marker {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: var(--bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .option.selected .option-marker {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .option.selected.gold .option-marker {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 32px 24px;
+            background: var(--bg-secondary);
+        }
+
         /* Results */
-        .results-header { text-align: center; margin-bottom: 28px; }
-        .results-header h2 { font-size: 1.5rem; margin-bottom: 6px; }
-        .results-header h2.gold { color: var(--accent-gold); }
-        
-        .score-display { display: flex; justify-content: center; margin: 32px 0; }
-        .score-ring { position: relative; width: 200px; height: 200px; }
-        .score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-        .score-ring circle { fill: none; stroke-width: 10; }
-        .score-ring .bg { stroke: var(--bg-elevated); }
-        .score-ring .progress { stroke: url(#scoreGrad); stroke-linecap: round; transition: stroke-dashoffset 1.5s ease-out; }
-        .score-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .score-value { font-size: 3rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .score-value.gold { background: linear-gradient(135deg, var(--accent-gold), #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .score-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
-        
-        .class-box { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 16px; padding: 24px; text-align: center; margin: 24px 0; }
-        .class-box.gold { background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1)); border-color: rgba(251, 191, 36, 0.3); }
-        .class-label { font-size: 1.2rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 6px; }
-        .class-label.gold { color: var(--accent-gold); }
-        .class-desc { color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
-        .percentile-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-elevated); padding: 8px 16px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 24px 0; }
-        .stat-card { background: var(--bg-secondary); border-radius: 12px; padding: 16px; text-align: center; }
-        .stat-value { font-size: 1.6rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
-        
-        .certificate { background: linear-gradient(135deg, #1a1a25, #222230); border: 3px solid var(--accent-gold); border-radius: 20px; padding: 32px; text-align: center; position: relative; overflow: hidden; margin: 24px 0; }
-        .cert-badge { width: 72px; height: 72px; margin: 0 auto 16px; background: linear-gradient(135deg, var(--accent-gold), #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 0 30px var(--glow-gold); }
-        .cert-title { font-size: 1.5rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 6px; }
-        .cert-subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px; }
-        .cert-details { display: flex; justify-content: center; gap: 28px; margin: 16px 0; flex-wrap: wrap; }
-        .cert-detail { text-align: center; }
-        .cert-detail-value { font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
-        .cert-detail-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-        .cert-code-box { background: var(--bg-elevated); border-radius: 10px; padding: 14px 20px; margin: 16px auto; max-width: 260px; }
-        .cert-code-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-        .cert-code-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; color: var(--accent-gold); letter-spacing: 0.08em; }
-        
-        .email-form { background: var(--bg-secondary); border-radius: 14px; padding: 20px; margin: 20px 0; }
-        .email-form h4 { margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-        .email-form p { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px; }
-        .email-success { color: var(--accent-success); margin-top: 10px; display: none; align-items: center; gap: 6px; font-size: 0.9rem; }
-        
-        .not-qualified { background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 14px; padding: 20px; margin: 20px 0; }
-        .not-qualified h4 { color: var(--text-secondary); font-size: 1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .not-qualified p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
-        
-        .result-actions { display: flex; justify-content: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-card); border-radius: 20px; padding: 32px; max-width: 420px; width: 100%; text-align: center; }
-        .modal-icon { font-size: 40px; margin-bottom: 16px; }
-        .modal h3 { font-size: 1.2rem; margin-bottom: 10px; }
-        .modal p { color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; font-size: 0.9rem; }
-        .modal-btns { display: flex; justify-content: center; gap: 10px; }
-        
-        .section { display: none; }
-        .section.active { display: block; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .animate { animation: fadeIn 0.5s ease-out; }
-        
+        .results-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .results-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .results-header h2.gold {
+            color: var(--accent-gold);
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: center;
+            margin: 32px 0;
+        }
+
+        .score-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .score-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .score-ring circle {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .score-ring .bg {
+            stroke: var(--bg-elevated);
+        }
+
+        .score-ring .progress {
+            stroke: url(#scoreGrad);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+
+        .score-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-value.gold {
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .class-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .class-box.gold {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .class-label {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 6px;
+        }
+
+        .class-label.gold {
+            color: var(--accent-gold);
+        }
+
+        .class-desc {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .percentile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-elevated);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .certificate {
+            background: linear-gradient(135deg, #1a1a25, #222230);
+            border: 3px solid var(--accent-gold);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin: 24px 0;
+        }
+
+        .cert-badge {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 0 30px var(--glow-gold);
+        }
+
+        .cert-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 6px;
+        }
+
+        .cert-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .cert-details {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+
+        .cert-detail {
+            text-align: center;
+        }
+
+        .cert-detail-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .cert-detail-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .cert-code-box {
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin: 16px auto;
+            max-width: 260px;
+        }
+
+        .cert-code-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .cert-code-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            letter-spacing: 0.08em;
+        }
+
+        .email-form {
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .email-form h4 {
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .email-form p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .email-success {
+            color: var(--accent-success);
+            margin-top: 10px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .not-qualified {
+            background: rgba(100, 116, 139, 0.05);
+            border: 1px solid rgba(100, 116, 139, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .not-qualified h4 {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .not-qualified p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .modal h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .modal-btns {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeIn 0.5s ease-out;
+        }
+
         @media (max-width: 640px) {
-            header h1 { font-size: 1.8rem; }
-            .card { padding: 20px; }
-            .question-content { padding: 20px; }
-            .options-area { padding: 20px; }
-            .nav-buttons { padding: 0 20px 20px; }
-            .matrix-cell { width: 60px; height: 60px; font-size: 1.3rem; }
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .question-content {
+                padding: 20px;
+            }
+
+            .options-area {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                padding: 0 20px 20px;
+            }
+
+            .matrix-cell {
+                width: 60px;
+                height: 60px;
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="bg-pattern" id="bgPattern"></div>
-    
+
     <div class="container">
         <div class="top-bar">
             <div class="logo" onclick="goHome()">
@@ -281,27 +1263,39 @@
                 </select>
             </div>
         </div>
-        
+
         <header>
             <h1 id="mainTitle">인지능력 측정 테스트</h1>
             <p id="mainSubtitle">5가지 영역 중 1가지를 선택하여 도전하세요</p>
         </header>
-        
+
         <!-- INTRO -->
         <div class="section active" id="introSection">
             <div class="card card-glow animate">
                 <h3 class="section-title"><span class="icon">📋</span> <span data-t="intro.title">테스트 안내</span></h3>
-                
+
                 <div class="info-box highlight">
                     <p class="highlight-text">
                         <span>🎯</span>
                         <span data-t="intro.highlight">5가지 테스트 중 1가지를 선택하여 IQ 120 이상 달성 시 멘사 도전 자격이 주어집니다.</span>
                     </p>
                 </div>
-                
-                <p style="color: var(--text-secondary); line-height: 1.6; margin: 16px 0;" data-t="intro.desc">아래에서 원하는 영역을 선택한 후 테스트를 시작하세요. 각 영역은 10문항으로 구성됩니다.</p>
-                
+
+                <p style="color: var(--text-secondary); line-height: 1.6; margin: 16px 0;" data-t="intro.desc">아래에서 원하는
+                    영역을 선택한 후 테스트를 시작하세요. 각 영역은 10문항으로 구성됩니다.</p>
+
                 <div class="select-grid" id="categoryGrid">
+                    <div class="select-card" data-cat="comprehensive" onclick="selectCat('comprehensive')"
+                        style="border-color: var(--accent-primary); background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(124, 58, 237, 0.05));">
+                        <div class="check">✓</div>
+                        <div class="header">
+                            <div class="icon" style="background: rgba(79, 70, 229, 0.1); color: var(--accent-primary);">
+                                🌟</div>
+                            <div class="title" data-t="cat.comprehensive">종합 능력</div>
+                        </div>
+                        <p class="desc" data-t="tut.comprehensive">5가지 모든 영역을 종합적으로 평가합니다. (총 20문항)</p>
+                        <div class="example" style="background: rgba(255,255,255,0.5);">Best Choice for IQ Test</div>
+                    </div>
                     <div class="select-card" data-cat="pattern" onclick="selectCat('pattern')">
                         <div class="check">✓</div>
                         <div class="header">
@@ -348,16 +1342,22 @@
                         <div class="example">책 : 읽다 = 음악 : <strong>?</strong> → 듣다</div>
                     </div>
                 </div>
-                
+
                 <div class="info-box" id="selectedInfo" style="display:none;">
                     <div class="info-row">
-                        <div class="info-item"><span>📂</span> <span class="label" data-t="info.selected">선택</span> <span class="value" id="selectedCatName">-</span></div>
-                        <div class="info-item"><span>📊</span> <span class="label" data-t="info.questions">문항</span> <span class="value">10</span></div>
-                        <div class="info-item"><span>⏱️</span> <span class="label" data-t="info.time">시간</span> <span class="value">45초/문항</span></div>
-                        <div class="info-item"><span>🎯</span> <span class="label" data-t="info.qual">자격</span> <span class="value">IQ 120+</span></div>
+                        <div class="info-item"><span>📂</span> <span class="label" data-t="info.selected">선택</span>
+                            <span class="value" id="selectedCatName">-</span>
+                        </div>
+                        <div class="info-item"><span>📊</span> <span class="label" data-t="info.questions">문항</span>
+                            <span class="value" id="infoTotalQ">10</span>
+                        </div>
+                        <div class="info-item"><span>⏱️</span> <span class="label" data-t="info.time">시간</span> <span
+                                class="value">45초/문항</span></div>
+                        <div class="info-item"><span>🎯</span> <span class="label" data-t="info.qual">자격</span> <span
+                                class="value">IQ 120+</span></div>
                     </div>
                 </div>
-                
+
                 <div class="instructions">
                     <h4 data-t="inst.title">📌 진행 안내</h4>
                     <ul>
@@ -367,21 +1367,22 @@
                         <li data-t="inst.4">선택한 영역에서 IQ 120+ 달성 시 멘사 코드가 발급됩니다.</li>
                     </ul>
                 </div>
-                
+
                 <div class="mensa-box">
                     <h4>🏆 <span data-t="mensa.title">멘사 도전 테스트</span></h4>
                     <p data-t="mensa.desc">이미 자격 코드가 있으신가요? 아래에 입력하여 바로 멘사 테스트에 접근하세요.</p>
                     <div class="input-row">
-                        <input type="text" class="form-input" id="codeInput" placeholder="CQ-XXXXXXXX" maxlength="12" style="text-transform: uppercase;">
+                        <input type="text" class="form-input" id="codeInput" placeholder="CQ-XXXXXXXX" maxlength="12"
+                            style="text-transform: uppercase;">
                         <button class="btn btn-gold" onclick="verifyCode()" data-t="mensa.verify">인증</button>
                     </div>
                     <div class="code-error" id="codeError" data-t="mensa.invalid">유효하지 않은 코드입니다.</div>
                 </div>
-                
+
                 <div class="disclaimer">
                     <strong>⚠️</strong> <span data-t="disclaimer">본 테스트는 참고용이며 공인된 IQ 검사를 대체하지 않습니다.</span>
                 </div>
-                
+
                 <div class="btn-center">
                     <button class="btn btn-primary" id="startBtn" onclick="startBasicTest()" disabled>
                         <span data-t="btn.start">영역을 선택하세요</span> <span>→</span>
@@ -389,12 +1390,13 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- BASIC TEST -->
         <div class="section" id="basicTestSection">
             <div class="progress-header">
                 <div class="progress-info">
-                    <span class="question-counter"><span data-t="q.num">문제</span> <strong id="bCurQ">1</strong> / <span id="bTotalQ">10</span></span>
+                    <span class="question-counter"><span data-t="q.num">문제</span> <strong id="bCurQ">1</strong> / <span
+                            id="bTotalQ">10</span></span>
                     <span class="badge badge-category" id="bCatBadge">패턴</span>
                     <span class="badge badge-medium" id="bDiffBadge">보통</span>
                 </div>
@@ -403,14 +1405,17 @@
                     <div class="timer-ring" id="bTimerRing">
                         <svg width="48" height="48">
                             <circle class="bg" cx="24" cy="24" r="20"></circle>
-                            <circle class="progress" id="bTimerProg" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"></circle>
+                            <circle class="progress" id="bTimerProg" cx="24" cy="24" r="20" stroke-dasharray="125.66"
+                                stroke-dashoffset="0"></circle>
                         </svg>
                         <span class="timer-text" id="bTimerTxt">45</span>
                     </div>
                 </div>
             </div>
-            <div class="progress-bar"><div class="progress-fill" id="bProgBar" style="width:0%"></div></div>
-            
+            <div class="progress-bar">
+                <div class="progress-fill" id="bProgBar" style="width:0%"></div>
+            </div>
+
             <div class="question-card animate" id="bQCard">
                 <div class="question-content">
                     <p class="question-text" id="bQText">문제</p>
@@ -422,11 +1427,12 @@
                 </div>
                 <div class="nav-buttons">
                     <button class="btn btn-ghost" onclick="skipBasic()" data-t="btn.skip">건너뛰기</button>
-                    <button class="btn btn-primary" id="bNextBtn" onclick="nextBasic()" disabled><span data-t="btn.next">다음</span> →</button>
+                    <button class="btn btn-primary" id="bNextBtn" onclick="nextBasic()" disabled><span
+                            data-t="btn.next">다음</span> →</button>
                 </div>
             </div>
         </div>
-        
+
         <!-- BASIC RESULTS -->
         <div class="section" id="basicResultsSection">
             <div class="card card-glow animate">
@@ -434,22 +1440,23 @@
                     <h2>🎉 <span data-t="res.complete">테스트 완료</span></h2>
                     <p><span id="resCatName">패턴 인식</span> <span data-t="res.analysis">영역 분석 결과</span></p>
                 </div>
-                
+
                 <div class="score-display">
                     <div class="score-ring">
                         <svg width="200" height="200">
                             <defs>
                                 <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#6366f1"/>
-                                    <stop offset="100%" stop-color="#8b5cf6"/>
+                                    <stop offset="0%" stop-color="#6366f1" />
+                                    <stop offset="100%" stop-color="#8b5cf6" />
                                 </linearGradient>
                                 <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#fbbf24"/>
-                                    <stop offset="100%" stop-color="#f59e0b"/>
+                                    <stop offset="0%" stop-color="#fbbf24" />
+                                    <stop offset="100%" stop-color="#f59e0b" />
                                 </linearGradient>
                             </defs>
                             <circle class="bg" cx="100" cy="100" r="88"></circle>
-                            <circle class="progress" id="bScoreProg" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="553"></circle>
+                            <circle class="progress" id="bScoreProg" cx="100" cy="100" r="88" stroke-dasharray="553"
+                                stroke-dashoffset="553"></circle>
                         </svg>
                         <div class="score-center">
                             <div class="score-value" id="bIQ">--</div>
@@ -457,29 +1464,36 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="class-box" id="bClassBox">
                     <div class="class-label" id="bClassLabel">분류</div>
                     <p class="class-desc" id="bClassDesc">설명</p>
                     <div class="percentile-badge"><span>📊</span> <span id="bPercentile">--</span></div>
                 </div>
-                
+
                 <div id="certSection" style="display:none;">
                     <div class="certificate">
                         <div class="cert-badge">🏅</div>
                         <div class="cert-title" data-t="cert.title">멘사 도전 자격증</div>
                         <div class="cert-subtitle">MENSA Challenge Certificate</div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;" data-t="cert.desc">귀하는 <span id="certCatName">패턴 인식</span> 테스트에서 우수한 성적을 거두어<br>멘사 도전 테스트 자격을 획득하였습니다.</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;" data-t="cert.desc">귀하는 <span
+                                id="certCatName">패턴 인식</span> 테스트에서 우수한 성적을 거두어<br>멘사 도전 테스트 자격을 획득하였습니다.</p>
                         <div class="cert-details">
-                            <div class="cert-detail"><div class="cert-detail-value" id="certIQ">--</div><div class="cert-detail-label">IQ</div></div>
-                            <div class="cert-detail"><div class="cert-detail-value" id="certDate">--</div><div class="cert-detail-label">발급일</div></div>
+                            <div class="cert-detail">
+                                <div class="cert-detail-value" id="certIQ">--</div>
+                                <div class="cert-detail-label">IQ</div>
+                            </div>
+                            <div class="cert-detail">
+                                <div class="cert-detail-value" id="certDate">--</div>
+                                <div class="cert-detail-label">발급일</div>
+                            </div>
                         </div>
                         <div class="cert-code-box">
                             <div class="cert-code-label">자격 코드</div>
                             <div class="cert-code-value" id="certCode">--</div>
                         </div>
                     </div>
-                    
+
                     <div class="email-form">
                         <h4>📧 이메일로 자격증 받기</h4>
                         <p>자격 코드를 이메일로 보내드립니다.</p>
@@ -490,33 +1504,47 @@
                         <div class="email-success" id="emailOK"><span>✅</span> 이메일 발송 완료!</div>
                     </div>
                 </div>
-                
+
                 <div id="notQualSection" style="display:none;">
                     <div class="not-qualified">
                         <h4>🔒 멘사 자격 미달</h4>
                         <p>IQ 120 이상 달성 시 멘사 도전 테스트에 접근할 수 있습니다. 다른 영역에 도전해보세요!</p>
                     </div>
                 </div>
-                
+
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value" id="bCorrect">--</div><div class="stat-label">정답</div></div>
-                    <div class="stat-card"><div class="stat-value" id="bAccuracy">--%</div><div class="stat-label">정확도</div></div>
-                    <div class="stat-card"><div class="stat-value" id="bAvgTime">--s</div><div class="stat-label">평균</div></div>
-                    <div class="stat-card"><div class="stat-value" id="bTotalTime">--s</div><div class="stat-label">총시간</div></div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bCorrect">--</div>
+                        <div class="stat-label">정답</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bAccuracy">--%</div>
+                        <div class="stat-label">정확도</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bAvgTime">--s</div>
+                        <div class="stat-label">평균</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bTotalTime">--s</div>
+                        <div class="stat-label">총시간</div>
+                    </div>
                 </div>
-                
+
                 <div class="result-actions">
                     <button class="btn btn-secondary" onclick="restart()"><span>🔄</span> 다른 영역 도전</button>
-                    <button class="btn btn-gold" id="mensaBtn" onclick="startMensaTest()" style="display:none;"><span>🏆</span> 멘사 도전</button>
+                    <button class="btn btn-gold" id="mensaBtn" onclick="startMensaTest()"
+                        style="display:none;"><span>🏆</span> 멘사 도전</button>
                 </div>
             </div>
         </div>
-        
+
         <!-- MENSA TEST -->
         <div class="section" id="mensaTestSection">
             <div class="progress-header">
                 <div class="progress-info">
-                    <span class="question-counter"><span data-t="q.num">문제</span> <strong id="mCurQ">1</strong> / <span id="mTotalQ">20</span></span>
+                    <span class="question-counter"><span data-t="q.num">문제</span> <strong id="mCurQ">1</strong> / <span
+                            id="mTotalQ">20</span></span>
                     <span class="badge badge-category gold">멘사</span>
                     <span class="badge badge-extreme" id="mDiffBadge">고급</span>
                 </div>
@@ -525,14 +1553,17 @@
                     <div class="timer-ring gold" id="mTimerRing">
                         <svg width="48" height="48">
                             <circle class="bg" cx="24" cy="24" r="20"></circle>
-                            <circle class="progress" id="mTimerProg" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"></circle>
+                            <circle class="progress" id="mTimerProg" cx="24" cy="24" r="20" stroke-dasharray="125.66"
+                                stroke-dashoffset="0"></circle>
                         </svg>
                         <span class="timer-text" id="mTimerTxt">60</span>
                     </div>
                 </div>
             </div>
-            <div class="progress-bar"><div class="progress-fill gold" id="mProgBar" style="width:0%"></div></div>
-            
+            <div class="progress-bar">
+                <div class="progress-fill gold" id="mProgBar" style="width:0%"></div>
+            </div>
+
             <div class="question-card animate">
                 <div class="question-content">
                     <p class="question-text" id="mQText">문제</p>
@@ -548,7 +1579,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- MENSA RESULTS -->
         <div class="section" id="mensaResultsSection">
             <div class="card card-gold animate">
@@ -556,12 +1587,13 @@
                     <h2 class="gold">🏆 멘사 도전 완료</h2>
                     <p>고급 인지능력 분석 결과</p>
                 </div>
-                
+
                 <div class="score-display">
                     <div class="score-ring">
                         <svg width="200" height="200">
                             <circle class="bg" cx="100" cy="100" r="88"></circle>
-                            <circle class="progress" id="mScoreProg" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="553" stroke="url(#goldGrad)"></circle>
+                            <circle class="progress" id="mScoreProg" cx="100" cy="100" r="88" stroke-dasharray="553"
+                                stroke-dashoffset="553" stroke="url(#goldGrad)"></circle>
                         </svg>
                         <div class="score-center">
                             <div class="score-value gold" id="mIQ">--</div>
@@ -569,13 +1601,13 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="class-box gold">
                     <div class="class-label gold" id="mClassLabel">등급</div>
                     <p class="class-desc" id="mClassDesc">설명</p>
                     <div class="percentile-badge"><span>🏆</span> <span id="mPercentile">--</span></div>
                 </div>
-                
+
                 <div id="mensaPassSection" style="display:none;">
                     <div class="certificate">
                         <div class="cert-badge">👑</div>
@@ -583,22 +1615,37 @@
                         <div class="cert-subtitle">MENSA Level Achievement</div>
                         <p style="color: var(--text-secondary); font-size: 0.9rem;">축하합니다! 상위 2% 인지능력을 보유하고 있습니다.</p>
                         <div class="cert-details">
-                            <div class="cert-detail"><div class="cert-detail-value" id="mCertIQ">--</div><div class="cert-detail-label">IQ</div></div>
-                            <div class="cert-detail"><div class="cert-detail-value" id="mCertPct">--</div><div class="cert-detail-label">백분위</div></div>
+                            <div class="cert-detail">
+                                <div class="cert-detail-value" id="mCertIQ">--</div>
+                                <div class="cert-detail-label">IQ</div>
+                            </div>
+                            <div class="cert-detail">
+                                <div class="cert-detail-value" id="mCertPct">--</div>
+                                <div class="cert-detail-label">백분위</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value" id="mCorrect">--</div><div class="stat-label">정답</div></div>
-                    <div class="stat-card"><div class="stat-value" id="mAccuracy">--%</div><div class="stat-label">정확도</div></div>
-                    <div class="stat-card"><div class="stat-value" id="mAvgTime">--s</div><div class="stat-label">평균</div></div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="mCorrect">--</div>
+                        <div class="stat-label">정답</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="mAccuracy">--%</div>
+                        <div class="stat-label">정확도</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="mAvgTime">--s</div>
+                        <div class="stat-label">평균</div>
+                    </div>
                 </div>
-                
+
                 <div class="disclaimer">
                     <strong>📌</strong> 본 결과는 참고용이며 실제 멘사 자격과 무관합니다.
                 </div>
-                
+
                 <div class="result-actions">
                     <button class="btn btn-secondary" onclick="restart()">🔄 처음부터</button>
                     <button class="btn btn-gold" onclick="retryMensa()">🏆 재도전</button>
@@ -606,7 +1653,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Exit Modal -->
     <div class="modal-overlay" id="exitModal">
         <div class="modal">
@@ -621,441 +1668,462 @@
     </div>
 
     <script>
-    // ========== TRANSLATIONS ==========
-    const T = {
-        ko: {
-            'intro.title': '테스트 안내',
-            'intro.highlight': '5가지 테스트 중 1가지를 선택하여 IQ 120 이상 달성 시 멘사 도전 자격이 주어집니다.',
-            'intro.desc': '아래에서 원하는 영역을 선택한 후 테스트를 시작하세요. 각 영역은 10문항으로 구성됩니다.',
-            'cat.pattern': '패턴 인식', 'cat.numerical': '수리 추론', 'cat.spatial': '공간 지각', 'cat.logical': '논리 추론', 'cat.verbal': '언어 유추',
-            'tut.pattern': '3×3 행렬에서 가로, 세로 규칙을 찾아 빈 칸을 채웁니다.',
-            'tut.numerical': '수열의 규칙을 파악하여 다음 숫자를 찾습니다.',
-            'tut.spatial': '도형의 회전, 반사 등 공간 변환을 수행합니다.',
-            'tut.logical': '조건과 명제를 분석해 논리적 결론을 도출합니다.',
-            'tut.verbal': '개념 간 관계를 파악하여 유추합니다.',
-            'btn.start': '테스트 시작', 'btn.select': '영역을 선택하세요'
-        },
-        en: {
-            'intro.title': 'Test Guide',
-            'intro.highlight': 'Select 1 of 5 tests. Achieve IQ 120+ to qualify for Mensa Challenge.',
-            'intro.desc': 'Select your preferred category below. Each test has 10 questions.',
-            'cat.pattern': 'Pattern Recognition', 'cat.numerical': 'Numerical Reasoning', 'cat.spatial': 'Spatial Perception', 'cat.logical': 'Logical Reasoning', 'cat.verbal': 'Verbal Analogies',
-            'tut.pattern': 'Find rules in rows and columns of a 3×3 matrix.',
-            'tut.numerical': 'Identify sequence patterns to find the next number.',
-            'tut.spatial': 'Perform spatial transformations like rotation.',
-            'tut.logical': 'Analyze conditions to derive conclusions.',
-            'tut.verbal': 'Identify relationships between concepts.',
-            'btn.start': 'Start Test', 'btn.select': 'Select a category'
-        }
-    };
-    let lang = 'ko';
-    function t(k) { return T[lang][k] || k; }
-    function setLang(l) {
-        lang = l;
-        document.querySelectorAll('[data-t]').forEach(el => {
-            const k = el.getAttribute('data-t');
-            if (T[l][k]) el.innerHTML = T[l][k];
-        });
-        updateStartBtn();
-    }
-    
-    // ========== QUESTIONS (10 per category) ==========
-    const questions = {
-        pattern: [
-            {id:'p1',diff:1,q:{ko:'규칙을 찾아 빈 칸을 채우세요.',en:'Find the pattern.'},type:'matrix',matrix:['●','●●','●●●','■','■■','■■■','▲','▲▲','?'],opts:['▲','▲▲▲','■■■','●●●'],ans:1},
-            {id:'p2',diff:1,q:{ko:'숫자 패턴을 찾으세요.',en:'Find number pattern.'},type:'matrix',matrix:['1','2','3','4','5','6','7','8','?'],opts:['9','10','0','7'],ans:0},
-            {id:'p3',diff:2,q:{ko:'행과 열의 규칙을 찾으세요.',en:'Find row/column rules.'},type:'matrix',matrix:['2','4','6','3','6','9','4','8','?'],opts:['10','12','14','16'],ans:1},
-            {id:'p4',diff:2,q:{ko:'도형 변화 규칙을 찾으세요.',en:'Find shape changes.'},type:'matrix',matrix:['○','◐','●','□','◧','■','△','◮','?'],opts:['△','▲','◮','○'],ans:1},
-            {id:'p5',diff:3,q:{ko:'복잡한 규칙을 찾으세요.',en:'Find complex pattern.'},type:'matrix',matrix:['1','1','1','2','4','8','3','9','?'],opts:['12','18','27','36'],ans:2},
-            {id:'p6',diff:3,q:{ko:'알파벳 패턴을 찾으세요.',en:'Find alphabet pattern.'},type:'matrix',matrix:['A','C','E','B','D','F','C','E','?'],opts:['F','G','H','I'],ans:1},
-            {id:'p7',diff:2,q:{ko:'색상 패턴입니다.',en:'Color pattern.'},type:'matrix',matrix:['🔴','🔵','🟢','🔵','🟢','🔴','🟢','🔴','?'],opts:['🔴','🔵','🟢','🟡'],ans:1},
-            {id:'p8',diff:3,q:{ko:'곱셈 규칙입니다.',en:'Multiplication rule.'},type:'matrix',matrix:['2','3','6','4','5','20','6','7','?'],opts:['13','36','42','48'],ans:2},
-            {id:'p9',diff:3,q:{ko:'덧셈 규칙입니다.',en:'Addition rule.'},type:'matrix',matrix:['1','2','3','4','5','9','5','7','?'],opts:['10','11','12','14'],ans:2},
-            {id:'p10',diff:4,q:{ko:'거듭제곱 패턴입니다.',en:'Power pattern.'},type:'matrix',matrix:['2','4','8','3','9','27','4','16','?'],opts:['32','48','64','256'],ans:2}
-        ],
-        numerical: [
-            {id:'n1',diff:1,q:{ko:'수열의 다음 항을 구하세요.',en:'Find next term.'},type:'seq',seq:[2,4,6,8,'?'],opts:['9','10','11','12'],ans:1},
-            {id:'n2',diff:1,q:{ko:'수열의 규칙을 찾으세요.',en:'Find sequence pattern.'},type:'seq',seq:[5,10,15,20,'?'],opts:['22','25','30','35'],ans:1},
-            {id:'n3',diff:2,q:{ko:'피보나치 수열입니다.',en:'Fibonacci sequence.'},type:'seq',seq:[1,1,2,3,5,8,'?'],opts:['11','12','13','15'],ans:2},
-            {id:'n4',diff:2,q:{ko:'등비수열입니다.',en:'Geometric sequence.'},type:'seq',seq:[3,6,12,24,'?'],opts:['36','48','30','42'],ans:1},
-            {id:'n5',diff:3,q:{ko:'제곱수 수열입니다.',en:'Square numbers.'},type:'seq',seq:[1,4,9,16,25,'?'],opts:['30','35','36','49'],ans:2},
-            {id:'n6',diff:3,q:{ko:'차이 증가 수열입니다.',en:'Increasing difference.'},type:'seq',seq:[2,6,12,20,30,'?'],opts:['40','42','44','56'],ans:1},
-            {id:'n7',diff:3,q:{ko:'삼각수 수열입니다.',en:'Triangular numbers.'},type:'seq',seq:[1,3,6,10,15,'?'],opts:['18','20','21','25'],ans:2},
-            {id:'n8',diff:3,q:{ko:'소수 수열입니다.',en:'Prime numbers.'},type:'seq',seq:[2,3,5,7,11,13,'?'],opts:['15','17','19','21'],ans:1},
-            {id:'n9',diff:4,q:{ko:'n^n 수열입니다.',en:'n^n sequence.'},type:'seq',seq:[1,4,27,256,'?'],opts:['625','1024','3125','4096'],ans:2},
-            {id:'n10',diff:4,q:{ko:'팩토리얼 수열입니다.',en:'Factorial sequence.'},type:'seq',seq:[1,2,6,24,120,'?'],opts:['240','480','720','840'],ans:2}
-        ],
-        spatial: [
-            {id:'s1',diff:1,q:{ko:'┘를 시계방향 90° 회전하면?',en:'Rotate ┘ clockwise 90°?'},type:'text',opts:['└','┐','┌','─'],ans:0},
-            {id:'s2',diff:1,q:{ko:'거울에 비친 "F"는?',en:'Mirror of "F"?'},type:'text',opts:{ko:['F','Ꮈ (반전)','d','ㅋ'],en:['F','Ꮈ (flipped)','d','K']},ans:1},
-            {id:'s3',diff:2,q:{ko:'정육면체 전개도에서 1의 맞은편은?',en:'Opposite of 1 in cube net?'},type:'text',opts:['2','4','5','6'],ans:3},
-            {id:'s4',diff:2,q:{ko:'왼쪽위 원이 있는 사각형을 180° 회전하면?',en:'Rotate square 180°?'},type:'text',opts:{ko:['왼쪽 위','오른쪽 위','왼쪽 아래','오른쪽 아래'],en:['Top-left','Top-right','Bottom-left','Bottom-right']},ans:3},
-            {id:'s5',diff:3,q:{ko:'직각삼각형 2개 + 정사각형 1개 = ?',en:'2 triangles + 1 square = ?'},type:'text',opts:{ko:['정사각형','직사각형','평행사변형','사다리꼴'],en:['Square','Rectangle','Parallelogram','Trapezoid']},ans:1},
-            {id:'s6',diff:3,q:{ko:'정육면체 대각선 절단 단면은?',en:'Diagonal cube cross-section?'},type:'text',opts:{ko:['정삼각형','정사각형','직사각형','정육각형'],en:['Equilateral tri','Square','Rectangle','Hexagon']},ans:3},
-            {id:'s7',diff:2,q:{ko:'L을 좌우반전하면?',en:'Flip L horizontally?'},type:'text',opts:['L','⅃','Γ','J'],ans:3},
-            {id:'s8',diff:3,q:{ko:'정삼각형을 60° 회전하면?',en:'Rotate triangle 60°?'},type:'text',opts:{ko:['같은 모양','다른 모양','뒤집힘','불가능'],en:['Same','Different','Flipped','Impossible']},ans:0},
-            {id:'s9',diff:3,q:{ko:'원뿔의 밑면 모양은?',en:'Cone base shape?'},type:'text',opts:{ko:['삼각형','사각형','원','타원'],en:['Triangle','Square','Circle','Ellipse']},ans:2},
-            {id:'s10',diff:4,q:{ko:'정십이면체의 면 개수는?',en:'Dodecahedron faces?'},type:'text',opts:['10','12','14','20'],ans:1}
-        ],
-        logical: [
-            {id:'l1',diff:1,q:{ko:'모든 개는 동물. 바둑이는 개. 참인 것은?',en:'All dogs are animals. Baduk is dog. True?'},type:'text',opts:{ko:['모든 동물은 개','바둑이는 동물','바둑이는 고양이 아님','모든 동물은 바둑이'],en:['All animals are dogs','Baduk is animal','Baduk is not cat','All animals are Baduk']},ans:1},
-            {id:'l2',diff:1,q:{ko:'A>B, B>C. 가장 작은 것은?',en:'A>B, B>C. Smallest?'},type:'text',opts:['A','B','C',{ko:'알 수 없음',en:'Unknown'}],ans:2},
-            {id:'l3',diff:2,q:{ko:'"비가 오면 땅이 젖는다"의 대우는?',en:'Contrapositive of "If rain, wet"?'},type:'text',opts:{ko:['젖으면 비','안 오면 안 젖음','안 젖으면 안 옴','젖어도 안 올 수 있음'],en:['Wet then rain','No rain no wet','Not wet no rain','Wet without rain']},ans:2},
-            {id:'l4',diff:2,q:{ko:'A>B, C>A, D<B. 가장 큰 것은?',en:'A>B, C>A, D<B. Largest?'},type:'text',opts:['A','B','C','D'],ans:2},
-            {id:'l5',diff:3,q:{ko:'(x+5)÷3=4. x는?',en:'(x+5)÷3=4. x=?'},type:'text',opts:['5','6','7','8'],ans:2},
-            {id:'l6',diff:3,q:{ko:'5명 줄서기: A≠맨앞, B는 C뒤, D=맨뒤, E는 A앞. 맨앞은?',en:'5 people: A≠first, B behind C, D=last, E before A. First?'},type:'text',opts:['A','B','C','E'],ans:3},
-            {id:'l7',diff:2,q:{ko:'참이면 거짓, 거짓이면 참. 이것은?',en:'True=False, False=True. This is?'},type:'text',opts:{ko:['참','거짓','모순','역설'],en:['True','False','Contradiction','Paradox']},ans:3},
-            {id:'l8',diff:3,q:{ko:'2x + 3 = 11. x는?',en:'2x + 3 = 11. x=?'},type:'text',opts:['3','4','5','6'],ans:1},
-            {id:'l9',diff:3,q:{ko:'A, B, C 중 하나만 참. A가 거짓이면?',en:'Only one of A,B,C is true. If A is false?'},type:'text',opts:{ko:['B나 C가 참','B와 C 모두 참','B와 C 모두 거짓','알 수 없음'],en:['B or C true','B and C true','B and C false','Unknown']},ans:0},
-            {id:'l10',diff:4,q:{ko:'모든 P는 Q. 모든 Q는 R. 참인 것은?',en:'All P are Q. All Q are R. True?'},type:'text',opts:{ko:['모든 R은 P','모든 P는 R','일부 R만 Q','P와 R은 같음'],en:['All R are P','All P are R','Some R are Q','P equals R']},ans:1}
-        ],
-        verbal: [
-            {id:'v1',diff:1,q:{ko:'책:읽다 = 음악:?',en:'Book:Read = Music:?'},type:'analogy',an:{ko:['책','읽다','음악','?'],en:['Book','Read','Music','?']},opts:{ko:['악기','듣다','가수','콘서트'],en:['Instrument','Listen','Singer','Concert']},ans:1},
-            {id:'v2',diff:1,q:{ko:'여름:덥다 = 겨울:?',en:'Summer:Hot = Winter:?'},type:'analogy',an:{ko:['여름','덥다','겨울','?'],en:['Summer','Hot','Winter','?']},opts:{ko:['눈','춥다','코트','난방'],en:['Snow','Cold','Coat','Heating']},ans:1},
-            {id:'v3',diff:2,q:{ko:'의사:병원 = 교사:?',en:'Doctor:Hospital = Teacher:?'},type:'analogy',an:{ko:['의사','병원','교사','?'],en:['Doctor','Hospital','Teacher','?']},opts:{ko:['학생','학교','교실','교육'],en:['Student','School','Classroom','Education']},ans:1},
-            {id:'v4',diff:2,q:{ko:'손:장갑 = 머리:?',en:'Hand:Glove = Head:?'},type:'analogy',an:{ko:['손','장갑','머리','?'],en:['Hand','Glove','Head','?']},opts:{ko:['모자','얼굴','두뇌','머리카락'],en:['Hat','Face','Brain','Hair']},ans:0},
-            {id:'v5',diff:3,q:{ko:'빛:어둠 = 지식:?',en:'Light:Darkness = Knowledge:?'},type:'analogy',an:{ko:['빛','어둠','지식','?'],en:['Light','Darkness','Knowledge','?']},opts:{ko:['학교','무지','책','공부'],en:['School','Ignorance','Book','Study']},ans:1},
-            {id:'v6',diff:3,q:{ko:'나무:숲 = 별:?',en:'Tree:Forest = Star:?'},type:'analogy',an:{ko:['나무','숲','별','?'],en:['Tree','Forest','Star','?']},opts:{ko:['하늘','은하','달','우주'],en:['Sky','Galaxy','Moon','Universe']},ans:1},
-            {id:'v7',diff:2,q:{ko:'새:둥지 = 사람:?',en:'Bird:Nest = Human:?'},type:'analogy',an:{ko:['새','둥지','사람','?'],en:['Bird','Nest','Human','?']},opts:{ko:['음식','옷','집','차'],en:['Food','Clothes','House','Car']},ans:2},
-            {id:'v8',diff:3,q:{ko:'화가:그림 = 작곡가:?',en:'Painter:Painting = Composer:?'},type:'analogy',an:{ko:['화가','그림','작곡가','?'],en:['Painter','Painting','Composer','?']},opts:{ko:['악기','음악','가수','무대'],en:['Instrument','Music','Singer','Stage']},ans:1},
-            {id:'v9',diff:3,q:{ko:'원인:결과 = 질문:?',en:'Cause:Effect = Question:?'},type:'analogy',an:{ko:['원인','결과','질문','?'],en:['Cause','Effect','Question','?']},opts:{ko:['대화','의문','답변','호기심'],en:['Talk','Doubt','Answer','Curiosity']},ans:2},
-            {id:'v10',diff:4,q:{ko:'씨앗:나무 = 아이디어:?',en:'Seed:Tree = Idea:?'},type:'analogy',an:{ko:['씨앗','나무','아이디어','?'],en:['Seed','Tree','Idea','?']},opts:{ko:['생각','혁신','두뇌','꿈'],en:['Thought','Innovation','Brain','Dream']},ans:1}
-        ]
-    };
-    
-    const mensaQ = [
-        {id:'m1',diff:3,q:{ko:'규칙을 찾으세요.',en:'Find pattern.'},type:'matrix',matrix:['●','●●','●●●','■','■■','■■■','▲','▲▲','?'],opts:['▲','▲▲▲','■■■','●●●'],ans:1},
-        {id:'m2',diff:3,q:{ko:'도형 변화.',en:'Shape changes.'},type:'matrix',matrix:['○','◐','●','□','◧','■','△','◮','?'],opts:['△','▲','◮','○'],ans:1},
-        {id:'m3',diff:3,q:{ko:'제곱수입니다.',en:'Square numbers.'},type:'seq',seq:[1,4,9,16,25,'?'],opts:['30','36','42','49'],ans:1},
-        {id:'m4',diff:4,q:{ko:'거듭제곱 패턴.',en:'Power pattern.'},type:'matrix',matrix:['2','4','8','3','9','27','4','16','?'],opts:['32','48','64','256'],ans:2},
-        {id:'m5',diff:3,q:{ko:'숫자 패턴.',en:'Number pattern.'},type:'matrix',matrix:['1','2','3','4','5','6','7','8','?'],opts:['9','10','0','12'],ans:0},
-        {id:'m6',diff:4,q:{ko:'삼각수입니다.',en:'Triangular numbers.'},type:'seq',seq:[1,3,6,10,15,'?'],opts:['18','20','21','25'],ans:2},
-        {id:'m7',diff:4,q:{ko:'소수입니다.',en:'Prime numbers.'},type:'seq',seq:[2,3,5,7,11,13,'?'],opts:['15','17','19','21'],ans:1},
-        {id:'m8',diff:4,q:{ko:'알파벳-숫자.',en:'Alphanumeric.'},type:'matrix',matrix:['A1','B2','C3','D4','E5','F6','G7','H8','?'],opts:['I9','J9','I10','J10'],ans:0},
-        {id:'m9',diff:4,q:{ko:'색상 패턴.',en:'Color pattern.'},type:'matrix',matrix:['🔴','🔵','🟢','🔵','🟢','🔴','🟢','🔴','?'],opts:['🔴','🔵','🟢','🟡'],ans:1},
-        {id:'m10',diff:4,q:{ko:'피보나치.',en:'Fibonacci.'},type:'seq',seq:[1,1,2,3,5,8,13,21,'?'],opts:['29','34','36','42'],ans:1},
-        {id:'m11',diff:5,q:{ko:'곱셈 규칙.',en:'Multiplication.'},type:'matrix',matrix:['2','3','6','4','5','20','6','7','?'],opts:['13','36','42','48'],ans:2},
-        {id:'m12',diff:5,q:{ko:'n^n 수열.',en:'n^n sequence.'},type:'seq',seq:[1,4,27,256,'?'],opts:['625','1024','3125','4096'],ans:2},
-        {id:'m13',diff:5,q:{ko:'세제곱수.',en:'Cube numbers.'},type:'matrix',matrix:['1','8','27','64','125','216','343','512','?'],opts:['625','729','1000','1024'],ans:1},
-        {id:'m14',diff:5,q:{ko:'덧셈 규칙.',en:'Addition rule.'},type:'matrix',matrix:['1','2','3','4','5','9','5','7','?'],opts:['10','11','12','14'],ans:2},
-        {id:'m15',diff:5,q:{ko:'복잡한 수열.',en:'Complex sequence.'},type:'seq',seq:[0,1,1,2,4,7,13,'?'],opts:['20','22','24','26'],ans:2},
-        {id:'m16',diff:4,q:{ko:'크기 변화.',en:'Size change.'},type:'matrix',matrix:['•','●','⬤','▪','■','⬛','▴','▲','?'],opts:['▴','▲','⏶','△'],ans:2},
-        {id:'m17',diff:4,q:{ko:'차이 증가.',en:'Increasing diff.'},type:'seq',seq:[2,3,5,8,12,17,'?'],opts:['22','23','24','25'],ans:1},
-        {id:'m18',diff:5,q:{ko:'대각선 패턴.',en:'Diagonal pattern.'},type:'matrix',matrix:['1','3','6','2','5','9','4','8','?'],opts:['10','12','13','15'],ans:2},
-        {id:'m19',diff:5,q:{ko:'팩토리얼.',en:'Factorial.'},type:'seq',seq:[1,2,6,24,120,'?'],opts:['240','480','720','840'],ans:2},
-        {id:'m20',diff:5,q:{ko:'종합 패턴.',en:'Comprehensive.'},type:'matrix',matrix:['2','6','18','4','12','36','8','24','?'],opts:['48','64','72','96'],ans:2}
-    ];
-    
-    // ========== STATE ==========
-    let selectedCat = null;
-    const catNames = {ko:{pattern:'패턴 인식',numerical:'수리 추론',spatial:'공간 지각',logical:'논리 추론',verbal:'언어 유추'},en:{pattern:'Pattern Recognition',numerical:'Numerical Reasoning',spatial:'Spatial Perception',logical:'Logical Reasoning',verbal:'Verbal Analogies'}};
-    
-    let bIdx=0, bQs=[], bAns=[], bTimes=[], bTimer=null, bTimeLeft=45, bStart=null, bTestStart=null;
-    const B_MAX=45, B_TOTAL=10;
-    let mIdx=0, mQs=[], mAns=[], mTimes=[], mTimer=null, mTimeLeft=60, mStart=null, mTestStart=null;
-    const M_MAX=60, M_TOTAL=20;
-    let qualCode='', qualIQ=0, validCodes=[];
-    
-    // ========== UTILS ==========
-    function shuffle(a){const n=[...a];for(let i=n.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[n[i],n[j]]=[n[j],n[i]];}return n;}
-    function show(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
-    function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='CQ-';for(let i=0;i<8;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
-    function fmtDate(d){return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
-    function getLoc(o){return typeof o==='string'?o:(o[lang]||o.ko||o);}
-    function getOpts(o){return Array.isArray(o)?o.map(x=>getLoc(x)):getLoc(o);}
-    
-    // ========== CATEGORY SELECTION ==========
-    function selectCat(cat) {
-        selectedCat = cat;
-        document.querySelectorAll('.select-card').forEach(c => c.classList.remove('selected'));
-        document.querySelector(`.select-card[data-cat="${cat}"]`).classList.add('selected');
-        document.getElementById('selectedInfo').style.display = 'block';
-        document.getElementById('selectedCatName').textContent = catNames[lang][cat];
-        updateStartBtn();
-    }
-    function updateStartBtn() {
-        const btn = document.getElementById('startBtn');
-        if (selectedCat) {
-            btn.disabled = false;
-            btn.innerHTML = `<span>${t('btn.start')}</span> <span>→</span>`;
-        } else {
-            btn.disabled = true;
-            btn.innerHTML = `<span>${t('btn.select')}</span> <span>→</span>`;
-        }
-    }
-    
-    // ========== NAV ==========
-    function goHome(){
-        if(document.getElementById('basicTestSection').classList.contains('active')||document.getElementById('mensaTestSection').classList.contains('active')){
-            showExitModal();
-        }else restart();
-    }
-    function showExitModal(){document.getElementById('exitModal').classList.add('active');}
-    function closeModal(){document.getElementById('exitModal').classList.remove('active');}
-    function confirmExit(){closeModal();clearInterval(bTimer);clearInterval(mTimer);restart();}
-    function restart(){
-        clearInterval(bTimer);clearInterval(mTimer);selectedCat=null;
-        document.querySelectorAll('.select-card').forEach(c=>c.classList.remove('selected'));
-        document.getElementById('selectedInfo').style.display='none';
-        document.getElementById('bgPattern').classList.remove('mensa');
-        document.getElementById('logoIcon').classList.remove('gold');
-        document.getElementById('mainTitle').textContent=lang==='ko'?'인지능력 측정 테스트':'Cognitive Intelligence Test';
-        document.getElementById('mainTitle').classList.remove('gold');
-        document.getElementById('mainSubtitle').textContent=lang==='ko'?'5가지 영역 중 1가지를 선택하여 도전하세요':'Select 1 of 5 categories to challenge';
-        updateStartBtn();
-        show('introSection');
-    }
-    
-    // ========== CODE VERIFY ==========
-    function verifyCode(){
-        const inp=document.getElementById('codeInput').value.trim().toUpperCase();
-        const err=document.getElementById('codeError');
-        if(validCodes.includes(inp)||inp==='CQ-TESTCODE'){
-            err.style.display='none';qualCode=inp;startMensaTest();
-        }else err.style.display='block';
-    }
-    
-    // ========== BASIC TEST ==========
-    function startBasicTest(){
-        if(!selectedCat)return;
-        bQs=shuffle([...questions[selectedCat]]).slice(0,B_TOTAL);
-        bAns=Array(B_TOTAL).fill(null);bTimes=Array(B_TOTAL).fill(null);bTestStart=Date.now();
-        document.getElementById('bTotalQ').textContent=B_TOTAL;
-        document.getElementById('bCatBadge').textContent=catNames[lang][selectedCat];
-        show('basicTestSection');loadBasicQ(0);
-    }
-    function loadBasicQ(i){
-        bIdx=i;const q=bQs[i];
-        document.getElementById('bCurQ').textContent=i+1;
-        document.getElementById('bProgBar').style.width=`${((i+1)/B_TOTAL)*100}%`;
-        const db=document.getElementById('bDiffBadge');db.className='badge';
-        if(q.diff===1){db.classList.add('badge-easy');db.textContent=lang==='ko'?'쉬움':'Easy';}
-        else if(q.diff===2){db.classList.add('badge-medium');db.textContent=lang==='ko'?'보통':'Medium';}
-        else if(q.diff===3){db.classList.add('badge-hard');db.textContent=lang==='ko'?'어려움':'Hard';}
-        else{db.classList.add('badge-extreme');db.textContent=lang==='ko'?'고급':'Expert';}
-        document.getElementById('bQText').textContent=getLoc(q.q);
-        document.getElementById('bVisual').innerHTML=renderVisual(q);
-        const opts=getOpts(q.opts);const mk=['A','B','C','D'];
-        document.getElementById('bOptions').innerHTML=opts.map((o,j)=>`<div class="option" onclick="selBasic(${j})" data-i="${j}"><span class="option-marker">${mk[j]}</span><span class="option-text">${o}</span></div>`).join('');
-        if(bAns[i]!==null){document.querySelector(`#bOptions [data-i="${bAns[i]}"]`)?.classList.add('selected');document.getElementById('bNextBtn').disabled=false;}
-        else document.getElementById('bNextBtn').disabled=true;
-        startBTimer();bStart=Date.now();
-    }
-    function renderVisual(q){
-        if(q.type==='matrix'&&q.matrix){
-            return `<div class="matrix-box"><div class="matrix-grid">${q.matrix.map(c=>`<div class="matrix-cell ${c==='?'?'empty':''}">${c==='?'?'':c}</div>`).join('')}</div></div>`;
-        }
-        if(q.type==='seq'&&q.seq){
-            return `<div class="sequence-box">${q.seq.map((s,i)=>`<div class="seq-item ${s==='?'?'unknown':''}">${s}</div>${i<q.seq.length-1?'<span class="seq-arrow">→</span>':''}`).join('')}</div>`;
-        }
-        if(q.type==='analogy'&&q.an){
-            const a=getOpts(q.an);
-            return `<div class="analogy-box"><span class="analogy-item">${a[0]}</span><span class="analogy-sep">:</span><span class="analogy-item">${a[1]}</span><span class="analogy-sep">=</span><span class="analogy-item">${a[2]}</span><span class="analogy-sep">:</span><span class="analogy-item unknown">?</span></div>`;
-        }
-        return '';
-    }
-    function startBTimer(){
-        clearInterval(bTimer);bTimeLeft=B_MAX;
-        document.getElementById('bTimerTxt').textContent=bTimeLeft;
-        document.getElementById('bTimerProg').style.strokeDashoffset=0;
-        const circ=2*Math.PI*20;
-        bTimer=setInterval(()=>{
-            bTimeLeft--;
-            document.getElementById('bTimerTxt').textContent=bTimeLeft;
-            document.getElementById('bTimerProg').style.strokeDashoffset=(1-bTimeLeft/B_MAX)*circ;
-            const ring=document.getElementById('bTimerRing');
-            ring.classList.remove('warning','danger');
-            if(bTimeLeft<=10)ring.classList.add('danger');
-            else if(bTimeLeft<=20)ring.classList.add('warning');
-            if(bTimeLeft<=0){clearInterval(bTimer);autoNextB();}
-        },1000);
-    }
-    function selBasic(j){
-        document.querySelectorAll('#bOptions .option').forEach(o=>o.classList.remove('selected'));
-        document.querySelector(`#bOptions [data-i="${j}"]`).classList.add('selected');
-        bAns[bIdx]=j;bTimes[bIdx]=Date.now()-bStart;
-        document.getElementById('bNextBtn').disabled=false;
-    }
-    function nextBasic(){clearInterval(bTimer);if(bIdx<B_TOTAL-1)loadBasicQ(bIdx+1);else showBasicRes();}
-    function skipBasic(){clearInterval(bTimer);bTimes[bIdx]=B_MAX*1000;if(bIdx<B_TOTAL-1)loadBasicQ(bIdx+1);else showBasicRes();}
-    function autoNextB(){bTimes[bIdx]=B_MAX*1000;if(bIdx<B_TOTAL-1)loadBasicQ(bIdx+1);else showBasicRes();}
-    
-    function calcBasicRes(){
-        let tc=0,ws=0,mw=0;
-        bQs.forEach((q,i)=>{
-            mw+=q.diff;
-            if(bAns[i]===q.ans){
-                tc++;
-                const tr=Math.max(0,1-(bTimes[i]/(B_MAX*1000)));
-                ws+=q.diff*(1+tr*0.15);
+        // ========== TRANSLATIONS ==========
+        const T = {
+            ko: {
+                'intro.title': '테스트 안내',
+                'intro.highlight': '5가지 테스트 중 1가지를 선택하여 IQ 120 이상 달성 시 멘사 도전 자격이 주어집니다.',
+                'intro.desc': '아래에서 원하는 영역을 선택한 후 테스트를 시작하세요. 각 영역은 10문항으로 구성됩니다.',
+                'cat.pattern': '패턴 인식', 'cat.numerical': '수리 추론', 'cat.spatial': '공간 지각', 'cat.logical': '논리 추론', 'cat.verbal': '언어 유추',
+                'tut.pattern': '3×3 행렬에서 가로, 세로 규칙을 찾아 빈 칸을 채웁니다.',
+                'tut.numerical': '수열의 규칙을 파악하여 다음 숫자를 찾습니다.',
+                'tut.spatial': '도형의 회전, 반사 등 공간 변환을 수행합니다.',
+                'tut.logical': '조건과 명제를 분석해 논리적 결론을 도출합니다.',
+                'tut.verbal': '개념 간 관계를 파악하여 유추합니다.',
+                'btn.start': '테스트 시작', 'btn.select': '영역을 선택하세요'
+            },
+            en: {
+                'intro.title': 'Test Guide',
+                'intro.highlight': 'Select 1 of 5 tests. Achieve IQ 120+ to qualify for Mensa Challenge.',
+                'intro.desc': 'Select your preferred category below. Each test has 10 questions.',
+                'cat.pattern': 'Pattern Recognition', 'cat.numerical': 'Numerical Reasoning', 'cat.spatial': 'Spatial Perception', 'cat.logical': 'Logical Reasoning', 'cat.verbal': 'Verbal Analogies', 'cat.comprehensive': 'Comprehensive Test',
+                'tut.pattern': 'Find rules in rows and columns of a 3×3 matrix.',
+                'tut.numerical': 'Identify sequence patterns to find the next number.',
+                'tut.spatial': 'Perform spatial transformations like rotation.',
+                'tut.logical': 'Analyze conditions to derive conclusions.',
+                'tut.verbal': 'Identify relationships between concepts.',
+                'tut.comprehensive': 'Evaluate all 5 cognitive areas comprehensively. (20 Questions)',
+                'btn.start': 'Start Test', 'btn.select': 'Select a category'
             }
-        });
-        const rr=ws/mw,z=(rr-0.45)*4.5;
-        let iq=Math.round(100+z*15);iq=Math.max(55,Math.min(145,iq));
-        const vt=bTimes.filter(x=>x&&x<B_MAX*1000);
-        const avg=vt.length?Math.round(vt.reduce((a,b)=>a+b,0)/vt.length/1000):0;
-        const tot=Math.round((Date.now()-bTestStart)/1000);
-        return {iq,tc,acc:Math.round((tc/B_TOTAL)*100),avg,tot};
-    }
-    function getIQClass(iq){
-        if(iq>=130)return{l:lang==='ko'?'매우 우수':'Very Superior',d:lang==='ko'?'상위 2% 이내의 뛰어난 인지능력입니다.':'Outstanding (top 2%).',p:98};
-        if(iq>=120)return{l:lang==='ko'?'우수':'Superior',d:lang==='ko'?'상위 10% 이내의 우수한 인지능력입니다.':'Excellent (top 10%).',p:91};
-        if(iq>=110)return{l:lang==='ko'?'평균 상':'High Average',d:lang==='ko'?'평균 이상의 좋은 인지능력입니다.':'Good, above average.',p:75};
-        if(iq>=90)return{l:lang==='ko'?'평균':'Average',d:lang==='ko'?'일반적인 수준입니다.':'Normal level.',p:50};
-        return{l:lang==='ko'?'평균 하':'Below Average',d:lang==='ko'?'평균보다 낮은 수준입니다.':'Below average.',p:25};
-    }
-    function showBasicRes(){
-        show('basicResultsSection');
-        const r=calcBasicRes(),cl=getIQClass(r.iq);
-        document.getElementById('resCatName').textContent=catNames[lang][selectedCat];
-        document.getElementById('bIQ').textContent=r.iq;
-        const norm=Math.min(Math.max((r.iq-55)/90,0),1);
-        const circ=2*Math.PI*88;
-        setTimeout(()=>document.getElementById('bScoreProg').style.strokeDashoffset=circ*(1-norm),100);
-        document.getElementById('bClassLabel').textContent=cl.l;
-        document.getElementById('bClassDesc').textContent=cl.d;
-        document.getElementById('bPercentile').textContent=lang==='ko'?`상위 ${100-cl.p}% (백분위 ${cl.p})`:`Top ${100-cl.p}% (Percentile ${cl.p})`;
-        document.getElementById('bCorrect').textContent=r.tc+'/'+B_TOTAL;
-        document.getElementById('bAccuracy').textContent=r.acc+'%';
-        document.getElementById('bAvgTime').textContent=r.avg+'s';
-        document.getElementById('bTotalTime').textContent=r.tot+'s';
-        
-        if(r.iq>=120){
-            qualCode=genCode();qualIQ=r.iq;validCodes.push(qualCode);
-            document.getElementById('certSection').style.display='block';
-            document.getElementById('notQualSection').style.display='none';
-            document.getElementById('mensaBtn').style.display='inline-flex';
-            document.getElementById('certCatName').textContent=catNames[lang][selectedCat];
-            document.getElementById('certIQ').textContent=r.iq;
-            document.getElementById('certDate').textContent=fmtDate(new Date());
-            document.getElementById('certCode').textContent=qualCode;
-            document.getElementById('bClassBox').classList.add('gold');
-            document.getElementById('bClassLabel').classList.add('gold');
-            document.getElementById('bIQ').classList.add('gold');
-            document.getElementById('bScoreProg').setAttribute('stroke','url(#goldGrad)');
-        }else{
-            document.getElementById('certSection').style.display='none';
-            document.getElementById('notQualSection').style.display='block';
-            document.getElementById('mensaBtn').style.display='none';
-            document.getElementById('bClassBox').classList.remove('gold');
-            document.getElementById('bClassLabel').classList.remove('gold');
-            document.getElementById('bIQ').classList.remove('gold');
+        };
+        let lang = 'ko';
+        function t(k) { return T[lang][k] || k; }
+        function setLang(l) {
+            lang = l;
+            document.querySelectorAll('[data-t]').forEach(el => {
+                const k = el.getAttribute('data-t');
+                if (T[l][k]) el.innerHTML = T[l][k];
+            });
+            updateStartBtn();
         }
-    }
-    function sendEmail(){
-        const em=document.getElementById('emailInput').value.trim();
-        if(!em||!em.includes('@')){alert(lang==='ko'?'올바른 이메일을 입력하세요.':'Enter valid email.');return;}
-        console.log('Email:',em,'Code:',qualCode,'IQ:',qualIQ);
-        document.getElementById('emailOK').style.display='flex';
-        setTimeout(()=>document.getElementById('emailOK').style.display='none',4000);
-    }
-    
-    // ========== MENSA TEST ==========
-    function startMensaTest(){
-        document.getElementById('bgPattern').classList.add('mensa');
-        document.getElementById('logoIcon').classList.add('gold');
-        document.getElementById('mainTitle').textContent=lang==='ko'?'멘사 도전 테스트':'Mensa Challenge Test';
-        document.getElementById('mainTitle').classList.add('gold');
-        document.getElementById('mainSubtitle').textContent=lang==='ko'?'상위 2% 인지능력 도전':'Top 2% Cognitive Challenge';
-        mQs=shuffle([...mensaQ]).slice(0,M_TOTAL);
-        mAns=Array(M_TOTAL).fill(null);mTimes=Array(M_TOTAL).fill(null);mTestStart=Date.now();
-        document.getElementById('mTotalQ').textContent=M_TOTAL;
-        show('mensaTestSection');loadMensaQ(0);
-    }
-    function loadMensaQ(i){
-        mIdx=i;const q=mQs[i];
-        document.getElementById('mCurQ').textContent=i+1;
-        document.getElementById('mProgBar').style.width=`${((i+1)/M_TOTAL)*100}%`;
-        const db=document.getElementById('mDiffBadge');db.className='badge';
-        if(q.diff<=3){db.classList.add('badge-hard');db.textContent=lang==='ko'?'어려움':'Hard';}
-        else{db.classList.add('badge-extreme');db.textContent=lang==='ko'?'고급':'Expert';}
-        document.getElementById('mQText').textContent=getLoc(q.q);
-        document.getElementById('mVisual').innerHTML=renderMVisual(q);
-        const mk=['A','B','C','D'];
-        document.getElementById('mOptions').innerHTML=q.opts.map((o,j)=>`<div class="option gold" onclick="selMensa(${j})" data-i="${j}"><span class="option-marker">${mk[j]}</span><span class="option-text">${o}</span></div>`).join('');
-        if(mAns[i]!==null){document.querySelector(`#mOptions [data-i="${mAns[i]}"]`)?.classList.add('selected');document.getElementById('mNextBtn').disabled=false;}
-        else document.getElementById('mNextBtn').disabled=true;
-        startMTimer();mStart=Date.now();
-    }
-    function renderMVisual(q){
-        if(q.type==='matrix'&&q.matrix){
-            return `<div class="matrix-box"><div class="matrix-grid">${q.matrix.map(c=>`<div class="matrix-cell ${c==='?'?'empty gold':''}">${c==='?'?'':c}</div>`).join('')}</div></div>`;
+
+        // ========== QUESTIONS (10 per category) ==========
+        const questions = {
+            pattern: [
+                { id: 'p1', diff: 1, q: { ko: '규칙을 찾아 빈 칸을 채우세요.', en: 'Find the pattern.' }, type: 'matrix', matrix: ['●', '●●', '●●●', '■', '■■', '■■■', '▲', '▲▲', '?'], opts: ['▲', '▲▲▲', '■■■', '●●●'], ans: 1 },
+                { id: 'p2', diff: 1, q: { ko: '숫자 패턴을 찾으세요.', en: 'Find number pattern.' }, type: 'matrix', matrix: ['1', '2', '3', '4', '5', '6', '7', '8', '?'], opts: ['9', '10', '0', '7'], ans: 0 },
+                { id: 'p3', diff: 2, q: { ko: '행과 열의 규칙을 찾으세요.', en: 'Find row/column rules.' }, type: 'matrix', matrix: ['2', '4', '6', '3', '6', '9', '4', '8', '?'], opts: ['10', '12', '14', '16'], ans: 1 },
+                { id: 'p4', diff: 2, q: { ko: '도형 변화 규칙을 찾으세요.', en: 'Find shape changes.' }, type: 'matrix', matrix: ['○', '◐', '●', '□', '◧', '■', '△', '◮', '?'], opts: ['△', '▲', '◮', '○'], ans: 1 },
+                { id: 'p5', diff: 3, q: { ko: '복잡한 규칙을 찾으세요.', en: 'Find complex pattern.' }, type: 'matrix', matrix: ['1', '1', '1', '2', '4', '8', '3', '9', '?'], opts: ['12', '18', '27', '36'], ans: 2 },
+                { id: 'p6', diff: 3, q: { ko: '알파벳 패턴을 찾으세요.', en: 'Find alphabet pattern.' }, type: 'matrix', matrix: ['A', 'C', 'E', 'B', 'D', 'F', 'C', 'E', '?'], opts: ['F', 'G', 'H', 'I'], ans: 1 },
+                { id: 'p7', diff: 2, q: { ko: '색상 패턴입니다.', en: 'Color pattern.' }, type: 'matrix', matrix: ['🔴', '🔵', '🟢', '🔵', '🟢', '🔴', '🟢', '🔴', '?'], opts: ['🔴', '🔵', '🟢', '🟡'], ans: 1 },
+                { id: 'p8', diff: 3, q: { ko: '곱셈 규칙입니다.', en: 'Multiplication rule.' }, type: 'matrix', matrix: ['2', '3', '6', '4', '5', '20', '6', '7', '?'], opts: ['13', '36', '42', '48'], ans: 2 },
+                { id: 'p9', diff: 3, q: { ko: '덧셈 규칙입니다.', en: 'Addition rule.' }, type: 'matrix', matrix: ['1', '2', '3', '4', '5', '9', '5', '7', '?'], opts: ['10', '11', '12', '14'], ans: 2 },
+                { id: 'p10', diff: 4, q: { ko: '거듭제곱 패턴입니다.', en: 'Power pattern.' }, type: 'matrix', matrix: ['2', '4', '8', '3', '9', '27', '4', '16', '?'], opts: ['32', '48', '64', '256'], ans: 2 }
+            ],
+            numerical: [
+                { id: 'n1', diff: 1, q: { ko: '수열의 다음 항을 구하세요.', en: 'Find next term.' }, type: 'seq', seq: [2, 4, 6, 8, '?'], opts: ['9', '10', '11', '12'], ans: 1 },
+                { id: 'n2', diff: 1, q: { ko: '수열의 규칙을 찾으세요.', en: 'Find sequence pattern.' }, type: 'seq', seq: [5, 10, 15, 20, '?'], opts: ['22', '25', '30', '35'], ans: 1 },
+                { id: 'n3', diff: 2, q: { ko: '피보나치 수열입니다.', en: 'Fibonacci sequence.' }, type: 'seq', seq: [1, 1, 2, 3, 5, 8, '?'], opts: ['11', '12', '13', '15'], ans: 2 },
+                { id: 'n4', diff: 2, q: { ko: '등비수열입니다.', en: 'Geometric sequence.' }, type: 'seq', seq: [3, 6, 12, 24, '?'], opts: ['36', '48', '30', '42'], ans: 1 },
+                { id: 'n5', diff: 3, q: { ko: '제곱수 수열입니다.', en: 'Square numbers.' }, type: 'seq', seq: [1, 4, 9, 16, 25, '?'], opts: ['30', '35', '36', '49'], ans: 2 },
+                { id: 'n6', diff: 3, q: { ko: '차이 증가 수열입니다.', en: 'Increasing difference.' }, type: 'seq', seq: [2, 6, 12, 20, 30, '?'], opts: ['40', '42', '44', '56'], ans: 1 },
+                { id: 'n7', diff: 3, q: { ko: '삼각수 수열입니다.', en: 'Triangular numbers.' }, type: 'seq', seq: [1, 3, 6, 10, 15, '?'], opts: ['18', '20', '21', '25'], ans: 2 },
+                { id: 'n8', diff: 3, q: { ko: '소수 수열입니다.', en: 'Prime numbers.' }, type: 'seq', seq: [2, 3, 5, 7, 11, 13, '?'], opts: ['15', '17', '19', '21'], ans: 1 },
+                { id: 'n9', diff: 4, q: { ko: 'n^n 수열입니다.', en: 'n^n sequence.' }, type: 'seq', seq: [1, 4, 27, 256, '?'], opts: ['625', '1024', '3125', '4096'], ans: 2 },
+                { id: 'n10', diff: 4, q: { ko: '팩토리얼 수열입니다.', en: 'Factorial sequence.' }, type: 'seq', seq: [1, 2, 6, 24, 120, '?'], opts: ['240', '480', '720', '840'], ans: 2 }
+            ],
+            spatial: [
+                { id: 's1', diff: 1, q: { ko: '┘를 시계방향 90° 회전하면?', en: 'Rotate ┘ clockwise 90°?' }, type: 'text', opts: ['└', '┐', '┌', '─'], ans: 0 },
+                { id: 's2', diff: 1, q: { ko: '거울에 비친 "F"는?', en: 'Mirror of "F"?' }, type: 'text', opts: { ko: ['F', 'Ꮈ (반전)', 'd', 'ㅋ'], en: ['F', 'Ꮈ (flipped)', 'd', 'K'] }, ans: 1 },
+                { id: 's3', diff: 2, q: { ko: '정육면체 전개도에서 1의 맞은편은?', en: 'Opposite of 1 in cube net?' }, type: 'text', opts: ['2', '4', '5', '6'], ans: 3 },
+                { id: 's4', diff: 2, q: { ko: '왼쪽위 원이 있는 사각형을 180° 회전하면?', en: 'Rotate square 180°?' }, type: 'text', opts: { ko: ['왼쪽 위', '오른쪽 위', '왼쪽 아래', '오른쪽 아래'], en: ['Top-left', 'Top-right', 'Bottom-left', 'Bottom-right'] }, ans: 3 },
+                { id: 's5', diff: 3, q: { ko: '직각삼각형 2개 + 정사각형 1개 = ?', en: '2 triangles + 1 square = ?' }, type: 'text', opts: { ko: ['정사각형', '직사각형', '평행사변형', '사다리꼴'], en: ['Square', 'Rectangle', 'Parallelogram', 'Trapezoid'] }, ans: 1 },
+                { id: 's6', diff: 3, q: { ko: '정육면체 대각선 절단 단면은?', en: 'Diagonal cube cross-section?' }, type: 'text', opts: { ko: ['정삼각형', '정사각형', '직사각형', '정육각형'], en: ['Equilateral tri', 'Square', 'Rectangle', 'Hexagon'] }, ans: 3 },
+                { id: 's7', diff: 2, q: { ko: 'L을 좌우반전하면?', en: 'Flip L horizontally?' }, type: 'text', opts: ['L', '⅃', 'Γ', 'J'], ans: 3 },
+                { id: 's8', diff: 3, q: { ko: '정삼각형을 60° 회전하면?', en: 'Rotate triangle 60°?' }, type: 'text', opts: { ko: ['같은 모양', '다른 모양', '뒤집힘', '불가능'], en: ['Same', 'Different', 'Flipped', 'Impossible'] }, ans: 0 },
+                { id: 's9', diff: 3, q: { ko: '원뿔의 밑면 모양은?', en: 'Cone base shape?' }, type: 'text', opts: { ko: ['삼각형', '사각형', '원', '타원'], en: ['Triangle', 'Square', 'Circle', 'Ellipse'] }, ans: 2 },
+                { id: 's10', diff: 4, q: { ko: '정십이면체의 면 개수는?', en: 'Dodecahedron faces?' }, type: 'text', opts: ['10', '12', '14', '20'], ans: 1 }
+            ],
+            logical: [
+                { id: 'l1', diff: 1, q: { ko: '모든 개는 동물. 바둑이는 개. 참인 것은?', en: 'All dogs are animals. Baduk is dog. True?' }, type: 'text', opts: { ko: ['모든 동물은 개', '바둑이는 동물', '바둑이는 고양이 아님', '모든 동물은 바둑이'], en: ['All animals are dogs', 'Baduk is animal', 'Baduk is not cat', 'All animals are Baduk'] }, ans: 1 },
+                { id: 'l2', diff: 1, q: { ko: 'A>B, B>C. 가장 작은 것은?', en: 'A>B, B>C. Smallest?' }, type: 'text', opts: ['A', 'B', 'C', { ko: '알 수 없음', en: 'Unknown' }], ans: 2 },
+                { id: 'l3', diff: 2, q: { ko: '"비가 오면 땅이 젖는다"의 대우는?', en: 'Contrapositive of "If rain, wet"?' }, type: 'text', opts: { ko: ['젖으면 비', '안 오면 안 젖음', '안 젖으면 안 옴', '젖어도 안 올 수 있음'], en: ['Wet then rain', 'No rain no wet', 'Not wet no rain', 'Wet without rain'] }, ans: 2 },
+                { id: 'l4', diff: 2, q: { ko: 'A>B, C>A, D<B. 가장 큰 것은?', en: 'A>B, C>A, D<B. Largest?' }, type: 'text', opts: ['A', 'B', 'C', 'D'], ans: 2 },
+                { id: 'l5', diff: 3, q: { ko: '(x+5)÷3=4. x는?', en: '(x+5)÷3=4. x=?' }, type: 'text', opts: ['5', '6', '7', '8'], ans: 2 },
+                { id: 'l6', diff: 3, q: { ko: '5명 줄서기: A≠맨앞, B는 C뒤, D=맨뒤, E는 A앞. 맨앞은?', en: '5 people: A≠first, B behind C, D=last, E before A. First?' }, type: 'text', opts: ['A', 'B', 'C', 'E'], ans: 3 },
+                { id: 'l7', diff: 2, q: { ko: '참이면 거짓, 거짓이면 참. 이것은?', en: 'True=False, False=True. This is?' }, type: 'text', opts: { ko: ['참', '거짓', '모순', '역설'], en: ['True', 'False', 'Contradiction', 'Paradox'] }, ans: 3 },
+                { id: 'l8', diff: 3, q: { ko: '2x + 3 = 11. x는?', en: '2x + 3 = 11. x=?' }, type: 'text', opts: ['3', '4', '5', '6'], ans: 1 },
+                { id: 'l9', diff: 3, q: { ko: 'A, B, C 중 하나만 참. A가 거짓이면?', en: 'Only one of A,B,C is true. If A is false?' }, type: 'text', opts: { ko: ['B나 C가 참', 'B와 C 모두 참', 'B와 C 모두 거짓', '알 수 없음'], en: ['B or C true', 'B and C true', 'B and C false', 'Unknown'] }, ans: 0 },
+                { id: 'l10', diff: 4, q: { ko: '모든 P는 Q. 모든 Q는 R. 참인 것은?', en: 'All P are Q. All Q are R. True?' }, type: 'text', opts: { ko: ['모든 R은 P', '모든 P는 R', '일부 R만 Q', 'P와 R은 같음'], en: ['All R are P', 'All P are R', 'Some R are Q', 'P equals R'] }, ans: 1 }
+            ],
+            verbal: [
+                { id: 'v1', diff: 1, q: { ko: '책:읽다 = 음악:?', en: 'Book:Read = Music:?' }, type: 'analogy', an: { ko: ['책', '읽다', '음악', '?'], en: ['Book', 'Read', 'Music', '?'] }, opts: { ko: ['악기', '듣다', '가수', '콘서트'], en: ['Instrument', 'Listen', 'Singer', 'Concert'] }, ans: 1 },
+                { id: 'v2', diff: 1, q: { ko: '여름:덥다 = 겨울:?', en: 'Summer:Hot = Winter:?' }, type: 'analogy', an: { ko: ['여름', '덥다', '겨울', '?'], en: ['Summer', 'Hot', 'Winter', '?'] }, opts: { ko: ['눈', '춥다', '코트', '난방'], en: ['Snow', 'Cold', 'Coat', 'Heating'] }, ans: 1 },
+                { id: 'v3', diff: 2, q: { ko: '의사:병원 = 교사:?', en: 'Doctor:Hospital = Teacher:?' }, type: 'analogy', an: { ko: ['의사', '병원', '교사', '?'], en: ['Doctor', 'Hospital', 'Teacher', '?'] }, opts: { ko: ['학생', '학교', '교실', '교육'], en: ['Student', 'School', 'Classroom', 'Education'] }, ans: 1 },
+                { id: 'v4', diff: 2, q: { ko: '손:장갑 = 머리:?', en: 'Hand:Glove = Head:?' }, type: 'analogy', an: { ko: ['손', '장갑', '머리', '?'], en: ['Hand', 'Glove', 'Head', '?'] }, opts: { ko: ['모자', '얼굴', '두뇌', '머리카락'], en: ['Hat', 'Face', 'Brain', 'Hair'] }, ans: 0 },
+                { id: 'v5', diff: 3, q: { ko: '빛:어둠 = 지식:?', en: 'Light:Darkness = Knowledge:?' }, type: 'analogy', an: { ko: ['빛', '어둠', '지식', '?'], en: ['Light', 'Darkness', 'Knowledge', '?'] }, opts: { ko: ['학교', '무지', '책', '공부'], en: ['School', 'Ignorance', 'Book', 'Study'] }, ans: 1 },
+                { id: 'v6', diff: 3, q: { ko: '나무:숲 = 별:?', en: 'Tree:Forest = Star:?' }, type: 'analogy', an: { ko: ['나무', '숲', '별', '?'], en: ['Tree', 'Forest', 'Star', '?'] }, opts: { ko: ['하늘', '은하', '달', '우주'], en: ['Sky', 'Galaxy', 'Moon', 'Universe'] }, ans: 1 },
+                { id: 'v7', diff: 2, q: { ko: '새:둥지 = 사람:?', en: 'Bird:Nest = Human:?' }, type: 'analogy', an: { ko: ['새', '둥지', '사람', '?'], en: ['Bird', 'Nest', 'Human', '?'] }, opts: { ko: ['음식', '옷', '집', '차'], en: ['Food', 'Clothes', 'House', 'Car'] }, ans: 2 },
+                { id: 'v8', diff: 3, q: { ko: '화가:그림 = 작곡가:?', en: 'Painter:Painting = Composer:?' }, type: 'analogy', an: { ko: ['화가', '그림', '작곡가', '?'], en: ['Painter', 'Painting', 'Composer', '?'] }, opts: { ko: ['악기', '음악', '가수', '무대'], en: ['Instrument', 'Music', 'Singer', 'Stage'] }, ans: 1 },
+                { id: 'v9', diff: 3, q: { ko: '원인:결과 = 질문:?', en: 'Cause:Effect = Question:?' }, type: 'analogy', an: { ko: ['원인', '결과', '질문', '?'], en: ['Cause', 'Effect', 'Question', '?'] }, opts: { ko: ['대화', '의문', '답변', '호기심'], en: ['Talk', 'Doubt', 'Answer', 'Curiosity'] }, ans: 2 },
+                { id: 'v10', diff: 4, q: { ko: '씨앗:나무 = 아이디어:?', en: 'Seed:Tree = Idea:?' }, type: 'analogy', an: { ko: ['씨앗', '나무', '아이디어', '?'], en: ['Seed', 'Tree', 'Idea', '?'] }, opts: { ko: ['생각', '혁신', '두뇌', '꿈'], en: ['Thought', 'Innovation', 'Brain', 'Dream'] }, ans: 1 }
+            ]
+        };
+
+        const mensaQ = [
+            { id: 'm1', diff: 3, q: { ko: '규칙을 찾으세요.', en: 'Find pattern.' }, type: 'matrix', matrix: ['●', '●●', '●●●', '■', '■■', '■■■', '▲', '▲▲', '?'], opts: ['▲', '▲▲▲', '■■■', '●●●'], ans: 1 },
+            { id: 'm2', diff: 3, q: { ko: '도형 변화.', en: 'Shape changes.' }, type: 'matrix', matrix: ['○', '◐', '●', '□', '◧', '■', '△', '◮', '?'], opts: ['△', '▲', '◮', '○'], ans: 1 },
+            { id: 'm3', diff: 3, q: { ko: '제곱수입니다.', en: 'Square numbers.' }, type: 'seq', seq: [1, 4, 9, 16, 25, '?'], opts: ['30', '36', '42', '49'], ans: 1 },
+            { id: 'm4', diff: 4, q: { ko: '거듭제곱 패턴.', en: 'Power pattern.' }, type: 'matrix', matrix: ['2', '4', '8', '3', '9', '27', '4', '16', '?'], opts: ['32', '48', '64', '256'], ans: 2 },
+            { id: 'm5', diff: 3, q: { ko: '숫자 패턴.', en: 'Number pattern.' }, type: 'matrix', matrix: ['1', '2', '3', '4', '5', '6', '7', '8', '?'], opts: ['9', '10', '0', '12'], ans: 0 },
+            { id: 'm6', diff: 4, q: { ko: '삼각수입니다.', en: 'Triangular numbers.' }, type: 'seq', seq: [1, 3, 6, 10, 15, '?'], opts: ['18', '20', '21', '25'], ans: 2 },
+            { id: 'm7', diff: 4, q: { ko: '소수입니다.', en: 'Prime numbers.' }, type: 'seq', seq: [2, 3, 5, 7, 11, 13, '?'], opts: ['15', '17', '19', '21'], ans: 1 },
+            { id: 'm8', diff: 4, q: { ko: '알파벳-숫자.', en: 'Alphanumeric.' }, type: 'matrix', matrix: ['A1', 'B2', 'C3', 'D4', 'E5', 'F6', 'G7', 'H8', '?'], opts: ['I9', 'J9', 'I10', 'J10'], ans: 0 },
+            { id: 'm9', diff: 4, q: { ko: '색상 패턴.', en: 'Color pattern.' }, type: 'matrix', matrix: ['🔴', '🔵', '🟢', '🔵', '🟢', '🔴', '🟢', '🔴', '?'], opts: ['🔴', '🔵', '🟢', '🟡'], ans: 1 },
+            { id: 'm10', diff: 4, q: { ko: '피보나치.', en: 'Fibonacci.' }, type: 'seq', seq: [1, 1, 2, 3, 5, 8, 13, 21, '?'], opts: ['29', '34', '36', '42'], ans: 1 },
+            { id: 'm11', diff: 5, q: { ko: '곱셈 규칙.', en: 'Multiplication.' }, type: 'matrix', matrix: ['2', '3', '6', '4', '5', '20', '6', '7', '?'], opts: ['13', '36', '42', '48'], ans: 2 },
+            { id: 'm12', diff: 5, q: { ko: 'n^n 수열.', en: 'n^n sequence.' }, type: 'seq', seq: [1, 4, 27, 256, '?'], opts: ['625', '1024', '3125', '4096'], ans: 2 },
+            { id: 'm13', diff: 5, q: { ko: '세제곱수.', en: 'Cube numbers.' }, type: 'matrix', matrix: ['1', '8', '27', '64', '125', '216', '343', '512', '?'], opts: ['625', '729', '1000', '1024'], ans: 1 },
+            { id: 'm14', diff: 5, q: { ko: '덧셈 규칙.', en: 'Addition rule.' }, type: 'matrix', matrix: ['1', '2', '3', '4', '5', '9', '5', '7', '?'], opts: ['10', '11', '12', '14'], ans: 2 },
+            { id: 'm15', diff: 5, q: { ko: '복잡한 수열.', en: 'Complex sequence.' }, type: 'seq', seq: [0, 1, 1, 2, 4, 7, 13, '?'], opts: ['20', '22', '24', '26'], ans: 2 },
+            { id: 'm16', diff: 4, q: { ko: '크기 변화.', en: 'Size change.' }, type: 'matrix', matrix: ['•', '●', '⬤', '▪', '■', '⬛', '▴', '▲', '?'], opts: ['▴', '▲', '⏶', '△'], ans: 2 },
+            { id: 'm17', diff: 4, q: { ko: '차이 증가.', en: 'Increasing diff.' }, type: 'seq', seq: [2, 3, 5, 8, 12, 17, '?'], opts: ['22', '23', '24', '25'], ans: 1 },
+            { id: 'm18', diff: 5, q: { ko: '대각선 패턴.', en: 'Diagonal pattern.' }, type: 'matrix', matrix: ['1', '3', '6', '2', '5', '9', '4', '8', '?'], opts: ['10', '12', '13', '15'], ans: 2 },
+            { id: 'm19', diff: 5, q: { ko: '팩토리얼.', en: 'Factorial.' }, type: 'seq', seq: [1, 2, 6, 24, 120, '?'], opts: ['240', '480', '720', '840'], ans: 2 },
+            { id: 'm20', diff: 5, q: { ko: '종합 패턴.', en: 'Comprehensive.' }, type: 'matrix', matrix: ['2', '6', '18', '4', '12', '36', '8', '24', '?'], opts: ['48', '64', '72', '96'], ans: 2 }
+        ];
+
+        // ========== STATE ==========
+        let selectedCat = null;
+
+        const catNames = { ko: { pattern: '패턴 인식', numerical: '수리 추론', spatial: '공간 지각', logical: '논리 추론', verbal: '언어 유추', comprehensive: '종합 능력' }, en: { pattern: 'Pattern Recognition', numerical: 'Numerical Reasoning', spatial: 'Spatial Perception', logical: 'Logical Reasoning', verbal: 'Verbal Analogies', comprehensive: 'Comprehensive Test' } };
+
+        let bIdx = 0, bQs = [], bAns = [], bTimes = [], bTimer = null, bTimeLeft = 45, bStart = null, bTestStart = null;
+        const B_MAX = 45, B_TOTAL = 10;
+        let mIdx = 0, mQs = [], mAns = [], mTimes = [], mTimer = null, mTimeLeft = 60, mStart = null, mTestStart = null;
+        const M_MAX = 60, M_TOTAL = 20;
+        let qualCode = '', qualIQ = 0, validCodes = [];
+
+        // ========== UTILS ==========
+        function shuffle(a) { const n = [...a]; for (let i = n.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[n[i], n[j]] = [n[j], n[i]]; } return n; }
+        function show(id) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
+        function genCode() { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r = 'CQ-'; for (let i = 0; i < 8; i++)r += c[Math.floor(Math.random() * c.length)]; return r; }
+        function fmtDate(d) { return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; }
+        function getLoc(o) { return typeof o === 'string' ? o : (o[lang] || o.ko || o); }
+        function getOpts(o) { return Array.isArray(o) ? o.map(x => getLoc(x)) : getLoc(o); }
+
+        // ========== CATEGORY SELECTION ==========
+        function selectCat(cat) {
+            selectedCat = cat;
+            document.querySelectorAll('.select-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`.select-card[data-cat="${cat}"]`).classList.add('selected');
+            document.getElementById('selectedInfo').style.display = 'block';
+            document.getElementById('selectedCatName').textContent = catNames[lang][cat];
+            document.getElementById('infoTotalQ').textContent = cat === 'comprehensive' ? '20' : '10';
+            updateStartBtn();
         }
-        if(q.type==='seq'&&q.seq){
-            return `<div class="sequence-box">${q.seq.map((s,i)=>`<div class="seq-item ${s==='?'?'unknown':''}">${s}</div>${i<q.seq.length-1?'<span class="seq-arrow">→</span>':''}`).join('')}</div>`;
-        }
-        return '';
-    }
-    function startMTimer(){
-        clearInterval(mTimer);mTimeLeft=M_MAX;
-        document.getElementById('mTimerTxt').textContent=mTimeLeft;
-        document.getElementById('mTimerProg').style.strokeDashoffset=0;
-        const circ=2*Math.PI*20;
-        mTimer=setInterval(()=>{
-            mTimeLeft--;
-            document.getElementById('mTimerTxt').textContent=mTimeLeft;
-            document.getElementById('mTimerProg').style.strokeDashoffset=(1-mTimeLeft/M_MAX)*circ;
-            const ring=document.getElementById('mTimerRing');
-            ring.classList.remove('warning','danger');
-            if(mTimeLeft<=15)ring.classList.add('danger');
-            else if(mTimeLeft<=30)ring.classList.add('warning');
-            if(mTimeLeft<=0){clearInterval(mTimer);autoNextM();}
-        },1000);
-    }
-    function selMensa(j){
-        document.querySelectorAll('#mOptions .option').forEach(o=>o.classList.remove('selected'));
-        document.querySelector(`#mOptions [data-i="${j}"]`).classList.add('selected');
-        mAns[mIdx]=j;mTimes[mIdx]=Date.now()-mStart;
-        document.getElementById('mNextBtn').disabled=false;
-    }
-    function nextMensa(){clearInterval(mTimer);if(mIdx<M_TOTAL-1)loadMensaQ(mIdx+1);else showMensaRes();}
-    function skipMensa(){clearInterval(mTimer);mTimes[mIdx]=M_MAX*1000;if(mIdx<M_TOTAL-1)loadMensaQ(mIdx+1);else showMensaRes();}
-    function autoNextM(){mTimes[mIdx]=M_MAX*1000;if(mIdx<M_TOTAL-1)loadMensaQ(mIdx+1);else showMensaRes();}
-    
-    function calcMensaRes(){
-        let tc=0,ws=0,mw=0;
-        mQs.forEach((q,i)=>{
-            mw+=q.diff;
-            if(mAns[i]===q.ans){
-                tc++;
-                const tr=Math.max(0,1-(mTimes[i]/(M_MAX*1000)));
-                ws+=q.diff*(1+tr*0.1);
+        function updateStartBtn() {
+            const btn = document.getElementById('startBtn');
+            if (selectedCat) {
+                btn.disabled = false;
+                btn.innerHTML = `<span>${t('btn.start')}</span> <span>→</span>`;
+            } else {
+                btn.disabled = true;
+                btn.innerHTML = `<span>${t('btn.select')}</span> <span>→</span>`;
             }
-        });
-        const rr=ws/mw,z=(rr-0.35)*5;
-        let iq=Math.round(115+z*15);iq=Math.max(100,Math.min(160,iq));
-        const vt=mTimes.filter(x=>x&&x<M_MAX*1000);
-        const avg=vt.length?Math.round(vt.reduce((a,b)=>a+b,0)/vt.length/1000):0;
-        return{iq,tc,acc:Math.round((tc/M_TOTAL)*100),avg};
-    }
-    function getMensaClass(iq){
-        if(iq>=148)return{l:lang==='ko'?'천재 레벨':'Genius Level',d:lang==='ko'?'상위 0.1%의 극히 희귀한 인지능력입니다.':'Extremely rare (top 0.1%).',p:99.9};
-        if(iq>=140)return{l:lang==='ko'?'매우 영재':'Highly Gifted',d:lang==='ko'?'상위 0.5%의 뛰어난 인지능력입니다.':'Outstanding (top 0.5%).',p:99.5};
-        if(iq>=130)return{l:lang==='ko'?'멘사 합격권':'Mensa Level',d:lang==='ko'?'축하합니다! 상위 2%로 멘사 자격에 해당합니다.':'Congratulations! Mensa qualification.',p:98};
-        if(iq>=120)return{l:lang==='ko'?'우수':'Superior',d:lang==='ko'?'상위 10%의 우수한 인지능력입니다.':'Excellent (top 10%).',p:91};
-        if(iq>=110)return{l:lang==='ko'?'평균 상':'High Average',d:lang==='ko'?'평균 이상의 좋은 인지능력입니다.':'Good, above average.',p:75};
-        return{l:lang==='ko'?'평균':'Average',d:lang==='ko'?'일반적인 수준입니다.':'Normal level.',p:50};
-    }
-    function showMensaRes(){
-        show('mensaResultsSection');
-        const r=calcMensaRes(),cl=getMensaClass(r.iq);
-        document.getElementById('mIQ').textContent=r.iq;
-        const norm=Math.min(Math.max((r.iq-100)/60,0),1);
-        const circ=2*Math.PI*88;
-        setTimeout(()=>document.getElementById('mScoreProg').style.strokeDashoffset=circ*(1-norm),100);
-        document.getElementById('mClassLabel').textContent=cl.l;
-        document.getElementById('mClassDesc').textContent=cl.d;
-        document.getElementById('mPercentile').textContent=lang==='ko'?`상위 ${(100-cl.p).toFixed(1)}% (백분위 ${cl.p})`:`Top ${(100-cl.p).toFixed(1)}% (Percentile ${cl.p})`;
-        document.getElementById('mCorrect').textContent=r.tc+'/'+M_TOTAL;
-        document.getElementById('mAccuracy').textContent=r.acc+'%';
-        document.getElementById('mAvgTime').textContent=r.avg+'s';
-        if(r.iq>=130){
-            document.getElementById('mensaPassSection').style.display='block';
-            document.getElementById('mCertIQ').textContent=r.iq;
-            document.getElementById('mCertPct').textContent=cl.p+'%';
-        }else document.getElementById('mensaPassSection').style.display='none';
-    }
-    function retryMensa(){if(qualCode||validCodes.length)startMensaTest();}
+        }
+
+        // ========== NAV ==========
+        function goHome() {
+            if (document.getElementById('basicTestSection').classList.contains('active') || document.getElementById('mensaTestSection').classList.contains('active')) {
+                showExitModal();
+            } else restart();
+        }
+        function showExitModal() { document.getElementById('exitModal').classList.add('active'); }
+        function closeModal() { document.getElementById('exitModal').classList.remove('active'); }
+        function confirmExit() { closeModal(); clearInterval(bTimer); clearInterval(mTimer); restart(); }
+        function restart() {
+            clearInterval(bTimer); clearInterval(mTimer); selectedCat = null;
+            document.querySelectorAll('.select-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('selectedInfo').style.display = 'none';
+            document.getElementById('bgPattern').classList.remove('mensa');
+            document.getElementById('logoIcon').classList.remove('gold');
+            document.getElementById('mainTitle').textContent = lang === 'ko' ? '인지능력 측정 테스트' : 'Cognitive Intelligence Test';
+            document.getElementById('mainTitle').classList.remove('gold');
+            document.getElementById('mainSubtitle').textContent = lang === 'ko' ? '5가지 영역 중 1가지를 선택하여 도전하세요' : 'Select 1 of 5 categories to challenge';
+            updateStartBtn();
+            show('introSection');
+        }
+
+        // ========== CODE VERIFY ==========
+        function verifyCode() {
+            const inp = document.getElementById('codeInput').value.trim().toUpperCase();
+            const err = document.getElementById('codeError');
+            if (validCodes.includes(inp) || inp === 'CQ-TESTCODE') {
+                err.style.display = 'none'; qualCode = inp; startMensaTest();
+            } else err.style.display = 'block';
+        }
+
+        // ========== BASIC TEST ==========
+        function startBasicTest() {
+            if (!selectedCat) return;
+
+            if (selectedCat === 'comprehensive') {
+                bQs = [];
+                bQs.push(...shuffle([...questions.pattern]).slice(0, 4));
+                bQs.push(...shuffle([...questions.numerical]).slice(0, 4));
+                bQs.push(...shuffle([...questions.spatial]).slice(0, 4));
+                bQs.push(...shuffle([...questions.logical]).slice(0, 4));
+                bQs.push(...shuffle([...questions.verbal]).slice(0, 4));
+                bQs = shuffle(bQs);
+                document.getElementById('bTotalQ').textContent = '20';
+            } else {
+                bQs = shuffle([...questions[selectedCat]]).slice(0, B_TOTAL);
+                document.getElementById('bTotalQ').textContent = B_TOTAL;
+            }
+
+            bAns = Array(bQs.length).fill(null);
+            bTimes = Array(bQs.length).fill(null);
+            bTestStart = Date.now();
+
+            document.getElementById('bCatBadge').textContent = catNames[lang][selectedCat];
+            show('basicTestSection');
+            loadBasicQ(0);
+        }
+        function loadBasicQ(i) {
+            bIdx = i; const q = bQs[i];
+            document.getElementById('bCurQ').textContent = i + 1;
+            document.getElementById('bProgBar').style.width = `${((i + 1) / B_TOTAL) * 100}%`;
+            const db = document.getElementById('bDiffBadge'); db.className = 'badge';
+            if (q.diff === 1) { db.classList.add('badge-easy'); db.textContent = lang === 'ko' ? '쉬움' : 'Easy'; }
+            else if (q.diff === 2) { db.classList.add('badge-medium'); db.textContent = lang === 'ko' ? '보통' : 'Medium'; }
+            else if (q.diff === 3) { db.classList.add('badge-hard'); db.textContent = lang === 'ko' ? '어려움' : 'Hard'; }
+            else { db.classList.add('badge-extreme'); db.textContent = lang === 'ko' ? '고급' : 'Expert'; }
+            document.getElementById('bQText').textContent = getLoc(q.q);
+            document.getElementById('bVisual').innerHTML = renderVisual(q);
+            const opts = getOpts(q.opts); const mk = ['A', 'B', 'C', 'D'];
+            document.getElementById('bOptions').innerHTML = opts.map((o, j) => `<div class="option" onclick="selBasic(${j})" data-i="${j}"><span class="option-marker">${mk[j]}</span><span class="option-text">${o}</span></div>`).join('');
+            if (bAns[i] !== null) { document.querySelector(`#bOptions [data-i="${bAns[i]}"]`)?.classList.add('selected'); document.getElementById('bNextBtn').disabled = false; }
+            else document.getElementById('bNextBtn').disabled = true;
+            startBTimer(); bStart = Date.now();
+        }
+        function renderVisual(q) {
+            if (q.type === 'matrix' && q.matrix) {
+                return `<div class="matrix-box"><div class="matrix-grid">${q.matrix.map(c => `<div class="matrix-cell ${c === '?' ? 'empty' : ''}">${c === '?' ? '' : c}</div>`).join('')}</div></div>`;
+            }
+            if (q.type === 'seq' && q.seq) {
+                return `<div class="sequence-box">${q.seq.map((s, i) => `<div class="seq-item ${s === '?' ? 'unknown' : ''}">${s}</div>${i < q.seq.length - 1 ? '<span class="seq-arrow">→</span>' : ''}`).join('')}</div>`;
+            }
+            if (q.type === 'analogy' && q.an) {
+                const a = getOpts(q.an);
+                return `<div class="analogy-box"><span class="analogy-item">${a[0]}</span><span class="analogy-sep">:</span><span class="analogy-item">${a[1]}</span><span class="analogy-sep">=</span><span class="analogy-item">${a[2]}</span><span class="analogy-sep">:</span><span class="analogy-item unknown">?</span></div>`;
+            }
+            return '';
+        }
+        function startBTimer() {
+            clearInterval(bTimer); bTimeLeft = B_MAX;
+            document.getElementById('bTimerTxt').textContent = bTimeLeft;
+            document.getElementById('bTimerProg').style.strokeDashoffset = 0;
+            const circ = 2 * Math.PI * 20;
+            bTimer = setInterval(() => {
+                bTimeLeft--;
+                document.getElementById('bTimerTxt').textContent = bTimeLeft;
+                document.getElementById('bTimerProg').style.strokeDashoffset = (1 - bTimeLeft / B_MAX) * circ;
+                const ring = document.getElementById('bTimerRing');
+                ring.classList.remove('warning', 'danger');
+                if (bTimeLeft <= 10) ring.classList.add('danger');
+                else if (bTimeLeft <= 20) ring.classList.add('warning');
+                if (bTimeLeft <= 0) { clearInterval(bTimer); autoNextB(); }
+            }, 1000);
+        }
+        function selBasic(j) {
+            document.querySelectorAll('#bOptions .option').forEach(o => o.classList.remove('selected'));
+            document.querySelector(`#bOptions [data-i="${j}"]`).classList.add('selected');
+            bAns[bIdx] = j; bTimes[bIdx] = Date.now() - bStart;
+            document.getElementById('bNextBtn').disabled = false;
+        }
+        function nextBasic() { clearInterval(bTimer); if (bIdx < B_TOTAL - 1) loadBasicQ(bIdx + 1); else showBasicRes(); }
+        function skipBasic() { clearInterval(bTimer); bTimes[bIdx] = B_MAX * 1000; if (bIdx < B_TOTAL - 1) loadBasicQ(bIdx + 1); else showBasicRes(); }
+        function autoNextB() { bTimes[bIdx] = B_MAX * 1000; if (bIdx < B_TOTAL - 1) loadBasicQ(bIdx + 1); else showBasicRes(); }
+
+        function calcBasicRes() {
+            let tc = 0, ws = 0, mw = 0;
+            bQs.forEach((q, i) => {
+                mw += q.diff;
+                if (bAns[i] === q.ans) {
+                    tc++;
+                    const tr = Math.max(0, 1 - (bTimes[i] / (B_MAX * 1000)));
+                    ws += q.diff * (1 + tr * 0.15);
+                }
+            });
+            const rr = ws / mw, z = (rr - 0.45) * 4.5;
+            let iq = Math.round(100 + z * 15); iq = Math.max(55, Math.min(145, iq));
+            const vt = bTimes.filter(x => x && x < B_MAX * 1000);
+            const avg = vt.length ? Math.round(vt.reduce((a, b) => a + b, 0) / vt.length / 1000) : 0;
+            const tot = Math.round((Date.now() - bTestStart) / 1000);
+            return { iq, tc, acc: Math.round((tc / B_TOTAL) * 100), avg, tot };
+        }
+        function getIQClass(iq) {
+            if (iq >= 130) return { l: lang === 'ko' ? '매우 우수' : 'Very Superior', d: lang === 'ko' ? '상위 2% 이내의 뛰어난 인지능력입니다.' : 'Outstanding (top 2%).', p: 98 };
+            if (iq >= 120) return { l: lang === 'ko' ? '우수' : 'Superior', d: lang === 'ko' ? '상위 10% 이내의 우수한 인지능력입니다.' : 'Excellent (top 10%).', p: 91 };
+            if (iq >= 110) return { l: lang === 'ko' ? '평균 상' : 'High Average', d: lang === 'ko' ? '평균 이상의 좋은 인지능력입니다.' : 'Good, above average.', p: 75 };
+            if (iq >= 90) return { l: lang === 'ko' ? '평균' : 'Average', d: lang === 'ko' ? '일반적인 수준입니다.' : 'Normal level.', p: 50 };
+            return { l: lang === 'ko' ? '평균 하' : 'Below Average', d: lang === 'ko' ? '평균보다 낮은 수준입니다.' : 'Below average.', p: 25 };
+        }
+        function showBasicRes() {
+            show('basicResultsSection');
+            const r = calcBasicRes(), cl = getIQClass(r.iq);
+            document.getElementById('resCatName').textContent = catNames[lang][selectedCat];
+            document.getElementById('bIQ').textContent = r.iq;
+            const norm = Math.min(Math.max((r.iq - 55) / 90, 0), 1);
+            const circ = 2 * Math.PI * 88;
+            setTimeout(() => document.getElementById('bScoreProg').style.strokeDashoffset = circ * (1 - norm), 100);
+            document.getElementById('bClassLabel').textContent = cl.l;
+            document.getElementById('bClassDesc').textContent = cl.d;
+            document.getElementById('bPercentile').textContent = lang === 'ko' ? `상위 ${100 - cl.p}% (백분위 ${cl.p})` : `Top ${100 - cl.p}% (Percentile ${cl.p})`;
+            document.getElementById('bCorrect').textContent = r.tc + '/' + B_TOTAL;
+            document.getElementById('bAccuracy').textContent = r.acc + '%';
+            document.getElementById('bAvgTime').textContent = r.avg + 's';
+            document.getElementById('bTotalTime').textContent = r.tot + 's';
+
+            if (r.iq >= 120) {
+                qualCode = genCode(); qualIQ = r.iq; validCodes.push(qualCode);
+                document.getElementById('certSection').style.display = 'block';
+                document.getElementById('notQualSection').style.display = 'none';
+                document.getElementById('mensaBtn').style.display = 'inline-flex';
+                document.getElementById('certCatName').textContent = catNames[lang][selectedCat];
+                document.getElementById('certIQ').textContent = r.iq;
+                document.getElementById('certDate').textContent = fmtDate(new Date());
+                document.getElementById('certCode').textContent = qualCode;
+                document.getElementById('bClassBox').classList.add('gold');
+                document.getElementById('bClassLabel').classList.add('gold');
+                document.getElementById('bIQ').classList.add('gold');
+                document.getElementById('bScoreProg').setAttribute('stroke', 'url(#goldGrad)');
+            } else {
+                document.getElementById('certSection').style.display = 'none';
+                document.getElementById('notQualSection').style.display = 'block';
+                document.getElementById('mensaBtn').style.display = 'none';
+                document.getElementById('bClassBox').classList.remove('gold');
+                document.getElementById('bClassLabel').classList.remove('gold');
+                document.getElementById('bIQ').classList.remove('gold');
+            }
+        }
+        function sendEmail() {
+            const em = document.getElementById('emailInput').value.trim();
+            if (!em || !em.includes('@')) { alert(lang === 'ko' ? '올바른 이메일을 입력하세요.' : 'Enter valid email.'); return; }
+            console.log('Email:', em, 'Code:', qualCode, 'IQ:', qualIQ);
+            document.getElementById('emailOK').style.display = 'flex';
+            setTimeout(() => document.getElementById('emailOK').style.display = 'none', 4000);
+        }
+
+        // ========== MENSA TEST ==========
+        function startMensaTest() {
+            document.getElementById('bgPattern').classList.add('mensa');
+            document.getElementById('logoIcon').classList.add('gold');
+            document.getElementById('mainTitle').textContent = lang === 'ko' ? '멘사 도전 테스트' : 'Mensa Challenge Test';
+            document.getElementById('mainTitle').classList.add('gold');
+            document.getElementById('mainSubtitle').textContent = lang === 'ko' ? '상위 2% 인지능력 도전' : 'Top 2% Cognitive Challenge';
+            mQs = shuffle([...mensaQ]).slice(0, M_TOTAL);
+            mAns = Array(M_TOTAL).fill(null); mTimes = Array(M_TOTAL).fill(null); mTestStart = Date.now();
+            document.getElementById('mTotalQ').textContent = M_TOTAL;
+            show('mensaTestSection'); loadMensaQ(0);
+        }
+        function loadMensaQ(i) {
+            mIdx = i; const q = mQs[i];
+            document.getElementById('mCurQ').textContent = i + 1;
+            document.getElementById('mProgBar').style.width = `${((i + 1) / M_TOTAL) * 100}%`;
+            const db = document.getElementById('mDiffBadge'); db.className = 'badge';
+            if (q.diff <= 3) { db.classList.add('badge-hard'); db.textContent = lang === 'ko' ? '어려움' : 'Hard'; }
+            else { db.classList.add('badge-extreme'); db.textContent = lang === 'ko' ? '고급' : 'Expert'; }
+            document.getElementById('mQText').textContent = getLoc(q.q);
+            document.getElementById('mVisual').innerHTML = renderMVisual(q);
+            const mk = ['A', 'B', 'C', 'D'];
+            document.getElementById('mOptions').innerHTML = q.opts.map((o, j) => `<div class="option gold" onclick="selMensa(${j})" data-i="${j}"><span class="option-marker">${mk[j]}</span><span class="option-text">${o}</span></div>`).join('');
+            if (mAns[i] !== null) { document.querySelector(`#mOptions [data-i="${mAns[i]}"]`)?.classList.add('selected'); document.getElementById('mNextBtn').disabled = false; }
+            else document.getElementById('mNextBtn').disabled = true;
+            startMTimer(); mStart = Date.now();
+        }
+        function renderMVisual(q) {
+            if (q.type === 'matrix' && q.matrix) {
+                return `<div class="matrix-box"><div class="matrix-grid">${q.matrix.map(c => `<div class="matrix-cell ${c === '?' ? 'empty gold' : ''}">${c === '?' ? '' : c}</div>`).join('')}</div></div>`;
+            }
+            if (q.type === 'seq' && q.seq) {
+                return `<div class="sequence-box">${q.seq.map((s, i) => `<div class="seq-item ${s === '?' ? 'unknown' : ''}">${s}</div>${i < q.seq.length - 1 ? '<span class="seq-arrow">→</span>' : ''}`).join('')}</div>`;
+            }
+            return '';
+        }
+        function startMTimer() {
+            clearInterval(mTimer); mTimeLeft = M_MAX;
+            document.getElementById('mTimerTxt').textContent = mTimeLeft;
+            document.getElementById('mTimerProg').style.strokeDashoffset = 0;
+            const circ = 2 * Math.PI * 20;
+            mTimer = setInterval(() => {
+                mTimeLeft--;
+                document.getElementById('mTimerTxt').textContent = mTimeLeft;
+                document.getElementById('mTimerProg').style.strokeDashoffset = (1 - mTimeLeft / M_MAX) * circ;
+                const ring = document.getElementById('mTimerRing');
+                ring.classList.remove('warning', 'danger');
+                if (mTimeLeft <= 15) ring.classList.add('danger');
+                else if (mTimeLeft <= 30) ring.classList.add('warning');
+                if (mTimeLeft <= 0) { clearInterval(mTimer); autoNextM(); }
+            }, 1000);
+        }
+        function selMensa(j) {
+            document.querySelectorAll('#mOptions .option').forEach(o => o.classList.remove('selected'));
+            document.querySelector(`#mOptions [data-i="${j}"]`).classList.add('selected');
+            mAns[mIdx] = j; mTimes[mIdx] = Date.now() - mStart;
+            document.getElementById('mNextBtn').disabled = false;
+        }
+        function nextMensa() { clearInterval(mTimer); if (mIdx < M_TOTAL - 1) loadMensaQ(mIdx + 1); else showMensaRes(); }
+        function skipMensa() { clearInterval(mTimer); mTimes[mIdx] = M_MAX * 1000; if (mIdx < M_TOTAL - 1) loadMensaQ(mIdx + 1); else showMensaRes(); }
+        function autoNextM() { mTimes[mIdx] = M_MAX * 1000; if (mIdx < M_TOTAL - 1) loadMensaQ(mIdx + 1); else showMensaRes(); }
+
+        function calcMensaRes() {
+            let tc = 0, ws = 0, mw = 0;
+            mQs.forEach((q, i) => {
+                mw += q.diff;
+                if (mAns[i] === q.ans) {
+                    tc++;
+                    const tr = Math.max(0, 1 - (mTimes[i] / (M_MAX * 1000)));
+                    ws += q.diff * (1 + tr * 0.1);
+                }
+            });
+            const rr = ws / mw, z = (rr - 0.35) * 5;
+            let iq = Math.round(115 + z * 15); iq = Math.max(100, Math.min(160, iq));
+            const vt = mTimes.filter(x => x && x < M_MAX * 1000);
+            const avg = vt.length ? Math.round(vt.reduce((a, b) => a + b, 0) / vt.length / 1000) : 0;
+            return { iq, tc, acc: Math.round((tc / M_TOTAL) * 100), avg };
+        }
+        function getMensaClass(iq) {
+            if (iq >= 148) return { l: lang === 'ko' ? '천재 레벨' : 'Genius Level', d: lang === 'ko' ? '상위 0.1%의 극히 희귀한 인지능력입니다.' : 'Extremely rare (top 0.1%).', p: 99.9 };
+            if (iq >= 140) return { l: lang === 'ko' ? '매우 영재' : 'Highly Gifted', d: lang === 'ko' ? '상위 0.5%의 뛰어난 인지능력입니다.' : 'Outstanding (top 0.5%).', p: 99.5 };
+            if (iq >= 130) return { l: lang === 'ko' ? '멘사 합격권' : 'Mensa Level', d: lang === 'ko' ? '축하합니다! 상위 2%로 멘사 자격에 해당합니다.' : 'Congratulations! Mensa qualification.', p: 98 };
+            if (iq >= 120) return { l: lang === 'ko' ? '우수' : 'Superior', d: lang === 'ko' ? '상위 10%의 우수한 인지능력입니다.' : 'Excellent (top 10%).', p: 91 };
+            if (iq >= 110) return { l: lang === 'ko' ? '평균 상' : 'High Average', d: lang === 'ko' ? '평균 이상의 좋은 인지능력입니다.' : 'Good, above average.', p: 75 };
+            return { l: lang === 'ko' ? '평균' : 'Average', d: lang === 'ko' ? '일반적인 수준입니다.' : 'Normal level.', p: 50 };
+        }
+        function showMensaRes() {
+            show('mensaResultsSection');
+            const r = calcMensaRes(), cl = getMensaClass(r.iq);
+            document.getElementById('mIQ').textContent = r.iq;
+            const norm = Math.min(Math.max((r.iq - 100) / 60, 0), 1);
+            const circ = 2 * Math.PI * 88;
+            setTimeout(() => document.getElementById('mScoreProg').style.strokeDashoffset = circ * (1 - norm), 100);
+            document.getElementById('mClassLabel').textContent = cl.l;
+            document.getElementById('mClassDesc').textContent = cl.d;
+            document.getElementById('mPercentile').textContent = lang === 'ko' ? `상위 ${(100 - cl.p).toFixed(1)}% (백분위 ${cl.p})` : `Top ${(100 - cl.p).toFixed(1)}% (Percentile ${cl.p})`;
+            document.getElementById('mCorrect').textContent = r.tc + '/' + M_TOTAL;
+            document.getElementById('mAccuracy').textContent = r.acc + '%';
+            document.getElementById('mAvgTime').textContent = r.avg + 's';
+            if (r.iq >= 130) {
+                document.getElementById('mensaPassSection').style.display = 'block';
+                document.getElementById('mCertIQ').textContent = r.iq;
+                document.getElementById('mCertPct').textContent = cl.p + '%';
+            } else document.getElementById('mensaPassSection').style.display = 'none';
+        }
+        function retryMensa() { if (qualCode || validCodes.length) startMensaTest(); }
     </script>
 </body>
+
 </html>
