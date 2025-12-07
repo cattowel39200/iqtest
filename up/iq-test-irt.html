@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COGNIQ - Official IQ Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Cards */
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        /* Age Input Section */
+        .age-section {
+            margin-bottom: 30px;
+        }
+        
+        .age-input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .age-input-group label {
+            font-weight: 500;
+            color: #94a3b8;
+        }
+        
+        .age-input-group input {
+            width: 100px;
+            padding: 12px 16px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .age-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .age-note {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 10px;
+        }
+        
+        /* Category Selection */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .category-card {
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-card:hover {
+            border-color: rgba(96, 165, 250, 0.5);
+            background: rgba(96, 165, 250, 0.1);
+        }
+        
+        .category-card.selected {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.2);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .category-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--success);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .category-card {
+            position: relative;
+        }
+        
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box.highlight {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(124, 58, 237, 0.2));
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+        
+        .highlight-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #f1f5f9;
+            text-align: center;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        /* Timer */
+        .timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 20px;
+        }
+        
+        .timer.warning {
+            color: var(--warning);
+            animation: pulse 1s infinite;
+        }
+        
+        .timer.danger {
+            color: var(--danger);
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Question */
+        .question-container {
+            margin-bottom: 30px;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+            line-height: 1.8;
+        }
+        
+        .question-visual {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .matrix-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 0 auto;
+        }
+        
+        .matrix-cell {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        
+        .matrix-cell.highlight {
+            background: rgba(37, 99, 235, 0.3);
+            border: 2px solid var(--primary);
+        }
+        
+        .sequence-display {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 8px;
+            color: #e2e8f0;
+        }
+        
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .option-btn {
+            padding: 18px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .option-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .option-btn.selected {
+            background: rgba(37, 99, 235, 0.2);
+            border-color: var(--primary);
+        }
+        
+        /* Results */
+        .result-container {
+            text-align: center;
+        }
+        
+        .iq-display {
+            margin: 30px 0;
+        }
+        
+        .iq-score {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        
+        .iq-label {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        .confidence-interval {
+            font-size: 1.1rem;
+            color: #60a5fa;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .classification {
+            margin: 25px 0;
+        }
+        
+        .class-label {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        .percentile {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        /* Domain Results Chart */
+        .domain-chart {
+            margin: 30px 0;
+        }
+        
+        .domain-bar-item {
+            margin-bottom: 20px;
+        }
+        
+        .domain-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .domain-bar-name {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        
+        .domain-bar-score {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+        
+        .domain-bar-track {
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .domain-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease-out;
+        }
+        
+        .domain-bar-fill.excellent { background: linear-gradient(90deg, #10b981, #34d399); }
+        .domain-bar-fill.good { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .domain-bar-fill.average { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .domain-bar-fill.below { background: linear-gradient(90deg, #ef4444, #f87171); }
+        
+        /* Analysis Section */
+        .analysis-section {
+            text-align: left;
+            margin: 30px 0;
+        }
+        
+        .analysis-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+        }
+        
+        .strength-item, .weakness-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .strength-item {
+            border-left: 3px solid var(--success);
+        }
+        
+        .weakness-item {
+            border-left: 3px solid var(--warning);
+        }
+        
+        /* Certificate */
+        .certificate {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(37, 99, 235, 0.1));
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .certificate-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+        
+        .certificate-code {
+            font-family: monospace;
+            font-size: 1.5rem;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: #fbbf24;
+            letter-spacing: 2px;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+        }
+        
+        .modal-body {
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        /* Screen visibility */
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Report Print Styles */
+        .report-section {
+            page-break-inside: avoid;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .iq-score {
+                font-size: 4rem;
+            }
+            
+            .matrix-cell {
+                width: 50px;
+                height: 50px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLanguage('ko')">한국어</button>
+        <button class="lang-btn" onclick="setLanguage('en')">English</button>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">COGNIQ</div>
+            <p class="tagline" data-i18n="tagline">Official Intelligence Quotient Assessment</p>
+        </header>
+
+        <!-- Screen 1: Intro -->
+        <div id="screen-intro" class="screen active">
+            <div class="card">
+                <h2 class="card-title" data-i18n="intro.title">공인 IQ 테스트</h2>
+                
+                <div class="info-box highlight">
+                    <p class="highlight-text" data-i18n="intro.highlight">
+                        🎯 5가지 영역 중 1가지를 선택하여 IQ 120 이상 달성 시<br>멘사 도전 자격이 주어집니다.
+                    </p>
+                </div>
+                
+                <!-- Age Input -->
+                <div class="age-section">
+                    <div class="age-input-group">
+                        <label data-i18n="intro.age">나이 (만):</label>
+                        <input type="number" id="userAge" min="13" max="99" placeholder="25">
+                        <span data-i18n="intro.ageUnit">세</span>
+                    </div>
+                    <p class="age-note" data-i18n="intro.ageNote">* 연령별 규준을 적용하여 정확한 IQ를 산출합니다.</p>
+                </div>
+                
+                <!-- Category Selection -->
+                <p style="margin-bottom: 15px; color: #94a3b8;" data-i18n="intro.selectCategory">테스트 영역을 선택하세요:</p>
+                
+                <div class="category-grid">
+                    <div class="category-card" data-category="pattern" onclick="selectCategory('pattern')">
+                        <div class="category-icon">🔷</div>
+                        <div class="category-name" data-i18n="category.pattern">패턴 인식</div>
+                    </div>
+                    <div class="category-card" data-category="numerical" onclick="selectCategory('numerical')">
+                        <div class="category-icon">🔢</div>
+                        <div class="category-name" data-i18n="category.numerical">수리 추론</div>
+                    </div>
+                    <div class="category-card" data-category="spatial" onclick="selectCategory('spatial')">
+                        <div class="category-icon">📐</div>
+                        <div class="category-name" data-i18n="category.spatial">공간 지각</div>
+                    </div>
+                    <div class="category-card" data-category="logical" onclick="selectCategory('logical')">
+                        <div class="category-icon">🧩</div>
+                        <div class="category-name" data-i18n="category.logical">논리 추론</div>
+                    </div>
+                    <div class="category-card" data-category="verbal" onclick="selectCategory('verbal')">
+                        <div class="category-icon">📝</div>
+                        <div class="category-name" data-i18n="category.verbal">언어 유추</div>
+                    </div>
+                </div>
+                
+                <div class="info-box" id="selectionInfo" style="display: none;">
+                    <p id="selectionText"></p>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 25px;">
+                    <button class="btn btn-primary" id="startBtn" onclick="startTest()" disabled data-i18n="intro.selectFirst">
+                        영역을 선택하세요
+                    </button>
+                    <button class="btn btn-secondary" onclick="showCodeInput()" data-i18n="intro.havingCode">
+                        🔑 인증코드 입력
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 15px; color: #f1f5f9;" data-i18n="intro.method">📊 평가 방법론</h3>
+                <ul style="color: #94a3b8; padding-left: 20px;">
+                    <li data-i18n="intro.method1">문항반응이론(IRT) 3PL 모델 기반</li>
+                    <li data-i18n="intro.method2">최대우도추정(MLE)으로 능력 산출</li>
+                    <li data-i18n="intro.method3">95% 신뢰구간 제공</li>
+                    <li data-i18n="intro.method4">연령별 규준 적용</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Screen 2: Test -->
+        <div id="screen-test" class="screen">
+            <div class="card">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span id="progressText">1 / 10</span>
+                        <span id="categoryLabel"></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+                    </div>
+                </div>
+                
+                <div class="timer" id="timer">
+                    ⏱️ <span id="timerValue">45</span>
+                </div>
+                
+                <div class="question-container">
+                    <p class="question-text" id="questionText"></p>
+                    <div class="question-visual" id="questionVisual"></div>
+                </div>
+                
+                <div class="options-grid" id="optionsContainer"></div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+                    <button class="btn btn-danger" onclick="confirmExit()" data-i18n="test.exit">
+                        ✕ 종료
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled data-i18n="test.next">
+                        다음 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Results -->
+        <div id="screen-result" class="screen">
+            <div class="card result-container">
+                <h2 class="card-title" data-i18n="result.title">📊 IQ 평가 결과</h2>
+                
+                <div class="iq-display">
+                    <div class="iq-score" id="resultIQ">--</div>
+                    <div class="iq-label" data-i18n="result.iqLabel">연령 보정 IQ</div>
+                    <div class="confidence-interval" id="resultCI">
+                        95% CI: -- ~ --
+                    </div>
+                </div>
+                
+                <div class="classification">
+                    <div class="class-label" id="resultClass">--</div>
+                    <div class="percentile" id="resultPercentile">백분위 --%</div>
+                </div>
+                
+                <!-- Domain Analysis -->
+                <div class="domain-chart" id="domainChart">
+                    <h3 style="margin-bottom: 20px; text-align: left;" data-i18n="result.domainTitle">영역별 분석</h3>
+                </div>
+                
+                <!-- Strengths & Weaknesses -->
+                <div class="analysis-section" id="analysisSection">
+                    <div id="strengthsContainer"></div>
+                    <div id="weaknessesContainer" style="margin-top: 20px;"></div>
+                </div>
+                
+                <!-- Age Interpretation -->
+                <div class="info-box" id="ageInterpretation" style="text-align: left;"></div>
+                
+                <!-- Certificate (if qualified) -->
+                <div class="certificate" id="certificate" style="display: none;">
+                    <div class="certificate-title" data-i18n="result.qualified">🎉 멘사 도전 자격 획득!</div>
+                    <p style="margin-bottom: 15px; color: #94a3b8;" data-i18n="result.codeDesc">아래 코드로 멘사 테스트에 도전하세요:</p>
+                    <div class="certificate-code" id="certCode">CQ-XXXXXXXX</div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="tryAnotherCategory()" data-i18n="result.tryAnother">
+                        🔄 다른 영역 도전
+                    </button>
+                    <button class="btn btn-success" id="mensaBtn" onclick="goToMensa()" style="display: none;" data-i18n="result.goMensa">
+                        🏆 멘사 테스트 도전
+                    </button>
+                    <button class="btn btn-primary" onclick="printReport()" data-i18n="result.print">
+                        📄 리포트 출력
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 4: Mensa Test -->
+        <div id="screen-mensa" class="screen">
+            <div class="card">
+                <h2 class="card-title">🏆 <span data-i18n="mensa.title">멘사 도전 테스트</span></h2>
+                
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span id="mensaProgressText">1 / 20</span>
+                        <span data-i18n="mensa.subtitle">고급 문제</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="mensaProgressFill" style="width: 5%"></div>
+                    </div>
+                </div>
+                
+                <div class="timer" id="mensaTimer">
+                    ⏱️ <span id="mensaTimerValue">60</span>
+                </div>
+                
+                <div class="question-container">
+                    <p class="question-text" id="mensaQuestionText"></p>
+                    <div class="question-visual" id="mensaQuestionVisual"></div>
+                </div>
+                
+                <div class="options-grid" id="mensaOptionsContainer"></div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+                    <button class="btn btn-danger" onclick="confirmExit()" data-i18n="test.exit">
+                        ✕ 종료
+                    </button>
+                    <button class="btn btn-primary" id="mensaNextBtn" onclick="nextMensaQuestion()" disabled data-i18n="test.next">
+                        다음 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 5: Mensa Results -->
+        <div id="screen-mensa-result" class="screen">
+            <div class="card result-container">
+                <h2 class="card-title">🏆 <span data-i18n="mensaResult.title">멘사 테스트 결과</span></h2>
+                
+                <div class="iq-display">
+                    <div class="iq-score" id="mensaResultIQ">--</div>
+                    <div class="iq-label" data-i18n="mensaResult.iqLabel">멘사 테스트 IQ</div>
+                    <div class="confidence-interval" id="mensaResultCI">
+                        95% CI: -- ~ --
+                    </div>
+                </div>
+                
+                <div class="classification">
+                    <div class="class-label" id="mensaResultClass">--</div>
+                    <div class="percentile" id="mensaResultPercentile">백분위 --%</div>
+                </div>
+                
+                <div class="certificate" id="mensaCertificate" style="display: none;">
+                    <div class="certificate-title" data-i18n="mensaResult.passed">🎊 멘사 기준 통과!</div>
+                    <p style="color: #94a3b8;" data-i18n="mensaResult.passedDesc">
+                        축하합니다! 상위 2% 이내의 뛰어난 인지능력을 보유하고 계십니다.
+                    </p>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="location.reload()" data-i18n="mensaResult.restart">
+                        🔄 처음으로
+                    </button>
+                    <button class="btn btn-primary" onclick="printReport()" data-i18n="result.print">
+                        📄 리포트 출력
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Input Modal -->
+        <div class="modal-overlay" id="codeModal">
+            <div class="modal">
+                <h3 class="modal-title" data-i18n="modal.codeTitle">🔑 인증코드 입력</h3>
+                <div class="modal-body">
+                    <input type="text" id="codeInput" placeholder="CQ-XXXXXXXX" 
+                        style="width: 100%; padding: 15px; border: 2px solid rgba(255,255,255,0.1); 
+                        border-radius: 8px; background: rgba(0,0,0,0.2); color: white; 
+                        font-size: 1.2rem; text-align: center; text-transform: uppercase;">
+                    <p id="codeError" style="color: var(--danger); margin-top: 10px; display: none;"></p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="hideCodeInput()" data-i18n="modal.cancel">취소</button>
+                    <button class="btn btn-primary" onclick="verifyCode()" data-i18n="modal.verify">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exit Confirmation Modal -->
+        <div class="modal-overlay" id="exitModal">
+            <div class="modal">
+                <h3 class="modal-title" data-i18n="modal.exitTitle">⚠️ 테스트 종료</h3>
+                <div class="modal-body" data-i18n="modal.exitBody">
+                    정말 테스트를 종료하시겠습니까? 진행 상황이 저장되지 않습니다.
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="hideExitModal()" data-i18n="modal.continue">계속하기</button>
+                    <button class="btn btn-danger" onclick="exitTest()" data-i18n="modal.exitConfirm">종료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════════
+    // 다국어 지원
+    // ═══════════════════════════════════════════════════════════════
+    
+    const i18n = {
+        ko: {
+            tagline: "공식 지능지수 평가",
+            "intro.title": "공인 IQ 테스트",
+            "intro.highlight": "🎯 5가지 영역 중 1가지를 선택하여 IQ 120 이상 달성 시<br>멘사 도전 자격이 주어집니다.",
+            "intro.age": "나이 (만):",
+            "intro.ageUnit": "세",
+            "intro.ageNote": "* 연령별 규준을 적용하여 정확한 IQ를 산출합니다.",
+            "intro.selectCategory": "테스트 영역을 선택하세요:",
+            "intro.selectFirst": "영역을 선택하세요",
+            "intro.start": "테스트 시작",
+            "intro.havingCode": "🔑 인증코드 입력",
+            "intro.method": "📊 평가 방법론",
+            "intro.method1": "문항반응이론(IRT) 3PL 모델 기반",
+            "intro.method2": "최대우도추정(MLE)으로 능력 산출",
+            "intro.method3": "95% 신뢰구간 제공",
+            "intro.method4": "연령별 규준 적용",
+            "category.pattern": "패턴 인식",
+            "category.numerical": "수리 추론",
+            "category.spatial": "공간 지각",
+            "category.logical": "논리 추론",
+            "category.verbal": "언어 유추",
+            "test.exit": "✕ 종료",
+            "test.next": "다음 →",
+            "test.submit": "제출",
+            "result.title": "📊 IQ 평가 결과",
+            "result.iqLabel": "연령 보정 IQ",
+            "result.domainTitle": "영역별 분석",
+            "result.strengths": "💪 강점",
+            "result.weaknesses": "📈 개선 영역",
+            "result.qualified": "🎉 멘사 도전 자격 획득!",
+            "result.codeDesc": "아래 코드로 멘사 테스트에 도전하세요:",
+            "result.tryAnother": "🔄 다른 영역 도전",
+            "result.goMensa": "🏆 멘사 테스트 도전",
+            "result.print": "📄 리포트 출력",
+            "mensa.title": "멘사 도전 테스트",
+            "mensa.subtitle": "고급 문제",
+            "mensaResult.title": "멘사 테스트 결과",
+            "mensaResult.iqLabel": "멘사 테스트 IQ",
+            "mensaResult.passed": "🎊 멘사 기준 통과!",
+            "mensaResult.passedDesc": "축하합니다! 상위 2% 이내의 뛰어난 인지능력을 보유하고 계십니다.",
+            "mensaResult.restart": "🔄 처음으로",
+            "modal.codeTitle": "🔑 인증코드 입력",
+            "modal.cancel": "취소",
+            "modal.verify": "확인",
+            "modal.exitTitle": "⚠️ 테스트 종료",
+            "modal.exitBody": "정말 테스트를 종료하시겠습니까? 진행 상황이 저장되지 않습니다.",
+            "modal.continue": "계속하기",
+            "modal.exitConfirm": "종료",
+            "modal.invalidCode": "유효하지 않은 코드입니다.",
+            "selectionInfo": "선택: {category} | 10문항 | 문항당 45초 | IQ 120+ 시 멘사 자격"
+        },
+        en: {
+            tagline: "Official Intelligence Quotient Assessment",
+            "intro.title": "Official IQ Test",
+            "intro.highlight": "🎯 Select 1 of 5 domains. Score IQ 120+ to<br>qualify for the Mensa Challenge.",
+            "intro.age": "Age:",
+            "intro.ageUnit": "years",
+            "intro.ageNote": "* Age-adjusted norms applied for accurate IQ calculation.",
+            "intro.selectCategory": "Select a test domain:",
+            "intro.selectFirst": "Select a domain",
+            "intro.start": "Start Test",
+            "intro.havingCode": "🔑 Enter Code",
+            "intro.method": "📊 Assessment Methodology",
+            "intro.method1": "Based on Item Response Theory (IRT) 3PL Model",
+            "intro.method2": "Maximum Likelihood Estimation (MLE)",
+            "intro.method3": "95% Confidence Interval Provided",
+            "intro.method4": "Age-based Norms Applied",
+            "category.pattern": "Pattern Recognition",
+            "category.numerical": "Numerical Reasoning",
+            "category.spatial": "Spatial Perception",
+            "category.logical": "Logical Reasoning",
+            "category.verbal": "Verbal Analogies",
+            "test.exit": "✕ Exit",
+            "test.next": "Next →",
+            "test.submit": "Submit",
+            "result.title": "📊 IQ Assessment Results",
+            "result.iqLabel": "Age-Adjusted IQ",
+            "result.domainTitle": "Domain Analysis",
+            "result.strengths": "💪 Strengths",
+            "result.weaknesses": "📈 Areas for Improvement",
+            "result.qualified": "🎉 Mensa Challenge Qualified!",
+            "result.codeDesc": "Use this code to take the Mensa test:",
+            "result.tryAnother": "🔄 Try Another Domain",
+            "result.goMensa": "🏆 Take Mensa Test",
+            "result.print": "📄 Print Report",
+            "mensa.title": "Mensa Challenge Test",
+            "mensa.subtitle": "Advanced Problems",
+            "mensaResult.title": "Mensa Test Results",
+            "mensaResult.iqLabel": "Mensa Test IQ",
+            "mensaResult.passed": "🎊 Mensa Standard Achieved!",
+            "mensaResult.passedDesc": "Congratulations! You demonstrate cognitive abilities in the top 2%.",
+            "mensaResult.restart": "🔄 Start Over",
+            "modal.codeTitle": "🔑 Enter Verification Code",
+            "modal.cancel": "Cancel",
+            "modal.verify": "Verify",
+            "modal.exitTitle": "⚠️ Exit Test",
+            "modal.exitBody": "Are you sure you want to exit? Progress will not be saved.",
+            "modal.continue": "Continue",
+            "modal.exitConfirm": "Exit",
+            "modal.invalidCode": "Invalid code.",
+            "selectionInfo": "Selected: {category} | 10 items | 45s each | IQ 120+ for Mensa"
+        }
+    };
+    
+    let currentLang = 'ko';
+    
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.includes(lang === 'ko' ? '한국어' : 'English'));
+        });
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (i18n[lang][key]) {
+                el.innerHTML = i18n[lang][key];
+            }
+        });
+        updateSelectionInfo();
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // IRT 문제 데이터베이스
+    // ═══════════════════════════════════════════════════════════════
+    
+    const IQ_TEST_ITEMS = {
+        pattern: [
+            { id: "PAT001", irt: { a: 1.0, b: -2.0, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["●", "●", "●", "●", "●", "●", "●", "●", "?"], options: ["●", "○", "■", "▲"], answer: 0 },
+            { id: "PAT002", irt: { a: 1.0, b: -1.8, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["1", "2", "3", "1", "2", "3", "1", "2", "?"], options: ["1", "2", "3", "4"], answer: 2 },
+            { id: "PAT003", irt: { a: 1.1, b: -1.5, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["A", "A", "A", "B", "B", "B", "C", "C", "?"], options: ["A", "B", "C", "D"], answer: 2 },
+            { id: "PAT004", irt: { a: 1.2, b: -1.0, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["1", "2", "3", "4", "5", "6", "7", "8", "?"], options: ["9", "10", "0", "7"], answer: 0 },
+            { id: "PAT005", irt: { a: 1.3, b: -0.5, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["A", "B", "C", "D", "E", "F", "G", "H", "?"], options: ["I", "J", "G", "A"], answer: 0 },
+            { id: "PAT006", irt: { a: 1.5, b: 0.0, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["2", "4", "6", "3", "6", "9", "4", "8", "?"], options: ["10", "12", "14", "16"], answer: 1 },
+            { id: "PAT007", irt: { a: 1.6, b: 0.3, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["A", "C", "E", "B", "D", "F", "C", "E", "?"], options: ["F", "G", "H", "I"], answer: 1 },
+            { id: "PAT008", irt: { a: 1.8, b: 1.0, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["1", "1", "1", "2", "4", "8", "3", "9", "?"], options: ["12", "18", "27", "36"], answer: 2 },
+            { id: "PAT009", irt: { a: 1.9, b: 1.3, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["2", "3", "6", "4", "5", "20", "6", "7", "?"], options: ["13", "36", "42", "48"], answer: 2 },
+            { id: "PAT010", irt: { a: 2.0, b: 1.8, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["2", "4", "8", "3", "9", "27", "4", "16", "?"], options: ["32", "48", "64", "256"], answer: 2 },
+            { id: "PAT011", irt: { a: 2.1, b: 1.9, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["1", "8", "27", "64", "125", "216", "343", "512", "?"], options: ["625", "729", "1000", "1024"], answer: 1 },
+            { id: "PAT012", irt: { a: 2.2, b: 2.3, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["2", "6", "18", "4", "12", "36", "8", "24", "?"], options: ["48", "64", "72", "96"], answer: 2 },
+            { id: "PAT013", irt: { a: 2.3, b: 2.5, c: 0.25 }, question: { ko: "규칙을 찾아 ? 에 들어갈 것을 고르세요.", en: "Find the pattern for ?" }, matrix: ["1", "1", "2", "3", "5", "8", "13", "21", "?"], options: ["29", "32", "34", "36"], answer: 2 }
+        ],
+        
+        numerical: [
+            { id: "NUM001", irt: { a: 1.0, b: -2.0, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 2, 3, 4, ?", en: "Next term: 1, 2, 3, 4, ?" }, type: "sequence", options: ["5", "6", "4", "3"], answer: 0 },
+            { id: "NUM002", irt: { a: 1.0, b: -1.8, c: 0.25 }, question: { ko: "수열의 다음 항: 2, 4, 6, 8, ?", en: "Next term: 2, 4, 6, 8, ?" }, type: "sequence", options: ["9", "10", "11", "12"], answer: 1 },
+            { id: "NUM003", irt: { a: 1.1, b: -1.5, c: 0.25 }, question: { ko: "수열의 다음 항: 10, 20, 30, 40, ?", en: "Next term: 10, 20, 30, 40, ?" }, type: "sequence", options: ["45", "50", "55", "60"], answer: 1 },
+            { id: "NUM004", irt: { a: 1.3, b: -0.7, c: 0.25 }, question: { ko: "수열의 다음 항: 2, 4, 8, 16, ?", en: "Next term: 2, 4, 8, 16, ?" }, type: "sequence", options: ["24", "32", "30", "20"], answer: 1 },
+            { id: "NUM005", irt: { a: 1.5, b: 0.0, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 1, 2, 3, 5, 8, ?", en: "Next term: 1, 1, 2, 3, 5, 8, ?" }, type: "sequence", options: ["11", "12", "13", "15"], answer: 2 },
+            { id: "NUM006", irt: { a: 1.6, b: 0.4, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 4, 9, 16, 25, ?", en: "Next term: 1, 4, 9, 16, 25, ?" }, type: "sequence", options: ["30", "35", "36", "49"], answer: 2 },
+            { id: "NUM007", irt: { a: 1.8, b: 1.0, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 3, 6, 10, 15, ?", en: "Next term: 1, 3, 6, 10, 15, ?" }, type: "sequence", options: ["18", "20", "21", "25"], answer: 2 },
+            { id: "NUM008", irt: { a: 1.8, b: 1.2, c: 0.25 }, question: { ko: "수열의 다음 항: 2, 3, 5, 7, 11, 13, ?", en: "Next term: 2, 3, 5, 7, 11, 13, ?" }, type: "sequence", options: ["15", "17", "19", "21"], answer: 1 },
+            { id: "NUM009", irt: { a: 1.9, b: 1.5, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 2, 6, 24, 120, ?", en: "Next term: 1, 2, 6, 24, 120, ?" }, type: "sequence", options: ["240", "480", "720", "840"], answer: 2 },
+            { id: "NUM010", irt: { a: 2.0, b: 1.8, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 4, 27, 256, ?", en: "Next term: 1, 4, 27, 256, ?" }, type: "sequence", options: ["625", "1024", "3125", "4096"], answer: 2 },
+            { id: "NUM011", irt: { a: 2.2, b: 2.2, c: 0.25 }, question: { ko: "수열의 다음 항: 2, 5, 11, 23, 47, ?", en: "Next term: 2, 5, 11, 23, 47, ?" }, type: "sequence", options: ["71", "89", "95", "99"], answer: 2 },
+            { id: "NUM012", irt: { a: 2.2, b: 2.4, c: 0.25 }, question: { ko: "수열의 다음 항: 1, 2, 5, 14, 41, ?", en: "Next term: 1, 2, 5, 14, 41, ?" }, type: "sequence", options: ["100", "114", "122", "130"], answer: 2 },
+            { id: "NUM013", irt: { a: 2.3, b: 2.5, c: 0.25 }, question: { ko: "수열의 다음 항: 2, 3, 5, 9, 17, 33, ?", en: "Next term: 2, 3, 5, 9, 17, 33, ?" }, type: "sequence", options: ["49", "57", "65", "73"], answer: 2 }
+        ],
+        
+        spatial: [
+            { id: "SPA001", irt: { a: 1.0, b: -2.0, c: 0.25 }, question: { ko: "→ 를 180° 회전하면?", en: "Rotate → by 180°?" }, type: "rotation", options: ["→", "←", "↑", "↓"], answer: 1 },
+            { id: "SPA002", irt: { a: 1.0, b: -1.8, c: 0.25 }, question: { ko: "↑ 를 시계방향 90° 회전하면?", en: "Rotate ↑ clockwise 90°?" }, type: "rotation", options: ["←", "→", "↑", "↓"], answer: 1 },
+            { id: "SPA003", irt: { a: 1.2, b: -1.0, c: 0.25 }, question: { ko: "┘ 를 시계방향 90° 회전하면?", en: "Rotate ┘ clockwise 90°?" }, type: "rotation", options: ["└", "┐", "┌", "─"], answer: 0 },
+            { id: "SPA004", irt: { a: 1.3, b: -0.5, c: 0.25 }, question: { ko: "'b'를 거울에 비추면?", en: "Mirror image of 'b'?" }, type: "mirror", options: ["b", "d", "p", "q"], answer: 1 },
+            { id: "SPA005", irt: { a: 1.5, b: 0.0, c: 0.25 }, question: { ko: "주사위에서 1의 맞은편 숫자는? (1-6, 2-5, 3-4)", en: "Opposite of 1 on die? (1-6, 2-5, 3-4)" }, type: "cube", options: ["2", "4", "5", "6"], answer: 3 },
+            { id: "SPA006", irt: { a: 1.6, b: 0.4, c: 0.25 }, question: { ko: "정사각형을 반으로 접으면?", en: "Fold square in half?" }, type: "folding", options: { ko: ["정사각형", "직사각형", "삼각형", "마름모"], en: ["Square", "Rectangle", "Triangle", "Rhombus"] }, answer: 1 },
+            { id: "SPA007", irt: { a: 1.8, b: 1.0, c: 0.25 }, question: { ko: "직각삼각형 2개로 만들 수 있는 도형은?", en: "What can 2 right triangles make?" }, type: "construction", options: { ko: ["정삼각형만", "직사각형만", "둘 다 가능", "평행사변형만"], en: ["Only equilateral", "Only rectangle", "Both possible", "Only parallelogram"] }, answer: 2 },
+            { id: "SPA008", irt: { a: 1.9, b: 1.4, c: 0.25 }, question: { ko: "정육면체를 대각선으로 자르면 단면은?", en: "Diagonal cross-section of cube?" }, type: "cross_section", options: { ko: ["정삼각형", "정사각형", "직사각형", "정육각형"], en: ["Equilateral triangle", "Square", "Rectangle", "Regular hexagon"] }, answer: 3 },
+            { id: "SPA009", irt: { a: 2.0, b: 1.9, c: 0.25 }, question: { ko: "3cm 정육면체에서 1cm 정육면체 8개 제거 시 남은 부피?", en: "3cm cube minus 8 1cm cubes. Remaining volume?" }, type: "volume", options: ["19cm³", "21cm³", "23cm³", "25cm³"], answer: 0 },
+            { id: "SPA010", irt: { a: 2.2, b: 2.2, c: 0.25 }, question: { ko: "정이십면체의 면 개수는?", en: "Faces of icosahedron?" }, type: "polyhedron", options: ["12", "16", "20", "24"], answer: 2 },
+            { id: "SPA011", irt: { a: 2.2, b: 2.4, c: 0.25 }, question: { ko: "원기둥의 위, 앞, 옆 모양은?", en: "Top, front, side views of cylinder?" }, type: "projection", options: { ko: ["원,직사각형,직사각형", "원,원,직사각형", "원,타원,직사각형", "원,직사각형,원"], en: ["Circle,rect,rect", "Circle,circle,rect", "Circle,ellipse,rect", "Circle,rect,circle"] }, answer: 0 },
+            { id: "SPA012", irt: { a: 2.3, b: 2.5, c: 0.25 }, question: { ko: "도넛(토러스)과 위상동형인 것은?", en: "Topologically equivalent to torus?" }, type: "topology", options: { ko: ["공", "손잡이 있는 컵", "접시", "숟가락"], en: ["Ball", "Cup with handle", "Plate", "Spoon"] }, answer: 1 }
+        ],
+        
+        logical: [
+            { id: "LOG001", irt: { a: 1.0, b: -2.0, c: 0.25 }, question: { ko: "A > B, B > C 이면 가장 큰 것은?", en: "If A > B and B > C, largest is?" }, type: "comparison", options: ["A", "B", "C", { ko: "알 수 없음", en: "Unknown" }], answer: 0 },
+            { id: "LOG002", irt: { a: 1.1, b: -1.5, c: 0.25 }, question: { ko: "모든 강아지는 동물이다. 바둑이는 강아지다. 참인 것은?", en: "All dogs are animals. Baduk is a dog. True statement?" }, type: "syllogism", options: { ko: ["바둑이는 동물", "모든 동물은 강아지", "바둑이는 고양이", "알 수 없다"], en: ["Baduk is animal", "All animals are dogs", "Baduk is cat", "Unknown"] }, answer: 0 },
+            { id: "LOG003", irt: { a: 1.2, b: -0.8, c: 0.25 }, question: { ko: "'비가 오면 땅이 젖는다'가 참일 때 반드시 참인 것은?", en: "If 'Rain wets ground' is true, what must be true?" }, type: "conditional", options: { ko: ["땅이 젖으면 비가 온다", "비 안오면 안젖는다", "안젖으면 비 안온다", "항상 비가 온다"], en: ["If wet, rained", "No rain=dry", "If dry, no rain", "Always rains"] }, answer: 2 },
+            { id: "LOG004", irt: { a: 1.5, b: 0.0, c: 0.25 }, question: { ko: "x + 5 = 12 일 때, x = ?", en: "If x + 5 = 12, x = ?" }, type: "equation", options: ["5", "6", "7", "17"], answer: 2 },
+            { id: "LOG005", irt: { a: 1.5, b: 0.2, c: 0.25 }, question: { ko: "2x + 3 = 11 일 때, x = ?", en: "If 2x + 3 = 11, x = ?" }, type: "equation", options: ["3", "4", "5", "6"], answer: 1 },
+            { id: "LOG006", irt: { a: 1.6, b: 0.5, c: 0.25 }, question: { ko: "'P이면 Q'가 참이고 'P'가 참일 때, Q는?", en: "If 'P implies Q' is true and P is true, Q is?" }, type: "conditional", options: { ko: ["반드시 참", "반드시 거짓", "알 수 없음", "때에 따라"], en: ["Must be true", "Must be false", "Unknown", "Depends"] }, answer: 0 },
+            { id: "LOG007", irt: { a: 1.8, b: 1.0, c: 0.25 }, question: { ko: "(x + 5) ÷ 3 = 4 일 때, x = ?", en: "If (x + 5) ÷ 3 = 4, x = ?" }, type: "equation", options: ["5", "6", "7", "8"], answer: 2 },
+            { id: "LOG008", irt: { a: 1.9, b: 1.4, c: 0.25 }, question: { ko: "A,B,C 중 정확히 하나만 참. A가 거짓이면?", en: "Exactly one of A,B,C true. If A false?" }, type: "set", options: { ko: ["B나 C 하나 참", "B,C 모두 참", "B,C 모두 거짓", "알 수 없음"], en: ["One of B,C true", "Both B,C true", "Both B,C false", "Unknown"] }, answer: 0 },
+            { id: "LOG009", irt: { a: 2.0, b: 1.8, c: 0.25 }, question: { ko: "기사(진실)와 악당(거짓). A:'B는 악당' B:'둘 다 기사'. A와 B는?", en: "Knights(truth), Knaves(lies). A:'B is knave' B:'Both knights'. A and B?" }, type: "knights", options: { ko: ["둘 다 기사", "둘 다 악당", "A기사 B악당", "A악당 B기사"], en: ["Both knights", "Both knaves", "A knight B knave", "A knave B knight"] }, answer: 2 },
+            { id: "LOG010", irt: { a: 2.0, b: 1.9, c: 0.25 }, question: { ko: "몬티홀: 문 선택 후 빈 문 공개. 바꾸는 것이 유리?", en: "Monty Hall: After choosing, empty door opened. Switch?" }, type: "probability", options: { ko: ["바꾸면 유리(2/3)", "안바꾸면 유리", "같다(1/2)", "알 수 없음"], en: ["Switch better(2/3)", "Stay better", "Same(1/2)", "Unknown"] }, answer: 0 },
+            { id: "LOG011", irt: { a: 2.2, b: 2.2, c: 0.25 }, question: { ko: "'이 문장은 거짓이다'의 진리값은?", en: "Truth value of 'This sentence is false'?" }, type: "paradox", options: { ko: ["참", "거짓", "참도 거짓도 아님", "참이면서 거짓"], en: ["True", "False", "Neither", "Both"] }, answer: 2 },
+            { id: "LOG012", irt: { a: 2.3, b: 2.5, c: 0.25 }, question: { ko: "죄수의 딜레마에서 둘 다 합리적이면?", en: "In Prisoner's Dilemma, if both rational?" }, type: "game_theory", options: { ko: ["둘 다 협력", "둘 다 배신", "한 명만 배신", "무작위"], en: ["Both cooperate", "Both defect", "One defects", "Random"] }, answer: 1 }
+        ],
+        
+        verbal: [
+            { id: "VER001", irt: { a: 1.0, b: -2.0, c: 0.25 }, question: { ko: "아버지 : 아들 = 어머니 : ?", en: "Father : Son = Mother : ?" }, type: "analogy", options: { ko: ["남편", "아버지", "딸", "할머니"], en: ["Husband", "Father", "Daughter", "Grandmother"] }, answer: 2 },
+            { id: "VER002", irt: { a: 1.0, b: -1.8, c: 0.25 }, question: { ko: "큰 : 작은 = 높은 : ?", en: "Big : Small = High : ?" }, type: "analogy", options: { ko: ["깊은", "낮은", "멀리", "가까운"], en: ["Deep", "Low", "Far", "Near"] }, answer: 1 },
+            { id: "VER003", irt: { a: 1.2, b: -1.0, c: 0.25 }, question: { ko: "책 : 읽다 = 음악 : ?", en: "Book : Read = Music : ?" }, type: "analogy", options: { ko: ["악기", "듣다", "가수", "콘서트"], en: ["Instrument", "Listen", "Singer", "Concert"] }, answer: 1 },
+            { id: "VER004", irt: { a: 1.3, b: -0.5, c: 0.25 }, question: { ko: "의사 : 병원 = 교사 : ?", en: "Doctor : Hospital = Teacher : ?" }, type: "analogy", options: { ko: ["학생", "학교", "교실", "교육"], en: ["Student", "School", "Classroom", "Education"] }, answer: 1 },
+            { id: "VER005", irt: { a: 1.5, b: 0.0, c: 0.25 }, question: { ko: "손 : 장갑 = 머리 : ?", en: "Hand : Glove = Head : ?" }, type: "analogy", options: { ko: ["모자", "얼굴", "두뇌", "머리카락"], en: ["Hat", "Face", "Brain", "Hair"] }, answer: 0 },
+            { id: "VER006", irt: { a: 1.6, b: 0.4, c: 0.25 }, question: { ko: "화가 : 그림 = 작곡가 : ?", en: "Painter : Painting = Composer : ?" }, type: "analogy", options: { ko: ["악기", "음악", "가수", "무대"], en: ["Instrument", "Music", "Singer", "Stage"] }, answer: 1 },
+            { id: "VER007", irt: { a: 1.8, b: 1.0, c: 0.25 }, question: { ko: "빛 : 어둠 = 지식 : ?", en: "Light : Darkness = Knowledge : ?" }, type: "analogy", options: { ko: ["학교", "무지", "책", "공부"], en: ["School", "Ignorance", "Book", "Study"] }, answer: 1 },
+            { id: "VER008", irt: { a: 1.8, b: 1.2, c: 0.25 }, question: { ko: "나무 : 숲 = 별 : ?", en: "Tree : Forest = Star : ?" }, type: "analogy", options: { ko: ["하늘", "은하", "달", "우주"], en: ["Sky", "Galaxy", "Moon", "Universe"] }, answer: 1 },
+            { id: "VER009", irt: { a: 1.9, b: 1.5, c: 0.25 }, question: { ko: "물 : 갈증 = 음식 : ?", en: "Water : Thirst = Food : ?" }, type: "analogy", options: { ko: ["맛", "배고픔", "요리", "영양"], en: ["Taste", "Hunger", "Cooking", "Nutrition"] }, answer: 1 },
+            { id: "VER010", irt: { a: 2.0, b: 1.8, c: 0.25 }, question: { ko: "증상 : 진단 = 단서 : ?", en: "Symptom : Diagnosis = Clue : ?" }, type: "analogy", options: { ko: ["범인", "추론", "증거", "해결"], en: ["Culprit", "Deduction", "Evidence", "Solution"] }, answer: 1 },
+            { id: "VER011", irt: { a: 2.0, b: 1.9, c: 0.25 }, question: { ko: "겸손 : 오만 = 절제 : ?", en: "Humility : Arrogance = Temperance : ?" }, type: "analogy", options: { ko: ["인내", "탐욕", "평화", "분노"], en: ["Patience", "Greed", "Peace", "Anger"] }, answer: 1 },
+            { id: "VER012", irt: { a: 2.3, b: 2.5, c: 0.25 }, question: { ko: "엔트로피 : 열역학 = 불확정성 : ?", en: "Entropy : Thermodynamics = Uncertainty : ?" }, type: "analogy", options: { ko: ["확률", "통계학", "양자역학", "상대성"], en: ["Probability", "Statistics", "Quantum Mechanics", "Relativity"] }, answer: 2 }
+        ]
+    };
+    
+    // ═══════════════════════════════════════════════════════════════
+    // IRT 계산 엔진
+    // ═══════════════════════════════════════════════════════════════
+    
+    const IRTEngine = {
+        // 3PL 정답 확률
+        probability: function(theta, item) {
+            const { a, b, c } = item.irt;
+            const exp = Math.exp(a * (theta - b));
+            return c + (1 - c) * (exp / (1 + exp));
+        },
+        
+        // Fisher 정보량
+        fisherInfo: function(theta, items) {
+            let info = 0;
+            items.forEach(item => {
+                const p = this.probability(theta, item);
+                const q = 1 - p;
+                const pStar = (p - item.irt.c) / (1 - item.irt.c);
+                info += item.irt.a * item.irt.a * pStar * pStar * q / p;
+            });
+            return info;
+        },
+        
+        // MLE 추정
+        estimateMLE: function(responses, items, maxIter = 50) {
+            let theta = 0;
+            
+            for (let iter = 0; iter < maxIter; iter++) {
+                let firstDeriv = 0;
+                let secondDeriv = 0;
+                
+                items.forEach((item, i) => {
+                    const p = this.probability(theta, item);
+                    const pStar = (p - item.irt.c) / (1 - item.irt.c);
+                    const q = 1 - p;
+                    
+                    firstDeriv += item.irt.a * pStar * (responses[i] - p) / p;
+                    secondDeriv -= item.irt.a * item.irt.a * pStar * pStar * q / p;
+                });
+                
+                const delta = firstDeriv / Math.abs(secondDeriv);
+                theta += delta;
+                theta = Math.max(-4, Math.min(4, theta));
+                
+                if (Math.abs(delta) < 0.001) break;
+            }
+            
+            const info = this.fisherInfo(theta, items);
+            const se = 1 / Math.sqrt(Math.max(info, 0.01));
+            
+            return { theta, se };
+        },
+        
+        // EAP 추정 (극단 응답용)
+        estimateEAP: function(responses, items) {
+            const points = 41;
+            let numerator = 0;
+            let denominator = 0;
+            
+            for (let i = 0; i < points; i++) {
+                const theta = -4 + (i * 8 / (points - 1));
+                const prior = Math.exp(-theta * theta / 2) / Math.sqrt(2 * Math.PI);
+                
+                let likelihood = 1;
+                items.forEach((item, j) => {
+                    const p = this.probability(theta, item);
+                    likelihood *= responses[j] === 1 ? p : (1 - p);
+                });
+                
+                const weight = likelihood * prior;
+                numerator += theta * weight;
+                denominator += weight;
+            }
+            
+            const thetaEAP = numerator / (denominator || 0.001);
+            
+            // 사후 표준편차
+            let variance = 0;
+            for (let i = 0; i < points; i++) {
+                const theta = -4 + (i * 8 / (points - 1));
+                const prior = Math.exp(-theta * theta / 2) / Math.sqrt(2 * Math.PI);
+                
+                let likelihood = 1;
+                items.forEach((item, j) => {
+                    const p = this.probability(theta, item);
+                    likelihood *= responses[j] === 1 ? p : (1 - p);
+                });
+                
+                const weight = likelihood * prior / denominator;
+                variance += weight * Math.pow(theta - thetaEAP, 2);
+            }
+            
+            return { theta: thetaEAP, se: Math.sqrt(variance) };
+        },
+        
+        // 능력 추정 (자동 선택)
+        estimate: function(responses, items) {
+            const correct = responses.filter(r => r === 1).length;
+            
+            if (correct === 0 || correct === responses.length) {
+                return this.estimateEAP(responses, items);
+            }
+            return this.estimateMLE(responses, items);
+        },
+        
+        // theta → IQ
+        toIQ: function(theta) {
+            return Math.round(100 + theta * 15);
+        },
+        
+        // IQ → 백분위
+        toPercentile: function(iq) {
+            const z = (iq - 100) / 15;
+            const t = 1 / (1 + 0.2316419 * Math.abs(z));
+            const d = 0.3989423 * Math.exp(-z * z / 2);
+            const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            return Math.round((z > 0 ? (1 - p) : p) * 1000) / 10;
+        },
+        
+        // 신뢰구간
+        confidenceInterval: function(iq, se, level = 0.95) {
+            const z = level === 0.95 ? 1.96 : (level === 0.99 ? 2.576 : 1.645);
+            const margin = Math.round(z * se * 15);
+            return {
+                lower: Math.max(40, iq - margin),
+                upper: Math.min(160, iq + margin),
+                margin
+            };
+        }
+    };
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 연령 규준
+    // ═══════════════════════════════════════════════════════════════
+    
+    const AgeNorms = {
+        groups: [
+            { id: 'teen', range: [13, 17], label: { ko: '청소년', en: 'Teenager' }, thetaMean: -0.2, thetaSD: 1.0 },
+            { id: 'young', range: [18, 29], label: { ko: '청년', en: 'Young Adult' }, thetaMean: 0.1, thetaSD: 1.0 },
+            { id: 'adult', range: [30, 44], label: { ko: '성인', en: 'Adult' }, thetaMean: 0.0, thetaSD: 1.0 },
+            { id: 'middle', range: [45, 59], label: { ko: '중년', en: 'Middle Age' }, thetaMean: -0.1, thetaSD: 1.0 },
+            { id: 'senior', range: [60, 99], label: { ko: '장년', en: 'Senior' }, thetaMean: -0.3, thetaSD: 1.1 }
+        ],
+        
+        getGroup: function(age) {
+            for (const g of this.groups) {
+                if (age >= g.range[0] && age <= g.range[1]) return g;
+            }
+            return this.groups[2];
+        },
+        
+        adjustIQ: function(theta, age) {
+            const group = this.getGroup(age);
+            const normalized = (theta - group.thetaMean) / group.thetaSD;
+            const iq = Math.round(100 + normalized * 15);
+            return {
+                rawIQ: IRTEngine.toIQ(theta),
+                adjustedIQ: Math.max(40, Math.min(160, iq)),
+                ageGroup: group,
+                adjustment: Math.round((normalized - theta) * 15)
+            };
+        }
+    };
+    
+    // ═══════════════════════════════════════════════════════════════
+    // IQ 분류
+    // ═══════════════════════════════════════════════════════════════
+    
+    function classifyIQ(iq) {
+        const classifications = [
+            { min: 145, label: { ko: '최우수 (Very Superior)', en: 'Very Superior' } },
+            { min: 130, label: { ko: '매우 우수 (Superior)', en: 'Superior' } },
+            { min: 120, label: { ko: '우수 (High Average)', en: 'High Average' } },
+            { min: 110, label: { ko: '평균 상 (Above Average)', en: 'Above Average' } },
+            { min: 90, label: { ko: '평균 (Average)', en: 'Average' } },
+            { min: 80, label: { ko: '평균 하 (Low Average)', en: 'Low Average' } },
+            { min: 70, label: { ko: '경계선 (Borderline)', en: 'Borderline' } },
+            { min: 0, label: { ko: '매우 낮음 (Very Low)', en: 'Very Low' } }
+        ];
+        
+        for (const c of classifications) {
+            if (iq >= c.min) return c;
+        }
+        return classifications[classifications.length - 1];
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 게임 상태
+    // ═══════════════════════════════════════════════════════════════
+    
+    let state = {
+        selectedCategory: null,
+        userAge: 25,
+        currentItems: [],
+        currentIndex: 0,
+        responses: [],
+        responseTimes: [],
+        startTime: null,
+        timer: null,
+        timeLeft: 45,
+        validCodes: ['CQ-TESTCODE'],
+        isMensa: false
+    };
+    
+    // ═══════════════════════════════════════════════════════════════
+    // UI 함수
+    // ═══════════════════════════════════════════════════════════════
+    
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+    
+    function selectCategory(cat) {
+        state.selectedCategory = cat;
+        
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.classList.toggle('selected', card.dataset.category === cat);
+        });
+        
+        document.getElementById('selectionInfo').style.display = 'block';
+        updateSelectionInfo();
+        
+        const btn = document.getElementById('startBtn');
+        btn.disabled = false;
+        btn.textContent = currentLang === 'ko' ? '테스트 시작' : 'Start Test';
+    }
+    
+    function updateSelectionInfo() {
+        if (!state.selectedCategory) return;
+        
+        const catNames = {
+            ko: { pattern: '패턴 인식', numerical: '수리 추론', spatial: '공간 지각', logical: '논리 추론', verbal: '언어 유추' },
+            en: { pattern: 'Pattern Recognition', numerical: 'Numerical Reasoning', spatial: 'Spatial Perception', logical: 'Logical Reasoning', verbal: 'Verbal Analogies' }
+        };
+        
+        const template = i18n[currentLang]['selectionInfo'];
+        document.getElementById('selectionText').textContent = template.replace('{category}', catNames[currentLang][state.selectedCategory]);
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 테스트 시작
+    // ═══════════════════════════════════════════════════════════════
+    
+    function startTest() {
+        const ageInput = document.getElementById('userAge').value;
+        state.userAge = parseInt(ageInput) || 25;
+        
+        if (state.userAge < 13 || state.userAge > 99) {
+            alert(currentLang === 'ko' ? '13세 이상 99세 이하만 참여 가능합니다.' : 'Age must be between 13 and 99.');
+            return;
+        }
+        
+        if (!state.selectedCategory) return;
+        
+        // 문제 준비 (셔플하여 10문항 선택)
+        const allItems = [...IQ_TEST_ITEMS[state.selectedCategory]];
+        state.currentItems = shuffle(allItems).slice(0, 10);
+        state.currentIndex = 0;
+        state.responses = [];
+        state.responseTimes = [];
+        state.startTime = Date.now();
+        state.isMensa = false;
+        
+        const catNames = {
+            ko: { pattern: '패턴 인식', numerical: '수리 추론', spatial: '공간 지각', logical: '논리 추론', verbal: '언어 유추' },
+            en: { pattern: 'Pattern Recognition', numerical: 'Numerical Reasoning', spatial: 'Spatial Perception', logical: 'Logical Reasoning', verbal: 'Verbal Analogies' }
+        };
+        document.getElementById('categoryLabel').textContent = catNames[currentLang][state.selectedCategory];
+        
+        showScreen('screen-test');
+        displayQuestion();
+        startTimer();
+    }
+    
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 문제 표시
+    // ═══════════════════════════════════════════════════════════════
+    
+    function displayQuestion() {
+        const item = state.currentItems[state.currentIndex];
+        const total = state.currentItems.length;
+        
+        // 진행률
+        document.getElementById('progressText').textContent = `${state.currentIndex + 1} / ${total}`;
+        document.getElementById('progressFill').style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+        
+        // 문제 텍스트
+        const qText = typeof item.question === 'object' ? item.question[currentLang] : item.question;
+        document.getElementById('questionText').textContent = qText;
+        
+        // 시각 자료
+        const visual = document.getElementById('questionVisual');
+        if (item.matrix) {
+            visual.innerHTML = `
+                <div class="matrix-grid">
+                    ${item.matrix.map((cell, i) => `
+                        <div class="matrix-cell ${cell === '?' ? 'highlight' : ''}">${cell}</div>
+                    `).join('')}
+                </div>
+            `;
+            visual.style.display = 'block';
+        } else if (item.type === 'sequence') {
+            visual.innerHTML = `<div class="sequence-display">${qText.split(':')[1] || ''}</div>`;
+            visual.style.display = 'none';
+        } else {
+            visual.style.display = 'none';
+        }
+        
+        // 선택지
+        const container = document.getElementById('optionsContainer');
+        const options = typeof item.options[0] === 'object' ? item.options[currentLang] || item.options : item.options;
+        
+        container.innerHTML = options.map((opt, i) => `
+            <button class="option-btn" onclick="selectOption(${i})" data-index="${i}">
+                ${typeof opt === 'object' ? opt[currentLang] : opt}
+            </button>
+        `).join('');
+        
+        document.getElementById('nextBtn').disabled = true;
+    }
+    
+    function selectOption(index) {
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.toggle('selected', parseInt(btn.dataset.index) === index);
+        });
+        state.selectedOption = index;
+        document.getElementById('nextBtn').disabled = false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 타이머
+    // ═══════════════════════════════════════════════════════════════
+    
+    function startTimer() {
+        state.timeLeft = state.isMensa ? 60 : 45;
+        state.questionStartTime = Date.now();
+        updateTimerDisplay();
+        
+        clearInterval(state.timer);
+        state.timer = setInterval(() => {
+            state.timeLeft--;
+            updateTimerDisplay();
+            
+            if (state.timeLeft <= 0) {
+                autoSubmit();
+            }
+        }, 1000);
+    }
+    
+    function updateTimerDisplay() {
+        const timerId = state.isMensa ? 'mensaTimerValue' : 'timerValue';
+        const timerEl = document.getElementById(timerId).parentElement;
+        
+        document.getElementById(timerId).textContent = state.timeLeft;
+        
+        timerEl.classList.remove('warning', 'danger');
+        if (state.timeLeft <= 5) {
+            timerEl.classList.add('danger');
+        } else if (state.timeLeft <= 10) {
+            timerEl.classList.add('warning');
+        }
+    }
+    
+    function autoSubmit() {
+        // 시간 초과 - 오답 처리
+        const item = state.currentItems[state.currentIndex];
+        state.responses.push(0);
+        state.responseTimes.push(state.isMensa ? 60000 : 45000);
+        
+        if (state.currentIndex < state.currentItems.length - 1) {
+            state.currentIndex++;
+            state.selectedOption = null;
+            displayQuestion();
+            startTimer();
+        } else {
+            finishTest();
+        }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 다음 문제
+    // ═══════════════════════════════════════════════════════════════
+    
+    function nextQuestion() {
+        if (state.selectedOption === undefined || state.selectedOption === null) return;
+        
+        const item = state.currentItems[state.currentIndex];
+        const isCorrect = state.selectedOption === item.answer ? 1 : 0;
+        const responseTime = Date.now() - state.questionStartTime;
+        
+        state.responses.push(isCorrect);
+        state.responseTimes.push(responseTime);
+        
+        if (state.currentIndex < state.currentItems.length - 1) {
+            state.currentIndex++;
+            state.selectedOption = null;
+            displayQuestion();
+            startTimer();
+        } else {
+            finishTest();
+        }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 테스트 종료 및 결과
+    // ═══════════════════════════════════════════════════════════════
+    
+    function finishTest() {
+        clearInterval(state.timer);
+        
+        if (state.isMensa) {
+            showMensaResults();
+        } else {
+            showResults();
+        }
+    }
+    
+    function showResults() {
+        // IRT 능력 추정
+        const result = IRTEngine.estimate(state.responses, state.currentItems);
+        
+        // 연령 보정
+        const ageResult = AgeNorms.adjustIQ(result.theta, state.userAge);
+        
+        // 신뢰구간
+        const ci = IRTEngine.confidenceInterval(ageResult.adjustedIQ, result.se);
+        
+        // 분류
+        const classification = classifyIQ(ageResult.adjustedIQ);
+        
+        // 백분위
+        const percentile = IRTEngine.toPercentile(ageResult.adjustedIQ);
+        
+        // 결과 표시
+        document.getElementById('resultIQ').textContent = ageResult.adjustedIQ;
+        document.getElementById('resultCI').textContent = `95% CI: ${ci.lower} ~ ${ci.upper}`;
+        document.getElementById('resultClass').textContent = classification.label[currentLang];
+        document.getElementById('resultPercentile').textContent = 
+            currentLang === 'ko' ? `백분위 ${percentile}%` : `Percentile ${percentile}%`;
+        
+        // 영역별 분석 (단일 영역이므로 간략화)
+        const chartContainer = document.getElementById('domainChart');
+        const catNames = {
+            ko: { pattern: '패턴 인식', numerical: '수리 추론', spatial: '공간 지각', logical: '논리 추론', verbal: '언어 유추' },
+            en: { pattern: 'Pattern Recognition', numerical: 'Numerical Reasoning', spatial: 'Spatial Perception', logical: 'Logical Reasoning', verbal: 'Verbal Analogies' }
+        };
+        
+        const barClass = ageResult.adjustedIQ >= 120 ? 'excellent' : 
+                        ageResult.adjustedIQ >= 100 ? 'good' : 
+                        ageResult.adjustedIQ >= 80 ? 'average' : 'below';
+        
+        chartContainer.innerHTML = `
+            <h3 style="margin-bottom: 20px; text-align: left;">${currentLang === 'ko' ? '영역별 분석' : 'Domain Analysis'}</h3>
+            <div class="domain-bar-item">
+                <div class="domain-bar-header">
+                    <span class="domain-bar-name">${catNames[currentLang][state.selectedCategory]}</span>
+                    <span class="domain-bar-score">IQ ${ageResult.adjustedIQ}</span>
+                </div>
+                <div class="domain-bar-track">
+                    <div class="domain-bar-fill ${barClass}" style="width: ${Math.min(100, (ageResult.adjustedIQ / 160) * 100)}%"></div>
+                </div>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">
+                ${currentLang === 'ko' ? `정답률: ${state.responses.filter(r => r === 1).length}/10 (${state.responses.filter(r => r === 1).length * 10}%)` :
+                `Accuracy: ${state.responses.filter(r => r === 1).length}/10 (${state.responses.filter(r => r === 1).length * 10}%)`}
+            </p>
+        `;
+        
+        // 연령 해석
+        const ageInterpretation = document.getElementById('ageInterpretation');
+        const ageGroup = ageResult.ageGroup;
+        const adj = ageResult.adjustment;
+        
+        if (currentLang === 'ko') {
+            if (adj > 2) {
+                ageInterpretation.innerHTML = `📊 <strong>${ageGroup.label.ko}</strong> 연령대 평균보다 <strong>${Math.abs(adj)}점</strong> 높은 수준입니다. 동일 연령대에서 우수한 인지능력을 보이고 있습니다.`;
+            } else if (adj < -2) {
+                ageInterpretation.innerHTML = `📊 <strong>${ageGroup.label.ko}</strong> 연령대 평균보다 <strong>${Math.abs(adj)}점</strong> 낮은 수준입니다. 인지 훈련을 통한 개선을 권장합니다.`;
+            } else {
+                ageInterpretation.innerHTML = `📊 <strong>${ageGroup.label.ko}</strong> 연령대의 평균적인 인지능력 수준입니다.`;
+            }
+        } else {
+            if (adj > 2) {
+                ageInterpretation.innerHTML = `📊 Your score is <strong>${Math.abs(adj)} points above</strong> the ${ageGroup.label.en} average. You demonstrate superior cognitive ability for your age group.`;
+            } else if (adj < -2) {
+                ageInterpretation.innerHTML = `📊 Your score is <strong>${Math.abs(adj)} points below</strong> the ${ageGroup.label.en} average. Cognitive training may help improvement.`;
+            } else {
+                ageInterpretation.innerHTML = `📊 Your cognitive ability is <strong>average</strong> for the ${ageGroup.label.en} age group.`;
+            }
+        }
+        
+        // 멘사 자격 확인
+        if (ageResult.adjustedIQ >= 120) {
+            const code = generateCode();
+            state.validCodes.push(code);
+            
+            document.getElementById('certificate').style.display = 'block';
+            document.getElementById('certCode').textContent = code;
+            document.getElementById('mensaBtn').style.display = 'inline-flex';
+        } else {
+            document.getElementById('certificate').style.display = 'none';
+            document.getElementById('mensaBtn').style.display = 'none';
+        }
+        
+        showScreen('screen-result');
+    }
+    
+    function generateCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = 'CQ-';
+        for (let i = 0; i < 8; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 멘사 테스트
+    // ═══════════════════════════════════════════════════════════════
+    
+    function goToMensa() {
+        // 고난도 문제 선별 (b >= 1.5)
+        let mensaItems = [];
+        Object.keys(IQ_TEST_ITEMS).forEach(cat => {
+            const hard = IQ_TEST_ITEMS[cat].filter(item => item.irt.b >= 1.5);
+            mensaItems = mensaItems.concat(hard);
+        });
+        
+        state.currentItems = shuffle(mensaItems).slice(0, 20);
+        state.currentIndex = 0;
+        state.responses = [];
+        state.responseTimes = [];
+        state.startTime = Date.now();
+        state.isMensa = true;
+        state.selectedOption = null;
+        
+        showScreen('screen-mensa');
+        displayMensaQuestion();
+        startTimer();
+    }
+    
+    function displayMensaQuestion() {
+        const item = state.currentItems[state.currentIndex];
+        const total = state.currentItems.length;
+        
+        document.getElementById('mensaProgressText').textContent = `${state.currentIndex + 1} / ${total}`;
+        document.getElementById('mensaProgressFill').style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+        
+        const qText = typeof item.question === 'object' ? item.question[currentLang] : item.question;
+        document.getElementById('mensaQuestionText').textContent = qText;
+        
+        const visual = document.getElementById('mensaQuestionVisual');
+        if (item.matrix) {
+            visual.innerHTML = `
+                <div class="matrix-grid">
+                    ${item.matrix.map((cell, i) => `
+                        <div class="matrix-cell ${cell === '?' ? 'highlight' : ''}">${cell}</div>
+                    `).join('')}
+                </div>
+            `;
+            visual.style.display = 'block';
+        } else {
+            visual.style.display = 'none';
+        }
+        
+        const container = document.getElementById('mensaOptionsContainer');
+        const options = typeof item.options[0] === 'object' ? (item.options[currentLang] || item.options) : item.options;
+        
+        container.innerHTML = options.map((opt, i) => `
+            <button class="option-btn" onclick="selectMensaOption(${i})" data-index="${i}">
+                ${typeof opt === 'object' ? opt[currentLang] : opt}
+            </button>
+        `).join('');
+        
+        document.getElementById('mensaNextBtn').disabled = true;
+    }
+    
+    function selectMensaOption(index) {
+        document.querySelectorAll('#mensaOptionsContainer .option-btn').forEach(btn => {
+            btn.classList.toggle('selected', parseInt(btn.dataset.index) === index);
+        });
+        state.selectedOption = index;
+        document.getElementById('mensaNextBtn').disabled = false;
+    }
+    
+    function nextMensaQuestion() {
+        if (state.selectedOption === undefined || state.selectedOption === null) return;
+        
+        const item = state.currentItems[state.currentIndex];
+        const isCorrect = state.selectedOption === item.answer ? 1 : 0;
+        const responseTime = Date.now() - state.questionStartTime;
+        
+        state.responses.push(isCorrect);
+        state.responseTimes.push(responseTime);
+        
+        if (state.currentIndex < state.currentItems.length - 1) {
+            state.currentIndex++;
+            state.selectedOption = null;
+            displayMensaQuestion();
+            startTimer();
+        } else {
+            finishTest();
+        }
+    }
+    
+    function showMensaResults() {
+        const result = IRTEngine.estimate(state.responses, state.currentItems);
+        const ageResult = AgeNorms.adjustIQ(result.theta, state.userAge);
+        
+        // 멘사 테스트는 기본 115 보정
+        const mensaIQ = Math.round(Math.max(100, Math.min(160, 115 + result.theta * 15)));
+        const ci = IRTEngine.confidenceInterval(mensaIQ, result.se);
+        const classification = classifyIQ(mensaIQ);
+        const percentile = IRTEngine.toPercentile(mensaIQ);
+        
+        document.getElementById('mensaResultIQ').textContent = mensaIQ;
+        document.getElementById('mensaResultCI').textContent = `95% CI: ${ci.lower} ~ ${ci.upper}`;
+        document.getElementById('mensaResultClass').textContent = classification.label[currentLang];
+        document.getElementById('mensaResultPercentile').textContent = 
+            currentLang === 'ko' ? `백분위 ${percentile}%` : `Percentile ${percentile}%`;
+        
+        if (mensaIQ >= 130) {
+            document.getElementById('mensaCertificate').style.display = 'block';
+        } else {
+            document.getElementById('mensaCertificate').style.display = 'none';
+        }
+        
+        showScreen('screen-mensa-result');
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // 기타 기능
+    // ═══════════════════════════════════════════════════════════════
+    
+    function tryAnotherCategory() {
+        state.selectedCategory = null;
+        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('selectionInfo').style.display = 'none';
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('startBtn').textContent = currentLang === 'ko' ? '영역을 선택하세요' : 'Select a domain';
+        showScreen('screen-intro');
+    }
+    
+    function showCodeInput() {
+        document.getElementById('codeModal').classList.add('active');
+        document.getElementById('codeInput').value = '';
+        document.getElementById('codeError').style.display = 'none';
+    }
+    
+    function hideCodeInput() {
+        document.getElementById('codeModal').classList.remove('active');
+    }
+    
+    function verifyCode() {
+        const code = document.getElementById('codeInput').value.trim().toUpperCase();
+        
+        if (state.validCodes.includes(code)) {
+            hideCodeInput();
+            goToMensa();
+        } else {
+            document.getElementById('codeError').textContent = i18n[currentLang]['modal.invalidCode'];
+            document.getElementById('codeError').style.display = 'block';
+        }
+    }
+    
+    function confirmExit() {
+        document.getElementById('exitModal').classList.add('active');
+    }
+    
+    function hideExitModal() {
+        document.getElementById('exitModal').classList.remove('active');
+    }
+    
+    function exitTest() {
+        clearInterval(state.timer);
+        hideExitModal();
+        location.reload();
+    }
+    
+    function printReport() {
+        window.print();
+    }
+    
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+        setLanguage('ko');
+    });
+    </script>
+</body>
+</html>

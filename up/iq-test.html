@@ -3,50 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IQZone - IQ Assessment & High IQ Challenge</title>
+    <title>IQ 테스트 - 인지능력 평가</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ffffff;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
-            color: #333333;
-            position: relative;
-            /* Added for animation container */
+            color: #fff;
         }
-
-        /* Brain Animation Styles */
-        .brain-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        #brainCanvas {
-            width: 100%;
-            height: 100%;
-        }
-
+        
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
-
+        
         header {
             text-align: center;
             padding: 40px 0;
         }
-
+        
         header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
@@ -54,44 +36,44 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
+        
         header p {
-            color: #666666;
+            color: #8892b0;
             font-size: 1.1rem;
         }
-
+        
         .intro-section {
-            background: rgba(0, 0, 0, 0.02);
+            background: rgba(255,255,255,0.05);
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 30px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-
+        
         .intro-section h2 {
             color: #00d4ff;
             margin-bottom: 20px;
         }
-
+        
         .intro-section ul {
             list-style: none;
             margin: 20px 0;
         }
-
+        
         .intro-section li {
             padding: 10px 0;
             padding-left: 30px;
             position: relative;
-            color: #555555;
+            color: #ccd6f6;
         }
-
+        
         .intro-section li::before {
             content: "✓";
             position: absolute;
             left: 0;
             color: #00d4ff;
         }
-
+        
         .btn {
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             border: none;
@@ -102,77 +84,77 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
-
+        
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0,212,255,0.3);
         }
-
+        
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
+        
         .test-section {
             display: none;
         }
-
+        
         .question-card {
-            background: rgba(0, 0, 0, 0.02);
+            background: rgba(255,255,255,0.05);
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-
+        
         .progress-bar {
             width: 100%;
             height: 8px;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(255,255,255,0.1);
             border-radius: 4px;
             margin-bottom: 30px;
             overflow: hidden;
         }
-
+        
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             transition: width 0.3s;
         }
-
+        
         .question-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-
+        
         .question-number {
             color: #00d4ff;
             font-size: 0.9rem;
         }
-
+        
         .timer {
             color: #ff6b6b;
             font-size: 1.1rem;
             font-weight: bold;
         }
-
+        
         .category-badge {
-            background: rgba(123, 44, 191, 0.15);
+            background: rgba(123, 44, 191, 0.3);
             padding: 5px 15px;
             border-radius: 15px;
             font-size: 0.8rem;
-            color: #7b2cbf;
+            color: #b794f6;
         }
-
+        
         .question-text {
             font-size: 1.3rem;
             margin-bottom: 30px;
             line-height: 1.6;
-            color: #333333;
+            color: #e6f1ff;
         }
-
+        
         .matrix-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -180,55 +162,54 @@
             max-width: 300px;
             margin: 20px auto;
         }
-
+        
         .matrix-cell {
             aspect-ratio: 1;
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
-            color: #333333;
         }
-
+        
         .matrix-cell.empty {
-            background: rgba(0, 212, 255, 0.1);
+            background: rgba(0,212,255,0.2);
             border: 2px dashed #00d4ff;
         }
-
+        
         .options-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-top: 30px;
         }
-
+        
         .option {
-            background: rgba(0, 0, 0, 0.02);
-            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
             border-radius: 15px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
         }
-
+        
         .option:hover {
             border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.05);
+            background: rgba(0,212,255,0.1);
         }
-
+        
         .option.selected {
             border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
+            background: rgba(0,212,255,0.2);
         }
-
+        
         .option-label {
             font-size: 1.1rem;
-            color: #333333;
+            color: #ccd6f6;
         }
-
+        
         .sequence-display {
             display: flex;
             justify-content: center;
@@ -236,48 +217,46 @@
             margin: 30px 0;
             flex-wrap: wrap;
         }
-
+        
         .sequence-item {
             width: 60px;
             height: 60px;
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             font-weight: bold;
-            color: #333333;
         }
-
+        
         .sequence-item.unknown {
-            background: rgba(0, 212, 255, 0.1);
+            background: rgba(0,212,255,0.2);
             border: 2px dashed #00d4ff;
             color: #00d4ff;
         }
-
+        
         .nav-buttons {
             display: flex;
             justify-content: space-between;
             margin-top: 30px;
         }
-
+        
         .btn-secondary {
             background: transparent;
-            border: 2px solid rgba(0, 0, 0, 0.2);
-            color: #333333;
+            border: 2px solid rgba(255,255,255,0.2);
         }
-
+        
         .btn-secondary:hover {
             border-color: #00d4ff;
             box-shadow: none;
         }
-
+        
         .results-section {
             display: none;
             text-align: center;
         }
-
+        
         .score-circle {
             width: 200px;
             height: 200px;
@@ -289,75 +268,73 @@
             align-items: center;
             justify-content: center;
         }
-
+        
         .score-number {
             font-size: 4rem;
             font-weight: bold;
-            color: #ffffff;
         }
-
+        
         .score-label {
             font-size: 1rem;
             opacity: 0.8;
-            color: #ffffff;
         }
-
+        
         .results-details {
-            background: rgba(0, 0, 0, 0.02);
+            background: rgba(255,255,255,0.05);
             border-radius: 20px;
             padding: 40px;
             margin: 30px 0;
             text-align: left;
         }
-
+        
         .result-category {
             margin-bottom: 25px;
         }
-
+        
         .result-category h4 {
             color: #00d4ff;
             margin-bottom: 10px;
         }
-
+        
         .result-bar {
             height: 20px;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
             overflow: hidden;
         }
-
+        
         .result-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             border-radius: 10px;
             transition: width 1s;
         }
-
+        
         .result-score {
             text-align: right;
             margin-top: 5px;
-            color: #666666;
+            color: #8892b0;
             font-size: 0.9rem;
         }
-
+        
         .iq-classification {
             margin-top: 30px;
             padding: 20px;
-            background: rgba(0, 212, 255, 0.05);
+            background: rgba(0,212,255,0.1);
             border-radius: 15px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0,212,255,0.3);
         }
-
+        
         .iq-classification h3 {
             color: #00d4ff;
             margin-bottom: 10px;
         }
-
+        
         .percentile-info {
-            color: #666666;
+            color: #8892b0;
             margin-top: 15px;
         }
-
+        
         .shape-container {
             display: flex;
             justify-content: center;
@@ -365,7 +342,7 @@
             margin: 20px 0;
             flex-wrap: wrap;
         }
-
+        
         .shape {
             width: 80px;
             height: 80px;
@@ -373,12 +350,12 @@
             align-items: center;
             justify-content: center;
         }
-
+        
         .shape svg {
             width: 100%;
             height: 100%;
         }
-
+        
         .analogy-display {
             display: flex;
             align-items: center;
@@ -387,53 +364,46 @@
             margin: 30px 0;
             flex-wrap: wrap;
         }
-
+        
         .analogy-item {
             padding: 15px 25px;
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
             font-size: 1.2rem;
-            color: #333333;
         }
-
+        
         .analogy-separator {
             color: #00d4ff;
             font-size: 1.5rem;
         }
-
+        
         @media (max-width: 600px) {
             .options-grid {
                 grid-template-columns: 1fr;
             }
-
+            
             header h1 {
                 font-size: 1.8rem;
             }
-
+            
             .question-text {
                 font-size: 1.1rem;
             }
         }
     </style>
 </head>
-
 <body>
-    <!-- Brain Animation Container -->
-    <div class="brain-container">
-        <canvas id="brainCanvas"></canvas>
-    </div>
-
     <div class="container">
         <header>
-            <h1>IQZone</h1>
+            <h1>🧠 IQ 인지능력 테스트</h1>
             <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
         </header>
-
+        
         <!-- 시작 화면 -->
         <div class="intro-section" id="intro">
             <h2>테스트 안내</h2>
             <p>본 테스트는 다양한 인지 영역을 측정하는 종합 평가입니다.</p>
-
+            
             <ul>
                 <li><strong>패턴 인식</strong> - 시각적 패턴과 규칙 발견 능력</li>
                 <li><strong>수열 추론</strong> - 수학적 패턴 인식 능력</li>
@@ -441,65 +411,64 @@
                 <li><strong>논리 추론</strong> - 논리적 사고력</li>
                 <li><strong>언어 유추</strong> - 개념 간 관계 파악 능력</li>
             </ul>
-
-            <div
-                style="margin-top: 30px; padding: 20px; background: rgba(255,107,107,0.1); border-radius: 10px; border: 1px solid rgba(255,107,107,0.3);">
+            
+            <div style="margin-top: 30px; padding: 20px; background: rgba(255,107,107,0.1); border-radius: 10px; border: 1px solid rgba(255,107,107,0.3);">
                 <p><strong>⏱️ 제한 시간:</strong> 문제당 60초</p>
                 <p><strong>📝 문항 수:</strong> 총 25문항</p>
                 <p><strong>⚠️ 주의:</strong> 각 문제는 한 번만 답할 수 있습니다</p>
             </div>
-
+            
             <div style="text-align: center; margin-top: 40px;">
                 <button class="btn" onclick="startTest()">테스트 시작하기</button>
             </div>
         </div>
-
+        
         <!-- 테스트 화면 -->
         <div class="test-section" id="test">
             <div class="progress-bar">
                 <div class="progress-fill" id="progress"></div>
             </div>
-
+            
             <div class="question-card">
                 <div class="question-header">
                     <span class="question-number" id="questionNum">문제 1/25</span>
                     <span class="category-badge" id="categoryBadge">패턴 인식</span>
                     <span class="timer" id="timer">60초</span>
                 </div>
-
+                
                 <div id="questionContent">
                     <!-- 문제 내용이 동적으로 삽입됨 -->
                 </div>
-
+                
                 <div class="options-grid" id="optionsGrid">
                     <!-- 선택지가 동적으로 삽입됨 -->
                 </div>
-
+                
                 <div class="nav-buttons">
                     <button class="btn btn-secondary" onclick="skipQuestion()">건너뛰기</button>
                     <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>다음 문제</button>
                 </div>
             </div>
         </div>
-
+        
         <!-- 결과 화면 -->
         <div class="results-section" id="results">
             <h2>테스트 완료!</h2>
-
+            
             <div class="score-circle">
                 <span class="score-number" id="iqScore">--</span>
                 <span class="score-label">IQ 점수</span>
             </div>
-
+            
             <div class="iq-classification" id="iqClass">
                 <h3 id="classLabel">분류</h3>
                 <p id="classDesc">설명</p>
                 <p class="percentile-info" id="percentile">상위 %</p>
             </div>
-
+            
             <div class="results-details">
-                <h3 style="margin-bottom: 30px; color: #333333;">영역별 분석</h3>
-
+                <h3 style="margin-bottom: 30px; color: #e6f1ff;">영역별 분석</h3>
+                
                 <div class="result-category">
                     <h4>패턴 인식 (Pattern Recognition)</h4>
                     <div class="result-bar">
@@ -507,7 +476,7 @@
                     </div>
                     <div class="result-score" id="patternScore">0/5</div>
                 </div>
-
+                
                 <div class="result-category">
                     <h4>수열 추론 (Numerical Reasoning)</h4>
                     <div class="result-bar">
@@ -515,7 +484,7 @@
                     </div>
                     <div class="result-score" id="numericalScore">0/5</div>
                 </div>
-
+                
                 <div class="result-category">
                     <h4>공간 추론 (Spatial Reasoning)</h4>
                     <div class="result-bar">
@@ -523,7 +492,7 @@
                     </div>
                     <div class="result-score" id="spatialScore">0/5</div>
                 </div>
-
+                
                 <div class="result-category">
                     <h4>논리 추론 (Logical Reasoning)</h4>
                     <div class="result-bar">
@@ -531,7 +500,7 @@
                     </div>
                     <div class="result-score" id="logicalScore">0/5</div>
                 </div>
-
+                
                 <div class="result-category">
                     <h4>언어 유추 (Verbal Analogies)</h4>
                     <div class="result-bar">
@@ -540,16 +509,16 @@
                     <div class="result-score" id="verbalScore">0/5</div>
                 </div>
             </div>
-
+            
             <button class="btn" onclick="location.reload()">다시 테스트하기</button>
         </div>
     </div>
-
+    
     <script>
         // ============================================
         // IQ 테스트 문제 데이터베이스
         // ============================================
-
+        
         const questions = {
             // 패턴 인식 문제 (행렬 추론 스타일)
             pattern: [
@@ -609,7 +578,7 @@
                     explanation: '알파벳과 숫자가 순서대로 증가합니다.'
                 }
             ],
-
+            
             // 수열 추론 문제
             numerical: [
                 {
@@ -668,7 +637,7 @@
                     explanation: '차이가 4, 6, 8, 10, 12로 증가합니다. (n×(n+1) 패턴)'
                 }
             ],
-
+            
             // 공간 추론 문제
             spatial: [
                 {
@@ -729,7 +698,7 @@
                     explanation: '정육면체를 대각선으로 자르면 직사각형 단면이 생깁니다.'
                 }
             ],
-
+            
             // 논리 추론 문제
             logical: [
                 {
@@ -798,7 +767,7 @@
                     explanation: '(x × 3) - 7 = 20 → 3x = 27 → x = 9'
                 }
             ],
-
+            
             // 언어 유추 문제
             verbal: [
                 {
@@ -858,11 +827,11 @@
                 }
             ]
         };
-
+        
         // ============================================
         // 테스트 상태 관리
         // ============================================
-
+        
         let currentQuestionIndex = 0;
         let allQuestions = [];
         let answers = [];
@@ -870,11 +839,11 @@
         let timeLeft = 60;
         let startTime = null;
         let responseTimes = [];
-
+        
         // ============================================
         // 테스트 초기화 및 시작
         // ============================================
-
+        
         function startTest() {
             // 모든 카테고리에서 문제 수집 및 섞기
             allQuestions = [
@@ -884,20 +853,20 @@
                 ...shuffleArray(questions.logical),
                 ...shuffleArray(questions.verbal)
             ];
-
+            
             // 카테고리별로 섞이도록 전체 재배열
             allQuestions = shuffleArray(allQuestions);
-
+            
             // 답변 배열 초기화
             answers = new Array(allQuestions.length).fill(null);
             responseTimes = new Array(allQuestions.length).fill(null);
-
+            
             document.getElementById('intro').style.display = 'none';
             document.getElementById('test').style.display = 'block';
-
+            
             loadQuestion(0);
         }
-
+        
         function shuffleArray(array) {
             const newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -906,24 +875,24 @@
             }
             return newArray;
         }
-
+        
         // ============================================
         // 문제 로드 및 표시
         // ============================================
-
+        
         function loadQuestion(index) {
             currentQuestionIndex = index;
             const q = allQuestions[index];
-
+            
             // 진행 상황 업데이트
             document.getElementById('progress').style.width = `${((index + 1) / allQuestions.length) * 100}%`;
             document.getElementById('questionNum').textContent = `문제 ${index + 1}/${allQuestions.length}`;
             document.getElementById('categoryBadge').textContent = q.categoryName;
-
+            
             // 문제 내용 렌더링
             const contentDiv = document.getElementById('questionContent');
             contentDiv.innerHTML = renderQuestionContent(q);
-
+            
             // 선택지 렌더링
             const optionsDiv = document.getElementById('optionsGrid');
             optionsDiv.innerHTML = q.options.map((opt, i) => `
@@ -931,7 +900,7 @@
                     <span class="option-label">${opt}</span>
                 </div>
             `).join('');
-
+            
             // 이전 답변이 있으면 표시
             if (answers[index] !== null) {
                 const selectedOption = optionsDiv.querySelector(`[data-index="${answers[index]}"]`);
@@ -940,15 +909,15 @@
             } else {
                 document.getElementById('nextBtn').disabled = true;
             }
-
+            
             // 타이머 시작
             startTimer();
             startTime = Date.now();
         }
-
+        
         function renderQuestionContent(q) {
             let html = `<p class="question-text">${q.question}</p>`;
-
+            
             if (q.matrix) {
                 html += '<div class="matrix-grid">';
                 q.matrix.forEach((cell, i) => {
@@ -957,7 +926,7 @@
                 });
                 html += '</div>';
             }
-
+            
             if (q.sequence) {
                 html += '<div class="sequence-display">';
                 q.sequence.forEach(item => {
@@ -966,7 +935,7 @@
                 });
                 html += '</div>';
             }
-
+            
             if (q.analogy) {
                 html += '<div class="analogy-display">';
                 html += `<span class="analogy-item">${q.analogy[0]}</span>`;
@@ -978,97 +947,97 @@
                 html += `<span class="analogy-item unknown">?</span>`;
                 html += '</div>';
             }
-
+            
             if (q.shapeType === 'cube' && q.cubeNet) {
                 html += `<div style="text-align: center; margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
                     <p style="color: #8892b0;">${q.cubeNet}</p>
                 </div>`;
             }
-
+            
             if (q.shapeType === 'rotation' && q.shape) {
                 html += `<div style="text-align: center; margin: 20px 0; font-size: 3rem;">${q.shape}</div>`;
             }
-
+            
             return html;
         }
-
+        
         // ============================================
         // 타이머 관리
         // ============================================
-
+        
         function startTimer() {
             clearInterval(timer);
             timeLeft = 60;
             updateTimerDisplay();
-
+            
             timer = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
-
+                
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     autoNext();
                 }
             }, 1000);
         }
-
+        
         function updateTimerDisplay() {
             const timerEl = document.getElementById('timer');
             timerEl.textContent = `${timeLeft}초`;
-            timerEl.style.color = timeLeft <= 10 ? '#ff6b6b' : '#333333';
+            timerEl.style.color = timeLeft <= 10 ? '#ff6b6b' : '#fff';
         }
-
+        
         // ============================================
         // 답변 선택 및 네비게이션
         // ============================================
-
+        
         function selectOption(index) {
             // 이전 선택 해제
             document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-
+            
             // 새 선택
             document.querySelector(`[data-index="${index}"]`).classList.add('selected');
             answers[currentQuestionIndex] = index;
             responseTimes[currentQuestionIndex] = Date.now() - startTime;
-
+            
             document.getElementById('nextBtn').disabled = false;
         }
-
+        
         function nextQuestion() {
             clearInterval(timer);
-
+            
             if (currentQuestionIndex < allQuestions.length - 1) {
                 loadQuestion(currentQuestionIndex + 1);
             } else {
                 showResults();
             }
         }
-
+        
         function skipQuestion() {
             clearInterval(timer);
             responseTimes[currentQuestionIndex] = 60000; // 최대 시간
-
+            
             if (currentQuestionIndex < allQuestions.length - 1) {
                 loadQuestion(currentQuestionIndex + 1);
             } else {
                 showResults();
             }
         }
-
+        
         function autoNext() {
             responseTimes[currentQuestionIndex] = 60000;
-
+            
             if (currentQuestionIndex < allQuestions.length - 1) {
                 loadQuestion(currentQuestionIndex + 1);
             } else {
                 showResults();
             }
         }
-
+        
         // ============================================
         // 결과 계산 및 표시
         // ============================================
-
+        
         function calculateResults() {
             const categoryScores = {
                 pattern: { correct: 0, total: 0 },
@@ -1077,43 +1046,43 @@
                 logical: { correct: 0, total: 0 },
                 verbal: { correct: 0, total: 0 }
             };
-
+            
             let totalCorrect = 0;
             let totalDifficulty = 0;
             let weightedScore = 0;
-
+            
             allQuestions.forEach((q, i) => {
                 categoryScores[q.category].total++;
-
+                
                 if (answers[i] === q.correct) {
                     categoryScores[q.category].correct++;
                     totalCorrect++;
-
+                    
                     // 난이도 가중치 적용 (어려운 문제일수록 높은 점수)
                     const difficultyWeight = q.difficulty;
-
+                    
                     // 응답 시간 보너스 (빠를수록 높은 점수)
                     const timeBonus = Math.max(0, 1 - (responseTimes[i] / 60000)) * 0.2;
-
+                    
                     weightedScore += difficultyWeight * (1 + timeBonus);
                     totalDifficulty += difficultyWeight;
                 } else {
                     totalDifficulty += q.difficulty;
                 }
             });
-
+            
             // IQ 점수 계산 (표준화)
             // 원점수 비율을 정규분포로 변환
             const rawPercentage = weightedScore / totalDifficulty;
-
+            
             // 표준 IQ 척도로 변환 (평균 100, 표준편차 15)
             // z-score 변환 후 IQ 척도 적용
             const zScore = (rawPercentage - 0.5) * 4; // -2 ~ +2 범위
             const iqScore = Math.round(100 + (zScore * 15));
-
+            
             // IQ 범위 제한 (55 ~ 145)
             const finalIQ = Math.max(55, Math.min(145, iqScore));
-
+            
             return {
                 iq: finalIQ,
                 categoryScores,
@@ -1121,7 +1090,7 @@
                 totalQuestions: allQuestions.length
             };
         }
-
+        
         function getIQClassification(iq) {
             if (iq >= 130) return { label: '매우 우수 (Very Superior)', desc: '상위 2% 이내의 뛰어난 인지능력을 보유하고 있습니다.', percentile: 98 };
             if (iq >= 120) return { label: '우수 (Superior)', desc: '상위 10% 이내의 우수한 인지능력입니다.', percentile: 91 };
@@ -1131,98 +1100,32 @@
             if (iq >= 70) return { label: '경계선 (Borderline)', desc: '경계선 수준의 인지능력입니다.', percentile: 9 };
             return { label: '발달 지연 가능성', desc: '전문가 상담을 권장합니다.', percentile: 2 };
         }
-
+        
         function showResults() {
             document.getElementById('test').style.display = 'none';
             document.getElementById('results').style.display = 'block';
-
+            
             const results = calculateResults();
             const classification = getIQClassification(results.iq);
-
+            
             // IQ 점수 표시
             document.getElementById('iqScore').textContent = results.iq;
             document.getElementById('classLabel').textContent = classification.label;
             document.getElementById('classDesc').textContent = classification.desc;
             document.getElementById('percentile').textContent = `상위 ${100 - classification.percentile}% (백분위 ${classification.percentile})`;
-
+            
             // 카테고리별 점수 표시
             setTimeout(() => {
                 const categories = ['pattern', 'numerical', 'spatial', 'logical', 'verbal'];
                 categories.forEach(cat => {
                     const score = results.categoryScores[cat];
                     const percentage = (score.correct / score.total) * 100;
-
+                    
                     document.getElementById(`${cat}Bar`).style.width = `${percentage}%`;
                     document.getElementById(`${cat}Score`).textContent = `${score.correct}/${score.total} (${Math.round(percentage)}%)`;
                 });
             }, 100);
         }
-
-        // Brain Animation Script
-        const canvas = document.getElementById('brainCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2 + 1;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < 50; i++) particles.push(new Particle());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-                particles.forEach(p2 => {
-                    const dx = p.x - p2.x;
-                    const dy = p.y - p2.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 100) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 212, 255, ${0.1 - dist / 1000})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
-                    }
-                });
-            });
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', () => { resize(); initParticles(); });
-        resize();
-        initParticles();
-        animate();
     </script>
 </body>
-
 </html>
