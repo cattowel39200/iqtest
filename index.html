@@ -2365,10 +2365,10 @@
             weeklyRankingList.style.display = 'block';
             weeklyRankingEmpty.style.display = 'none';
 
-            // 상위 5명만 표시
-            const top5 = currentWeekRankings.slice(0, 5);
+            // 상위 10명만 표시
+            const top10 = currentWeekRankings.slice(0, 10);
 
-            weeklyRankingList.innerHTML = top5.map((rank, index) => {
+            weeklyRankingList.innerHTML = top10.map((rank, index) => {
                 const ranking = index + 1;
                 const medalIcon = ranking <= 3 ? ['🥇', '🥈', '🥉'][ranking - 1] : `${ranking}위`;
 
