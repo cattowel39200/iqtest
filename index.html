@@ -480,7 +480,7 @@
             <!-- 좌측: IQ 랭킹 -->
             <div class="intro-section" style="margin-bottom: 0;">
                 <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    🏆 IQ 랭킹 TOP 15
+                    🏆 IQ 랭킹 TOP 10
                     <button onclick="refreshRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
                 </h2>
                 <div id="rankingList">
@@ -492,23 +492,21 @@
                 </div>
             </div>
 
-            <!-- 우측: 최근 게시글 -->
+            <!-- 우측: 주간 랭킹 -->
             <div class="intro-section" style="margin-bottom: 0;">
                 <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    💬 최근 자랑글
-                    <button onclick="loadMainPosts()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+                    📅 이번 주 랭킹
+                    <button onclick="refreshWeeklyRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
                 </h2>
-                <div id="mainPostsList">
-                    <!-- 최근 게시글이 여기에 표시됨 -->
+                <div id="weeklyRankingList">
+                    <!-- 주간 랭킹이 여기에 표시됨 -->
                 </div>
-                <div id="mainPostsEmpty" style="text-align: center; color: #999999; padding: 20px;">
-                    <p>📝 아직 자랑글이 없습니다</p>
-                    <p>첫 번째 자랑의 주인공이 되어보세요!</p>
+                <div id="weeklyRankingEmpty" style="text-align: center; color: #999999; padding: 20px;">
+                    <p>📊 아직 이번 주 랭킹이 없습니다</p>
+                    <p>첫 번째 주간 챔피언이 되어보세요!</p>
                 </div>
-                <div style="text-align: center; margin-top: 15px;">
-                    <button class="btn btn-secondary" onclick="showFullBoard()" style="font-size: 0.9rem; padding: 8px 16px;">
-                        더 많은 글 보기 →
-                    </button>
+                <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #666666;">
+                    <span id="weeklyResetInfo">매주 월요일 자정에 초기화</span>
                 </div>
             </div>
 
@@ -600,59 +598,6 @@
             </div>
         </div>
 
-        <!-- 게시판 화면 -->
-        <div class="board-section" id="board" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <h2 style="color: #00d4ff; margin: 0;">🏆 IQ 자랑 게시판</h2>
-                <button class="btn btn-secondary" onclick="showResults()" style="margin: 0;">← 결과로 돌아가기</button>
-            </div>
-
-            <!-- 글쓰기 폼 -->
-            <div class="intro-section" id="postForm">
-                <h3 style="color: #333333; margin-bottom: 20px;">🏆 내 IQ 자랑하기</h3>
-
-                <!-- IQ 점수 자동 표시 -->
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">내 IQ 점수:</label>
-                    <div id="iqDisplay" style="width: 100%; padding: 15px; background: linear-gradient(90deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1)); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; font-size: 1.2rem; font-weight: bold; text-align: center; color: #333;">
-                        IQ 측정 완료 후 자동 표시
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">닉네임: *</label>
-                    <input type="text" id="nickname" placeholder="원하는 닉네임을 입력하세요" maxlength="20" required
-                           style="width: 100%; padding: 10px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px;">
-                    <div style="text-align: right; margin-top: 5px; font-size: 0.8rem; color: #666666;">
-                        <span id="nickCount">0</span>/20
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">한마디 (선택사항):</label>
-                    <textarea id="message" placeholder="추가하고 싶은 말이 있다면 여기에... (최대 200자)" maxlength="200"
-                              style="width: 100%; height: 80px; padding: 10px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; resize: vertical;"></textarea>
-                    <div style="text-align: right; margin-top: 5px; font-size: 0.8rem; color: #666666;">
-                        <span id="charCount">0</span>/200
-                    </div>
-                </div>
-                <div style="text-align: center;">
-                    <button class="btn" onclick="submitPost()" id="submitBtn">🚀 자랑글 등록하기</button>
-                </div>
-            </div>
-
-            <!-- 게시글 목록 -->
-            <div class="intro-section">
-                <h3 style="color: #333333; margin-bottom: 20px;">📋 최근 자랑 목록</h3>
-                <div id="postsList">
-                    <!-- 게시글들이 여기에 동적으로 추가됨 -->
-                </div>
-                <div id="emptyState" style="text-align: center; color: #999999; padding: 40px;">
-                    <p>아직 등록된 자랑글이 없습니다.</p>
-                    <p>첫 번째 자랑의 주인공이 되어보세요! 🎉</p>
-                </div>
-            </div>
-        </div>
 
         <!-- 테스트 화면 -->
         <div class="test-section" id="test">
@@ -744,9 +689,8 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
-                <button class="btn" onclick="showBoard()">🏆 결과 자랑하기</button>
-                <button class="btn btn-secondary" onclick="location.reload()">다시 테스트하기</button>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="location.reload()">다시 테스트하기</button>
             </div>
         </div>
     </div>
@@ -1667,6 +1611,13 @@
                 age: userAge
             };
 
+            // 자동으로 랭킹에 등록
+            if (userNickname) {
+                saveToRanking(userNickname, results.iq, classification.label, userAge);
+                saveToWeeklyRanking(userNickname, results.iq, classification.label, userAge);
+                refreshRanking();
+            }
+
             // IQ 점수 표시
             document.getElementById('iqScore').textContent = results.iq;
             document.getElementById('classLabel').textContent = classification.label;
@@ -1747,32 +1698,136 @@
         }
 
         // ============================================
-        // 게시판 기능
+        // 주간 랭킹 기능
         // ============================================
 
-        function showBoard() {
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('board').style.display = 'block';
-            loadPosts();
+        function getWeekStart() {
+            const now = new Date();
+            const day = now.getDay(); // 0: 일요일, 1: 월요일...
+            const diff = now.getDate() - day + (day === 0 ? -6 : 1); // 월요일을 주의 시작으로
+            const weekStart = new Date(now.setDate(diff));
+            weekStart.setHours(0, 0, 0, 0);
+            return weekStart.getTime();
+        }
 
-            // 사용자 닉네임을 기본값으로 설정
-            if (userNickname) {
-                document.getElementById('nickname').value = userNickname;
-                document.getElementById('nickCount').textContent = userNickname.length;
+        function saveToWeeklyRanking(nickname, iq, classification, age) {
+            const weekStart = getWeekStart();
+            let weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+
+            // 현재 주 데이터 초기화
+            if (!weeklyRankings[weekStart]) {
+                weeklyRankings[weekStart] = [];
             }
 
-            // IQ 점수 자동 표시
-            if (testResults) {
-                const iqDisplay = document.getElementById('iqDisplay');
-                iqDisplay.innerHTML = `
-                    <div style="font-size: 1.4rem; margin-bottom: 5px;">🧠 IQ ${testResults.iq}</div>
-                    <div style="font-size: 0.9rem; color: #666; font-weight: normal;">${testResults.classification.label}</div>
-                `;
-                iqDisplay.style.background = 'linear-gradient(90deg, rgba(0, 212, 255, 0.15), rgba(123, 44, 191, 0.15))';
-                iqDisplay.style.color = '#00d4ff';
+            const currentWeekRankings = weeklyRankings[weekStart];
+            const existingIndex = currentWeekRankings.findIndex(rank => rank.nickname === nickname);
 
-                // 메시지 플레이스홀더를 더 간단하게 설정
-                document.getElementById('message').placeholder = '자랑하고 싶은 추가 내용이 있다면 여기에...';
+            const newRank = {
+                nickname: nickname,
+                iq: iq,
+                classification: classification,
+                timestamp: new Date().toLocaleString('ko-KR'),
+                age: age
+            };
+
+            if (existingIndex >= 0) {
+                // 더 높은 점수로 업데이트
+                if (iq > currentWeekRankings[existingIndex].iq) {
+                    currentWeekRankings[existingIndex] = newRank;
+                }
+            } else {
+                currentWeekRankings.push(newRank);
+            }
+
+            // 점수 순으로 정렬
+            currentWeekRankings.sort((a, b) => b.iq - a.iq);
+
+            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyRankings));
+            refreshWeeklyRanking();
+        }
+
+        function refreshWeeklyRanking() {
+            const weekStart = getWeekStart();
+            const weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+            const currentWeekRankings = weeklyRankings[weekStart] || [];
+
+            const weeklyRankingList = document.getElementById('weeklyRankingList');
+            const weeklyRankingEmpty = document.getElementById('weeklyRankingEmpty');
+
+            if (currentWeekRankings.length === 0) {
+                weeklyRankingList.style.display = 'none';
+                weeklyRankingEmpty.style.display = 'block';
+                return;
+            }
+
+            weeklyRankingList.style.display = 'block';
+            weeklyRankingEmpty.style.display = 'none';
+
+            // 상위 5명만 표시
+            const top5 = currentWeekRankings.slice(0, 5);
+
+            weeklyRankingList.innerHTML = top5.map((rank, index) => {
+                const ranking = index + 1;
+                const medalIcon = ranking <= 3 ? ['🥇', '🥈', '🥉'][ranking - 1] : `${ranking}위`;
+
+                return `
+                    <div style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 6px; background: ${getWeeklyRankingBg(index)}; border-radius: 8px; border: 1px solid ${getWeeklyRankingBorder(index)};">
+                        <div style="width: 35px; text-align: center; font-size: ${ranking <= 3 ? '1.1rem' : '0.8rem'};">
+                            ${medalIcon}
+                        </div>
+                        <div style="flex: 1; margin-left: 8px;">
+                            <div style="font-weight: 600; color: #333333; font-size: 0.9rem;">
+                                ${rank.nickname}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: ${getIQTextColor(rank.iq)}; font-size: 0.95rem;">
+                                ${rank.iq}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 주간 리셋 정보 업데이트
+            const nextMonday = new Date(weekStart + 7 * 24 * 60 * 60 * 1000);
+            const daysLeft = Math.ceil((nextMonday - new Date()) / (24 * 60 * 60 * 1000));
+            document.getElementById('weeklyResetInfo').textContent = `${daysLeft}일 후 초기화 (월요일 자정)`;
+        }
+
+        function getWeeklyRankingBg(index) {
+            if (index === 0) return 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 193, 7, 0.15))';
+            if (index === 1) return 'linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(169, 169, 169, 0.15))';
+            if (index === 2) return 'linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(184, 115, 51, 0.15))';
+            return 'rgba(0, 212, 255, 0.05)';
+        }
+
+        function getWeeklyRankingBorder(index) {
+            if (index === 0) return 'rgba(255, 193, 7, 0.4)';
+            if (index === 1) return 'rgba(169, 169, 169, 0.4)';
+            if (index === 2) return 'rgba(184, 115, 51, 0.4)';
+            return 'rgba(0, 212, 255, 0.2)';
+        }
+
+        // 주간 랭킹 자동 초기화 시스템
+        function checkWeeklyReset() {
+            const weekStart = getWeekStart();
+            const weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+            const lastWeekStart = localStorage.getItem('lastWeekStart');
+
+            // 새로운 주가 시작되었는지 확인
+            if (!lastWeekStart || parseInt(lastWeekStart) !== weekStart) {
+                // 새로운 주 시작 - 이전 주 데이터는 유지하고 현재 주는 초기화
+                localStorage.setItem('lastWeekStart', weekStart.toString());
+
+                // 현재 주 랭킹이 없으면 빈 배열로 초기화
+                if (!weeklyRankings[weekStart]) {
+                    weeklyRankings[weekStart] = [];
+                    localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyRankings));
+                }
+
+                console.log('새로운 주 시작 - 주간 랭킹 초기화됨');
+                refreshWeeklyRanking();
             }
         }
 
@@ -1881,9 +1936,9 @@
             savePosts(post);
             loadPosts();
 
-            // 랭킹과 메인 페이지 게시글도 새로고침
+            // 랭킹과 주간 랭킹도 새로고침
             refreshRanking();
-            loadMainPosts();
+            refreshWeeklyRanking();
 
             // 폼 초기화
             document.getElementById('nickname').value = '';
@@ -1910,7 +1965,7 @@
 
             // 데이터 새로고침
             refreshRanking();
-            loadMainPosts();
+            refreshWeeklyRanking();
         }
 
         function savePosts(newPost) {
@@ -1982,11 +2037,12 @@
 
             let html = '';
 
-            // 상위 15명 표시
-            const top15 = rankings.slice(0, 15);
+            // 상위 10명 우선 표시, 나머지는 스크롤 영역에
+            const top10 = rankings.slice(0, 10);
+            const remaining = rankings.slice(10);
 
-            // 상위 랭킹 표시
-            html += top15.map((rank, index) => {
+            // 상위 10명 표시
+            html += top10.map((rank, index) => {
                 const ranking = index + 1;
                 const medalIcon = getMedalIcon(ranking);
                 const isTopThree = ranking <= 3;
@@ -2009,6 +2065,41 @@
                     </div>
                 `;
             }).join('');
+
+            // 더 많은 랭킹이 있으면 스크롤 영역 추가
+            if (remaining.length > 0) {
+                html += `
+                    <div style="border-top: 2px dashed #e0e0e0; margin: 15px 0; padding-top: 15px;">
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <button onclick="toggleMoreRankings()" style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 5px; padding: 8px 16px; cursor: pointer; color: #00d4ff; font-size: 0.9rem;">
+                                더 많은 랭킹 보기 (${remaining.length}명)
+                            </button>
+                        </div>
+                        <div id="moreRankings" style="display: none; max-height: 300px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 5px;">
+                            ${remaining.map((rank, index) => {
+                                const ranking = index + 11; // 11등부터
+                                return `
+                                    <div style="display: flex; align-items: center; padding: 6px 10px; margin-bottom: 4px; background: rgba(0, 212, 255, 0.03); border-radius: 6px;">
+                                        <div style="width: 35px; text-align: center; font-size: 0.8rem; color: #666;">
+                                            ${ranking}위
+                                        </div>
+                                        <div style="flex: 1; margin-left: 8px;">
+                                            <div style="font-weight: 500; color: #333333; font-size: 0.9rem;">
+                                                ${rank.nickname}
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: 600; color: ${getIQTextColor(rank.iq)}; font-size: 0.9rem;">
+                                                ${rank.iq}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
 
             // 나의 등수 찾기 및 표시
             if (userNickname) {
@@ -2041,6 +2132,20 @@
             }
 
             rankingList.innerHTML = html;
+        }
+
+        function toggleMoreRankings() {
+            const moreRankings = document.getElementById('moreRankings');
+            const button = event.target;
+
+            if (moreRankings.style.display === 'none') {
+                moreRankings.style.display = 'block';
+                button.textContent = '랭킹 접기';
+            } else {
+                moreRankings.style.display = 'none';
+                const remainingCount = document.querySelectorAll('#moreRankings > div').length;
+                button.textContent = `더 많은 랭킹 보기 (${remainingCount}명)`;
+            }
         }
 
         function getMedalIcon(ranking) {
@@ -2175,20 +2280,20 @@
             const posts = [];
             const currentTime = Date.now();
 
-            // IQ 점수 분포 (현실적인 분포)
+            // IQ 점수 분포 (더 현실적인 분포 - 최고 133)
             const iqScores = [];
-            // 천재급 (140+): 3명
-            for(let i = 0; i < 3; i++) iqScores.push(140 + Math.floor(Math.random() * 20));
-            // 매우 우수 (130-139): 8명
-            for(let i = 0; i < 8; i++) iqScores.push(130 + Math.floor(Math.random() * 10));
-            // 우수 (120-129): 12명
-            for(let i = 0; i < 12; i++) iqScores.push(120 + Math.floor(Math.random() * 10));
-            // 평균상 (110-119): 20명
-            for(let i = 0; i < 20; i++) iqScores.push(110 + Math.floor(Math.random() * 10));
-            // 평균 (90-109): 22명
-            for(let i = 0; i < 22; i++) iqScores.push(90 + Math.floor(Math.random() * 20));
-            // 평균하 (80-89): 4명
-            for(let i = 0; i < 4; i++) iqScores.push(80 + Math.floor(Math.random() * 10));
+            // 매우 우수 (130-133): 2명
+            for(let i = 0; i < 2; i++) iqScores.push(130 + Math.floor(Math.random() * 4));
+            // 우수 (120-129): 6명
+            for(let i = 0; i < 6; i++) iqScores.push(120 + Math.floor(Math.random() * 10));
+            // 평균상 (110-119): 12명
+            for(let i = 0; i < 12; i++) iqScores.push(110 + Math.floor(Math.random() * 10));
+            // 평균 중심 (95-105): 35명 (가장 많은 비중)
+            for(let i = 0; i < 35; i++) iqScores.push(95 + Math.floor(Math.random() * 11));
+            // 평균 하단 (85-94): 10명
+            for(let i = 0; i < 10; i++) iqScores.push(85 + Math.floor(Math.random() * 10));
+            // 평균하 (75-84): 4명
+            for(let i = 0; i < 4; i++) iqScores.push(75 + Math.floor(Math.random() * 10));
 
             // 점수 내림차순 정렬
             iqScores.sort((a, b) => b - a);
@@ -2233,24 +2338,30 @@
 
             // 로컬스토리지에 저장
             localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
-            localStorage.setItem('iqTestPosts', JSON.stringify(posts));
+
+            // 주간 랭킹 데이터도 생성 (현재 주)
+            const weekStart = getWeekStart ? getWeekStart() : new Date().getTime();
+            const weeklyRankings = {};
+            weeklyRankings[weekStart] = rankings.slice(0, 15); // 상위 15명을 이번 주 랭킹으로
+            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyRankings));
 
             console.log(`샘플 데이터 생성 완료: 랭킹 ${rankings.length}명, 게시글 ${posts.length}개`);
         }
 
         function getIQClassificationLabel(iq) {
-            if (iq >= 140) return '천재';
             if (iq >= 130) return '매우 우수';
             if (iq >= 120) return '우수';
             if (iq >= 110) return '평균상';
-            if (iq >= 90) return '평균';
-            return '평균하';
+            if (iq >= 95) return '평균';
+            if (iq >= 85) return '평균하';
+            return '보통하';
         }
 
         // 데이터 초기화 함수 (개발용)
         function resetAllData() {
             localStorage.removeItem('iqTestRankings');
-            localStorage.removeItem('iqTestPosts');
+            localStorage.removeItem('iqTestWeeklyRankings');
+            localStorage.removeItem('lastWeekStart');
             console.log('모든 데이터가 삭제되었습니다. 페이지를 새로고침하면 새로운 샘플 데이터가 생성됩니다.');
         }
 
@@ -2277,9 +2388,9 @@
         // 페이지 로드 시 샘플 데이터 생성 및 모든 데이터 불러오기
         window.addEventListener('load', () => {
             generateSampleData(); // 샘플 데이터 생성
-            loadPosts();
+            checkWeeklyReset(); // 주간 리셋 확인
             refreshRanking();
-            loadMainPosts();
+            refreshWeeklyRanking();
         });
 
         window.addEventListener('resize', () => { resize(); initParticles(); });
