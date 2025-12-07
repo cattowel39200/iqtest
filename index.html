@@ -654,23 +654,23 @@
                 <h3 style="margin-bottom: 30px; color: #333333;">영역별 분석</h3>
 
                 <div class="result-category">
-                    <h4>패턴 인식 (Pattern Recognition)</h4>
+                    <h4>지각 추론 (Perceptual Reasoning)</h4>
                     <div class="result-bar">
-                        <div class="result-bar-fill" id="patternBar" style="width: 0%"></div>
+                        <div class="result-bar-fill" id="perceptualBar" style="width: 0%"></div>
                     </div>
-                    <div class="result-score" id="patternScore">0/5</div>
+                    <div class="result-score" id="perceptualScore">0/5</div>
                 </div>
 
                 <div class="result-category">
-                    <h4>수열 추론 (Numerical Reasoning)</h4>
+                    <h4>수리 논리 (Quantitative Reasoning)</h4>
                     <div class="result-bar">
-                        <div class="result-bar-fill" id="numericalBar" style="width: 0%"></div>
+                        <div class="result-bar-fill" id="quantitativeBar" style="width: 0%"></div>
                     </div>
-                    <div class="result-score" id="numericalScore">0/5</div>
+                    <div class="result-score" id="quantitativeScore">0/5</div>
                 </div>
 
                 <div class="result-category">
-                    <h4>공간 추론 (Spatial Reasoning)</h4>
+                    <h4>시공간 처리 (Spatial Processing)</h4>
                     <div class="result-bar">
                         <div class="result-bar-fill" id="spatialBar" style="width: 0%"></div>
                     </div>
@@ -1020,165 +1020,289 @@
         // ============================================
 
         const questions = {
-            // 패턴 인식 문제 (행렬 추론 스타일)
-            pattern: [
+            // ============================================
+            // 영역 1: 지각 추론 및 유동성 지능 (Perceptual Reasoning & Fluid Intelligence)
+            // 가이드라인 기준: 레이븐 매트릭스 스타일, XOR 논리, 다중 변환 규칙
+            // ============================================
+            perceptual: [
+                // 문항 1-1: 회전 및 연속성 (난이도: 하, IRT b = -1.5)
                 {
-                    id: 'p1',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
+                    id: 'pr1',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
                     difficulty: 1,
-                    question: '다음 3x3 행렬에서 빈 칸에 들어갈 도형을 고르세요.',
-                    matrix: ['●', '●●', '●●●', '■', '■■', '■■■', '▲', '▲▲', '?'],
-                    options: ['▲', '▲▲▲', '■■■', '●●●'],
-                    correct: 1,
-                    explanation: '각 행에서 도형의 개수가 1, 2, 3으로 증가합니다.'
+                    irtB: -1.5,
+                    question: '3×3 행렬에서 빈 칸에 들어갈 도형을 고르세요.',
+                    matrix: ['↑', '→', '↓', '→', '↓', '←', '↓', '←', '?'],
+                    options: ['↑', '→', '↓', '←'],
+                    correct: 0,
+                    explanation: '각 행에서 화살표가 시계방향으로 90도씩 회전합니다.'
                 },
+                // 문항 1-2: XOR 논리 (난이도: 상, IRT b = +1.5)
                 {
-                    id: 'p2',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 2,
-                    question: '규칙을 찾아 빈 칸에 들어갈 것을 고르세요.',
-                    matrix: ['1', '2', '3', '2', '4', '6', '3', '6', '?'],
-                    options: ['7', '8', '9', '12'],
-                    correct: 2,
-                    explanation: '각 행의 세 번째 숫자는 첫 번째와 두 번째의 합입니다. 3+6=9'
-                },
-                {
-                    id: 'p3',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 2,
-                    question: '패턴을 분석하여 빈 칸을 채우세요.',
-                    matrix: ['○', '◐', '●', '□', '◧', '■', '△', '◭', '?'],
-                    options: ['△', '▲', '◭', '○'],
-                    correct: 1,
-                    explanation: '각 행에서 도형이 점점 채워집니다 (빈 것 → 반쯤 → 가득).'
-                },
-                {
-                    id: 'p4',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
+                    id: 'pr2',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
                     difficulty: 3,
-                    question: '규칙을 찾아 ? 에 들어갈 값을 고르세요.',
-                    matrix: ['2', '4', '8', '3', '9', '27', '4', '16', '?'],
-                    options: ['32', '48', '64', '256'],
+                    irtB: 1.5,
+                    question: '배타적 논리합(XOR) 규칙을 찾아 빈 칸을 채우세요.',
+                    matrix: ['|', '+', '─', '×', '○', '●', '□', '◧', '?'],
+                    options: ['■', '□', '◧', '○'],
+                    correct: 0,
+                    explanation: '각 행에서 첫 번째와 두 번째 도형을 겹쳤을 때 겹치는 부분은 사라지고 겹치지 않는 부분만 남습니다.'
+                },
+                // 문항 1-3: 다중 변환 (난이도: 최상, IRT b = +2.5)
+                {
+                    id: 'pr3',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
+                    difficulty: 5,
+                    irtB: 2.5,
+                    question: '3가지 속성이 독립적으로 변하는 패턴을 분석하세요.',
+                    matrix: ['○¹', '△²', '□³', '△²', '□³', '○¹', '□³', '○¹', '?'],
+                    options: ['△²', '○¹', '□³', '◇⁴'],
+                    correct: 0,
+                    explanation: '각 행은 라틴 스퀘어 규칙을 따릅니다. 모양과 숫자가 각 행마다 한 번씩만 등장해야 합니다.'
+                },
+                // 문항 1-4: 패턴 증가 (난이도: 중, IRT b = 0.0)
+                {
+                    id: 'pr4',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
+                    difficulty: 2,
+                    irtB: 0.0,
+                    question: '점의 개수가 변하는 규칙을 찾으세요.',
+                    matrix: ['•', '••', '•••', '••', '•••', '••••', '•••', '••••', '?'],
+                    options: ['••', '•••••', '••••', '•'],
                     correct: 2,
-                    explanation: '각 행은 n, n², n³ 패턴입니다. 4³ = 64'
+                    explanation: '각 행에서 점의 개수가 n, n+1, n+2 패턴으로 증가합니다.'
                 },
+                // 문항 1-5: 반사 대칭 (난이도: 중, IRT b = +0.5)
                 {
-                    id: 'p5',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 3,
-                    question: '행렬의 규칙을 찾아 빈 칸을 완성하세요.',
-                    matrix: ['A1', 'B2', 'C3', 'D4', 'E5', 'F6', 'G7', 'H8', '?'],
-                    options: ['I9', 'J9', 'I10', 'J10'],
+                    id: 'pr5',
+                    category: 'perceptual',
+                    categoryName: '지각 추론',
+                    difficulty: 2,
+                    irtB: 0.5,
+                    question: '반사 대칭 규칙을 적용하여 빈 칸을 찾으세요.',
+                    matrix: ['◄', '►', '◄', '▲', '▼', '▲', '◊', '◇', '?'],
+                    options: ['◊', '◇', '♦', '○'],
                     correct: 0,
-                    explanation: '알파벳과 숫자가 순서대로 증가합니다.'
-                },
-                {
-                    id: 'p6',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 4,
-                    question: '복잡한 패턴을 분석하여 ? 에 들어갈 값을 구하세요.',
-                    matrix: ['13', '21', '34', '21', '34', '55', '34', '55', '?'],
-                    options: ['89', '76', '68', '72'],
-                    correct: 0,
-                    explanation: '각 행이 피보나치 수열의 연속된 세 수입니다. 34, 55, 89'
-                },
-                {
-                    id: 'p7',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 4,
-                    question: '고차원 패턴을 찾아 빈 칸을 채우세요.',
-                    matrix: ['2×3', '3×5', '5×7', '4×6', '6×8', '8×10', '6×9', '9×11', '?'],
-                    options: ['11×13', '12×14', '10×12', '11×12'],
-                    correct: 0,
-                    explanation: '각 행은 (소수×다음소수) 패턴입니다. 11×13'
-                },
-                {
-                    id: 'p8',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 5,
-                    question: '최고 난이도 행렬 패턴을 분석하세요.',
-                    matrix: ['π²', 'e³', '√7', 'e³', '√7', '∛8', '√7', '∛8', '?'],
-                    options: ['∜9', '∜16', '∜15', '∛9'],
-                    correct: 1,
-                    explanation: '각 행은 지수가 감소하는 패턴: n², n³, n^(1/2), n^(1/3), n^(1/4)'
-                },
-                {
-                    id: 'p9',
-                    category: 'pattern',
-                    categoryName: '패턴 인식',
-                    difficulty: 5,
-                    question: '다차원 논리 패턴을 해결하세요.',
-                    matrix: ['1!+1', '2!+2', '3!+3', '2!+2', '3!+3', '4!+4', '3!+3', '4!+4', '?'],
-                    options: ['5!+5', '6!+6', '4!+5', '5!+4'],
-                    correct: 0,
-                    explanation: '각 행의 패턴: n!+n, (n+1)!+(n+1), (n+2)!+(n+2)'
+                    explanation: '각 행에서 중간 기호를 축으로 좌우가 대칭입니다.'
                 }
             ],
 
-            // 수열 추론 문제
-            numerical: [
+            // ============================================
+            // 영역 2: 수리 논리 및 패턴 인식 (Quantitative Reasoning)
+            // 가이드라인 기준: 다단계 수열, 교차 수열, 숫자 분해 패턴
+            // ============================================
+            quantitative: [
+                // 문항 2-1: 다단계 등차/등비 수열 (난이도: 중, IRT b = 0.0)
                 {
-                    id: 'n1',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
+                    id: 'qr1',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 2,
+                    irtB: 0.0,
+                    question: '다음 수열의 빈칸에 들어갈 숫자는?',
+                    sequence: [4, 9, 19, 39, 79, '?'],
+                    options: ['119', '139', '149', '159'],
+                    correct: 3,
+                    explanation: '차이가 5, 10, 20, 40으로 2배씩 증가하므로 다음 차이는 80입니다. 79 + 80 = 159'
+                },
+                // 문항 2-2: 교차 수열 (난이도: 상, IRT b = +1.0)
+                {
+                    id: 'qr2',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 3,
+                    irtB: 1.0,
+                    question: '두 개의 수열이 섞인 패턴을 분석하세요.',
+                    sequence: [5, 24, 7, 21, 9, 18, 11, '?'],
+                    options: ['13', '14', '15', '16'],
+                    correct: 2,
+                    explanation: '홀수 번째: 5, 7, 9, 11 (+2씩), 짝수 번째: 24, 21, 18 (-3씩). 18-3=15'
+                },
+                // 문항 2-3: 숫자 분해 패턴 (난이도: 최상, IRT b = +2.8)
+                {
+                    id: 'qr3',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 5,
+                    irtB: 2.8,
+                    question: '자릿수의 합을 이용한 규칙을 찾으세요.',
+                    sequence: ['12→9', '23→25', '34→49', '45→?'],
+                    options: ['65', '73', '81', '89'],
+                    correct: 2,
+                    explanation: '각 수의 자릿수를 더한 후 제곱합니다. (1+2)²=9, (2+3)²=25, (3+4)²=49, (4+5)²=81'
+                },
+                // 문항 2-4: 소인수분해 수열 (난이도: 상, IRT b = +1.2)
+                {
+                    id: 'qr4',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 3,
+                    irtB: 1.2,
+                    question: '소수의 곱셈 패턴을 찾아보세요.',
+                    sequence: [2, 6, 30, 210, 2310, '?'],
+                    options: ['23100', '30030', '46200', '69300'],
+                    correct: 1,
+                    explanation: '연속 소수의 곱: 2, 2×3, 2×3×5, 2×3×5×7, 2×3×5×7×11, 2×3×5×7×11×13=30030'
+                },
+                // 문항 2-5: 룩앤세이 수열 (난이도: 상, IRT b = +1.8)
+                {
+                    id: 'qr5',
+                    category: 'quantitative',
+                    categoryName: '수리 논리',
+                    difficulty: 4,
+                    irtB: 1.8,
+                    question: '다음 수열의 생성 규칙을 찾으세요.',
+                    sequence: [1, 11, 21, 1211, 111221, '?'],
+                    options: ['312211', '31121211', '3112221', '211213'],
+                    correct: 0,
+                    explanation: '"하나의 1" → 11, "두 개의 1" → 21, "하나의 2, 하나의 1" → 1211, ... "세 개의 1, 두 개의 2, 두 개의 1" → 312211'
+                }
+            ],
+
+            // ============================================
+            // 영역 3: 시공간 처리 능력 (Visual-Spatial Processing)
+            // 가이드라인 기준: 큐브 회전, 전개도 접기, 블록 카운팅
+            // ============================================
+            spatial: [
+                // 문항 3-1: 큐브 회전 (난이도: 중, IRT b = 0.5)
+                {
+                    id: 'sp1',
+                    category: 'spatial',
+                    categoryName: '시공간 처리',
+                    difficulty: 2,
+                    irtB: 0.5,
+                    question: '주사위를 회전시켜 만들 수 없는 것은?',
+                    description: '기준 주사위: 앞면=1, 윗면=2, 우측면=3',
+                    options: [
+                        '앞면=2, 윗면=3, 우측면=1',
+                        '앞면=3, 윗면=1, 우측면=2',
+                        '앞면=1, 윗면=3, 우측면=4',
+                        '앞면=2, 윗면=1, 우측면=6'
+                    ],
+                    correct: 2,
+                    explanation: '주사위에서 1의 대면은 6, 2의 대면은 5, 3의 대면은 4입니다. 1-3-4가 한 모서리에서 만날 수 없습니다.'
+                },
+                // 문항 3-2: 전개도 접기 (난이도: 상, IRT b = +1.8)
+                {
+                    id: 'sp2',
+                    category: 'spatial',
+                    categoryName: '시공간 처리',
+                    difficulty: 4,
+                    irtB: 1.8,
+                    question: '전개도를 접었을 때 점 A와 점 B가 만나는가?',
+                    description: '정육면체 전개도에서 인접하지 않은 두 점의 위치 관계',
+                    options: ['만난다', '만나지 않는다', '모서리에서 만난다', '알 수 없다'],
+                    correct: 1,
+                    explanation: '전개도 상에서 멀리 떨어진 두 점이지만 접었을 때 실제로는 인접한 면에 위치합니다.'
+                },
+                // 문항 3-3: 블록 카운팅 (난이도: 하, IRT b = -0.5)
+                {
+                    id: 'sp3',
+                    category: 'spatial',
+                    categoryName: '시공간 처리',
                     difficulty: 1,
-                    question: '다음 수열의 규칙을 찾아 ? 에 들어갈 숫자를 고르세요.',
-                    sequence: [2, 4, 6, 8, '?'],
-                    options: ['9', '10', '11', '12'],
-                    correct: 1,
-                    explanation: '2씩 증가하는 등차수열입니다.'
-                },
-                {
-                    id: 'n2',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 2,
-                    question: '규칙을 찾아 빈 칸에 들어갈 숫자를 고르세요.',
-                    sequence: [1, 1, 2, 3, 5, 8, '?'],
-                    options: ['11', '12', '13', '14'],
+                    irtB: -0.5,
+                    question: '쌓기나무 구조물의 총 블록 개수는?',
+                    description: '3층 피라미드: 맨 위층 1개, 2층 4개 보임, 1층 일부 보임',
+                    options: ['6개', '9개', '14개', '20개'],
                     correct: 2,
-                    explanation: '피보나치 수열입니다. 앞의 두 수를 더하면 다음 수가 됩니다.'
+                    explanation: '1층 9개, 2층 4개, 3층 1개로 총 14개입니다.'
                 },
+                // 문항 3-4: 단면 추론 (난이도: 중, IRT b = +0.3)
                 {
-                    id: 'n3',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
+                    id: 'sp4',
+                    category: 'spatial',
+                    categoryName: '시공간 처리',
                     difficulty: 2,
-                    question: '수열의 다음 항을 구하세요.',
-                    sequence: [3, 6, 12, 24, '?'],
-                    options: ['36', '48', '30', '42'],
-                    correct: 1,
-                    explanation: '각 항이 2배씩 증가하는 등비수열입니다.'
-                },
-                {
-                    id: 'n4',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 3,
-                    question: '규칙을 찾아 ? 에 들어갈 숫자를 고르세요.',
-                    sequence: [1, 4, 9, 16, 25, '?'],
-                    options: ['30', '35', '36', '49'],
+                    irtB: 0.3,
+                    question: '정육면체를 대각선으로 자른 단면의 모양은?',
+                    options: ['정삼각형', '정사각형', '직사각형', '정육각형'],
                     correct: 2,
-                    explanation: '자연수의 제곱수열입니다. (1², 2², 3², 4², 5², 6²)'
+                    explanation: '정육면체를 대각선으로 자르면 직사각형 단면이 나타납니다.'
                 },
+                // 문항 3-5: 거울상 (난이도: 하, IRT b = -1.0)
                 {
-                    id: 'n5',
-                    category: 'numerical',
-                    categoryName: '수열 추론',
-                    difficulty: 3,
-                    question: '복잡한 수열의 다음 항을 구하세요.',
-                    sequence: [2, 6, 12, 20, 30, '?'],
-                    options: ['40', '42', '44', '46'],
+                    id: 'sp5',
+                    category: 'spatial',
+                    categoryName: '시공간 처리',
+                    difficulty: 1,
+                    irtB: -1.0,
+                    question: '문자 "F"를 거울에 비춘 모양은?',
+                    options: ['F', 'Ꝼ', 'ᖴ', '⅂'],
                     correct: 1,
-                    explanation: '차이가 4, 6, 8, 10, 12로 증가합니다. (n×(n+1) 패턴)'
+                    explanation: '거울에 비치면 좌우가 반전됩니다.'
+                }
+            ],
+
+            // ============================================
+            // 영역 4: 언어 및 논리 추론 (Verbal & Logical Reasoning)
+            // 가이드라인 기준: 조건부 추론, 논리 그리드 퍼즐, 삼단논법
+            // ============================================
+            logical: [
+                // 문항 4-1: 조건부 추론 (난이도: 중, IRT b = 0.2)
+                {
+                    id: 'lg1',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 2,
+                    irtB: 0.2,
+                    question: '크롬(거짓말쟁이)과 주석(정직한 로봇) 중 로봇 A가 말했다: "우리는 둘 다 크롬이다." A와 B의 정체는?',
+                    options: ['A=크롬, B=주석', 'A=주석, B=크롬', 'A=크롬, B=크롬', 'A=주석, B=주석'],
+                    correct: 0,
+                    explanation: 'A가 주석이면 거짓말을 할 수 없고, A가 크롬이면 "둘 다 크롬"이 거짓이므로 B는 주석입니다.'
+                },
+                // 문항 4-2: 논리 그리드 퍼즐 (난이도: 상, IRT b = +1.2)
+                {
+                    id: 'lg2',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 3,
+                    irtB: 1.2,
+                    question: '철수, 영희, 민수가 빨강/파랑/노랑 셔츠를 입고 사과/배/포도를 먹는다. 철수는 빨강 안 입음. 배 먹는 사람은 파랑 입음. 영희는 포도 먹음. 민수는 노랑 입음. 철수가 먹는 과일은?',
+                    options: ['사과', '배', '포도', '알 수 없음'],
+                    correct: 1,
+                    explanation: '민수=노랑, 영희=포도, 배=파랑 조건으로 추론하면 철수=파랑=배입니다.'
+                },
+                // 문항 4-3: 삼단논법 (난이도: 하, IRT b = -0.8)
+                {
+                    id: 'lg3',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 1,
+                    irtB: -0.8,
+                    question: '모든 새는 날개가 있다. 참새는 새다. 반드시 참인 것은?',
+                    options: ['모든 날개 있는 것은 새다', '참새는 날개가 있다', '날개 없으면 참새 아니다', '모든 새는 참새다'],
+                    correct: 1,
+                    explanation: '삼단논법에 의해 참새는 새이므로 날개가 있습니다.'
+                },
+                // 문항 4-4: 러셀의 역설 (난이도: 최상, IRT b = +2.5)
+                {
+                    id: 'lg4',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 5,
+                    irtB: 2.5,
+                    question: '"자기 자신을 포함하지 않는 모든 집합의 집합" R은 R을 포함하는가?',
+                    options: ['포함한다', '포함하지 않는다', '모순이다', '정의할 수 없다'],
+                    correct: 2,
+                    explanation: 'R이 자신을 포함하면 정의에 모순, 포함하지 않으면 자신을 포함해야 하므로 모순입니다.'
+                },
+                // 문항 4-5: 확률 추론 (난이도: 중, IRT b = +0.8)
+                {
+                    id: 'lg5',
+                    category: 'logical',
+                    categoryName: '논리 추론',
+                    difficulty: 2,
+                    irtB: 0.8,
+                    question: 'A > B, B > C, D > A 일 때, 가장 큰 것은?',
+                    options: ['A', 'B', 'C', 'D'],
+                    correct: 3,
+                    explanation: 'D > A > B > C 순서이므로 D가 가장 큽니다.'
                 },
                 {
                     id: 'n6',
@@ -1441,14 +1565,19 @@
             ],
 
             // 언어 유추 문제
+            // ============================================
+            // 영역 5: 언어 유추 (Verbal Analogies)
+            // 가이드라인: 문화적 편향을 최소화한 논리적 관계성
+            // ============================================
             verbal: [
+                // 문항 5-1: 기본 유추 (난이도: 하, IRT b = -1.2)
                 {
-                    id: 'v1',
+                    id: 'vb1',
                     category: 'verbal',
                     categoryName: '언어 유추',
                     difficulty: 1,
+                    irtB: -1.2,
                     question: '책 : 독서 = 음악 : ?',
-                    analogy: ['책', '독서', '음악', '?'],
                     options: ['악기', '청취', '가수', '콘서트'],
                     correct: 1,
                     explanation: '책을 하는 행위가 독서이듯, 음악을 하는 행위는 청취입니다.'
@@ -1815,8 +1944,8 @@
 
         function calculateResults() {
             const categoryScores = {
-                pattern: { correct: 0, total: 0, ability: 0 },
-                numerical: { correct: 0, total: 0, ability: 0 },
+                perceptual: { correct: 0, total: 0, ability: 0 },
+                quantitative: { correct: 0, total: 0, ability: 0 },
                 spatial: { correct: 0, total: 0, ability: 0 },
                 logical: { correct: 0, total: 0, ability: 0 },
                 verbal: { correct: 0, total: 0, ability: 0 }
@@ -2128,7 +2257,7 @@
 
             // 카테고리별 점수 표시
             setTimeout(() => {
-                const categories = ['pattern', 'numerical', 'spatial', 'logical', 'verbal'];
+                const categories = ['perceptual', 'quantitative', 'spatial', 'logical', 'verbal'];
                 categories.forEach(cat => {
                     const score = results.categoryScores[cat];
                     const percentage = (score.correct / score.total) * 100;
