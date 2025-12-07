@@ -475,7 +475,7 @@
         </header>
 
         <!-- 랭킹 & 게시판 섹션 -->
-        <div class="main-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <div class="main-grid" id="mainDashboard" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
 
             <!-- 좌측: IQ 랭킹 -->
             <div class="intro-section" style="margin-bottom: 0;">
@@ -547,7 +547,7 @@
         </div>
 
         <!-- 평가 방식 설명 섹션 -->
-        <div class="intro-section" style="margin-top: 20px;">
+        <div class="intro-section" id="evaluationSection" style="margin-top: 20px;">
             <h2>🔬 평가 방식</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
 
@@ -1355,6 +1355,9 @@
             responseTimes = new Array(allQuestions.length).fill(null);
 
             document.getElementById('intro').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('evaluationSection').style.display = 'none';
+            document.getElementById('board').style.display = 'none';
             document.getElementById('test').style.display = 'block';
 
             loadQuestion(0);
@@ -1645,6 +1648,10 @@
             }
 
             document.getElementById('test').style.display = 'none';
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('evaluationSection').style.display = 'none';
+            document.getElementById('board').style.display = 'none';
             document.getElementById('results').style.display = 'block';
 
             const results = calculateResults();
@@ -2041,9 +2048,9 @@
         }
 
         function showFullBoard() {
-            document.querySelector('.main-grid').style.display = 'none';
-            document.querySelector('.intro-section#intro').style.display = 'none';
-            document.querySelector('.intro-section:has(h2:contains("평가"))').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('evaluationSection').style.display = 'none';
             document.getElementById('board').style.display = 'block';
             loadPosts();
         }
