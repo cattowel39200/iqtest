@@ -1265,8 +1265,14 @@
         </div>
 
         <header>
-            <h1 id="mainTitle">인지능력 측정 테스트</h1>
-            <p id="mainSubtitle">5가지 영역 중 1가지를 선택하여 도전하세요</p>
+            <div class="brain-container">
+                <canvas id="brainCanvas"></canvas>
+            </div>
+            <h1 id="mainTitle"
+                style="font-size: 3rem; margin-bottom: 10px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                IQZone</h1>
+            <p id="mainSubtitle" style="font-size: 1.1rem; color: var(--text-secondary);">Official Intelligence Quotient
+                Test</p>
         </header>
 
         <!-- INTRO -->
@@ -1281,65 +1287,12 @@
                     </p>
                 </div>
 
-                <p style="color: var(--text-secondary); line-height: 1.6; margin: 16px 0;" data-t="intro.desc">아래에서 원하는
-                    영역을 선택한 후 테스트를 시작하세요. 각 영역은 10문항으로 구성됩니다.</p>
-
-                <div class="select-grid" id="categoryGrid">
-                    <div class="select-card" data-cat="comprehensive" onclick="selectCat('comprehensive')"
-                        style="border-color: var(--accent-primary); background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(124, 58, 237, 0.05));">
-                        <div class="check">✓</div>
-                        <div class="header">
-                            <div class="icon" style="background: rgba(79, 70, 229, 0.1); color: var(--accent-primary);">
-                                🌟</div>
-                            <div class="title" data-t="cat.comprehensive">종합 능력</div>
-                        </div>
-                        <p class="desc" data-t="tut.comprehensive">5가지 모든 영역을 종합적으로 평가합니다. (총 20문항)</p>
-                        <div class="example" style="background: rgba(255,255,255,0.5);">Best Choice for IQ Test</div>
-                    </div>
-                    <div class="select-card" data-cat="pattern" onclick="selectCat('pattern')">
-                        <div class="check">✓</div>
-                        <div class="header">
-                            <div class="icon">🔷</div>
-                            <div class="title" data-t="cat.pattern">패턴 인식</div>
-                        </div>
-                        <p class="desc" data-t="tut.pattern">3×3 행렬에서 가로, 세로 규칙을 찾아 빈 칸을 채웁니다.</p>
-                        <div class="example">1, 2, 3 → 4, 5, 6 → 7, 8, <strong>?</strong></div>
-                    </div>
-                    <div class="select-card" data-cat="numerical" onclick="selectCat('numerical')">
-                        <div class="check">✓</div>
-                        <div class="header">
-                            <div class="icon">🔢</div>
-                            <div class="title" data-t="cat.numerical">수리 추론</div>
-                        </div>
-                        <p class="desc" data-t="tut.numerical">수열의 규칙을 파악하여 다음 숫자를 찾습니다.</p>
-                        <div class="example">2, 4, 8, 16, <strong>?</strong> → 32</div>
-                    </div>
-                    <div class="select-card" data-cat="spatial" onclick="selectCat('spatial')">
-                        <div class="check">✓</div>
-                        <div class="header">
-                            <div class="icon">📐</div>
-                            <div class="title" data-t="cat.spatial">공간 지각</div>
-                        </div>
-                        <p class="desc" data-t="tut.spatial">도형의 회전, 반사 등 공간 변환을 수행합니다.</p>
-                        <div class="example">┘ → 90° 회전 → <strong>└</strong></div>
-                    </div>
-                    <div class="select-card" data-cat="logical" onclick="selectCat('logical')">
-                        <div class="check">✓</div>
-                        <div class="header">
-                            <div class="icon">🧩</div>
-                            <div class="title" data-t="cat.logical">논리 추론</div>
-                        </div>
-                        <p class="desc" data-t="tut.logical">조건과 명제를 분석해 논리적 결론을 도출합니다.</p>
-                        <div class="example">A>B, B>C → <strong>C가 최소</strong></div>
-                    </div>
-                    <div class="select-card" data-cat="verbal" onclick="selectCat('verbal')">
-                        <div class="check">✓</div>
-                        <div class="header">
-                            <div class="icon">📝</div>
-                            <div class="title" data-t="cat.verbal">언어 유추</div>
-                        </div>
-                        <p class="desc" data-t="tut.verbal">개념 간 관계를 파악하여 유추합니다.</p>
-                        <div class="example">책 : 읽다 = 음악 : <strong>?</strong> → 듣다</div>
+                <div class="main-action-area">
+                    <div class="start-card" onclick="startBasicTest('comprehensive')"
+                        style="cursor: pointer; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 30px; border-radius: 20px; color: white; box-shadow: 0 10px 30px var(--glow-primary); transition: transform 0.2s; max-width: 400px; margin: 0 auto;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🧠</div>
+                        <h2 style="font-size: 2rem; margin-bottom: 10px;" data-t="btn.start">IQ 테스트 시작</h2>
+                        <p style="opacity: 0.9;">총 20문항 • 제한시간 없음</p>
                     </div>
                 </div>
 
@@ -1668,6 +1621,72 @@
     </div>
 
     <script>
+        // Brain Animation
+        const canvas = document.getElementById('brainCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = canvas.parentElement.offsetWidth;
+            height = canvas.height = canvas.parentElement.offsetHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(79, 70, 229, 0.5)';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+                particles.forEach(p2 => {
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(79, 70, 229, ${0.1 - dist / 1000})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => { resize(); initParticles(); });
+        resize();
+        initParticles();
+        animate();
+    </script>
+    <script>
         // ========== TRANSLATIONS ==========
         const T = {
             ko: {
@@ -1814,15 +1833,7 @@
         function getOpts(o) { return Array.isArray(o) ? o.map(x => getLoc(x)) : getLoc(o); }
 
         // ========== CATEGORY SELECTION ==========
-        function selectCat(cat) {
-            selectedCat = cat;
-            document.querySelectorAll('.select-card').forEach(c => c.classList.remove('selected'));
-            document.querySelector(`.select-card[data-cat="${cat}"]`).classList.add('selected');
-            document.getElementById('selectedInfo').style.display = 'block';
-            document.getElementById('selectedCatName').textContent = catNames[lang][cat];
-            document.getElementById('infoTotalQ').textContent = cat === 'comprehensive' ? '20' : '10';
-            updateStartBtn();
-        }
+        // Removed selectCat as we now start directly
         function updateStartBtn() {
             const btn = document.getElementById('startBtn');
             if (selectedCat) {
@@ -1866,8 +1877,8 @@
         }
 
         // ========== BASIC TEST ==========
-        function startBasicTest() {
-            if (!selectedCat) return;
+        function startBasicTest(cat = 'comprehensive') {
+            selectedCat = cat;
 
             if (selectedCat === 'comprehensive') {
                 bQs = [];
