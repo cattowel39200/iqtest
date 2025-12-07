@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COGNIQ - IQ Assessment & Mensa Challenge</title>
+    <title>IQZone - IQ Assessment & Mensa Challenge</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -40,6 +40,19 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
+        }
+
+        .brain-container {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #brainCanvas {
+            width: 100%;
+            height: 100%;
         }
 
         .bg-pattern {
@@ -1311,15 +1324,7 @@
                     </div>
                 </div>
 
-                <div class="instructions">
-                    <h4 data-t="inst.title">📌 진행 안내</h4>
-                    <ul>
-                        <li data-t="inst.1">위에서 테스트할 영역 1개를 선택하세요.</li>
-                        <li data-t="inst.2">4개 보기 중 정답을 선택하세요.</li>
-                        <li data-t="inst.3">시간 초과 시 자동으로 다음 문제로 넘어갑니다.</li>
-                        <li data-t="inst.4">선택한 영역에서 IQ 120+ 달성 시 멘사 코드가 발급됩니다.</li>
-                    </ul>
-                </div>
+
 
                 <div class="mensa-box">
                     <h4>🏆 <span data-t="mensa.title">멘사 도전 테스트</span></h4>
@@ -1699,7 +1704,7 @@
                 'tut.spatial': '도형의 회전, 반사 등 공간 변환을 수행합니다.',
                 'tut.logical': '조건과 명제를 분석해 논리적 결론을 도출합니다.',
                 'tut.verbal': '개념 간 관계를 파악하여 유추합니다.',
-                'btn.start': '테스트 시작', 'btn.select': '영역을 선택하세요'
+                'btn.start': '테스트 시작'
             },
             en: {
                 'intro.title': 'Test Guide',
