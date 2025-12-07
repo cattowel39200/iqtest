@@ -435,7 +435,7 @@
             font-size: 1.5rem;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .options-grid {
                 grid-template-columns: 1fr;
             }
@@ -446,6 +446,12 @@
 
             .question-text {
                 font-size: 1.1rem;
+            }
+
+            /* 모바일에서 랭킹과 게시판을 세로로 배치 */
+            .main-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
             }
         }
     </style>
@@ -462,6 +468,46 @@
             <h1>IQZone</h1>
             <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
         </header>
+
+        <!-- 랭킹 & 게시판 섹션 -->
+        <div class="main-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+
+            <!-- 좌측: IQ 랭킹 -->
+            <div class="intro-section" style="margin-bottom: 0;">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    🏆 IQ 랭킹 TOP 10
+                    <button onclick="refreshRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+                </h2>
+                <div id="rankingList">
+                    <!-- 랭킹 목록이 여기에 표시됨 -->
+                </div>
+                <div id="rankingEmpty" style="text-align: center; color: #999999; padding: 20px;">
+                    <p>🎯 아직 랭킹이 없습니다</p>
+                    <p>첫 번째 랭커가 되어보세요!</p>
+                </div>
+            </div>
+
+            <!-- 우측: 최근 게시글 -->
+            <div class="intro-section" style="margin-bottom: 0;">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    💬 최근 자랑글
+                    <button onclick="loadMainPosts()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+                </h2>
+                <div id="mainPostsList">
+                    <!-- 최근 게시글이 여기에 표시됨 -->
+                </div>
+                <div id="mainPostsEmpty" style="text-align: center; color: #999999; padding: 20px;">
+                    <p>📝 아직 자랑글이 없습니다</p>
+                    <p>첫 번째 자랑의 주인공이 되어보세요!</p>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="showFullBoard()" style="font-size: 0.9rem; padding: 8px 16px;">
+                        더 많은 글 보기 →
+                    </button>
+                </div>
+            </div>
+
+        </div>
 
         <!-- 시작 화면 -->
         <div class="intro-section" id="intro">
@@ -566,9 +612,12 @@
             <div class="intro-section" id="postForm">
                 <h3 style="color: #333333; margin-bottom: 20px;">✍️ 자랑하기</h3>
                 <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">닉네임:</label>
-                    <input type="text" id="nickname" placeholder="익명123" maxlength="20"
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">닉네임: *</label>
+                    <input type="text" id="nickname" placeholder="원하는 닉네임을 입력하세요" maxlength="20" required
                            style="width: 100%; padding: 10px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px;">
+                    <div style="text-align: right; margin-top: 5px; font-size: 0.8rem; color: #666666;">
+                        <span id="nickCount">0</span>/20
+                    </div>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">한마디:</label>
@@ -1664,31 +1713,85 @@
             document.getElementById('board').style.display = 'block';
             loadPosts();
 
-            // 사용자 IQ 정보를 폼에 미리 표시
+            // 사용자 IQ 정보를 메시지 플레이스홀더에 표시
             if (testResults) {
-                document.getElementById('nickname').placeholder = `IQ${testResults.iq} 천재`;
                 document.getElementById('message').placeholder =
                     `와! 내 IQ가 ${testResults.iq}점이 나왔어요! ${testResults.classification.label} 수준이래요 🎉`;
             }
         }
 
-        function generateRandomNickname() {
-            const adjectives = ['똑똑한', '천재', '영리한', '현명한', '재치있는', '창의적인', '논리적인', '직관적인'];
-            const nouns = ['두뇌왕', '아인슈타인', '뉴턴', '다빈치', '테슬라', '에디슨', '큐리', '호킹'];
-            const numbers = Math.floor(Math.random() * 9999) + 1;
+        function isNicknameExists(nickname) {
+            const posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
+            const rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
 
-            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            // 게시글에서 중복 체크
+            const existsInPosts = posts.some(post => post.nickname.toLowerCase() === nickname.toLowerCase());
+            // 랭킹에서 중복 체크
+            const existsInRankings = rankings.some(rank => rank.nickname.toLowerCase() === nickname.toLowerCase());
 
-            return `${adj}${noun}${numbers}`;
+            return existsInPosts || existsInRankings;
+        }
+
+        function saveToRanking(nickname, iq, classification, age) {
+            let rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+
+            // 같은 닉네임이 이미 있는지 확인 (더 높은 점수로 업데이트)
+            const existingIndex = rankings.findIndex(rank => rank.nickname === nickname);
+
+            const newRank = {
+                nickname: nickname,
+                iq: iq,
+                classification: classification,
+                age: age,
+                timestamp: new Date().toLocaleString('ko-KR')
+            };
+
+            if (existingIndex >= 0) {
+                // 기존 기록이 있으면 더 높은 점수일 때만 업데이트
+                if (iq > rankings[existingIndex].iq) {
+                    rankings[existingIndex] = newRank;
+                }
+            } else {
+                // 새로운 기록 추가
+                rankings.push(newRank);
+            }
+
+            // IQ 점수 내림차순으로 정렬
+            rankings.sort((a, b) => b.iq - a.iq);
+
+            // 상위 100명만 유지
+            if (rankings.length > 100) {
+                rankings = rankings.slice(0, 100);
+            }
+
+            localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
         }
 
         function submitPost() {
-            const nickname = document.getElementById('nickname').value.trim() || generateRandomNickname();
+            const nickname = document.getElementById('nickname').value.trim();
             const message = document.getElementById('message').value.trim();
 
             if (!testResults) {
                 alert('테스트를 먼저 완료해주세요!');
+                return;
+            }
+
+            if (!nickname) {
+                alert('닉네임을 입력해주세요!');
+                document.getElementById('nickname').focus();
+                return;
+            }
+
+            if (nickname.length < 2) {
+                alert('닉네임은 최소 2글자 이상 입력해주세요!');
+                document.getElementById('nickname').focus();
+                return;
+            }
+
+            // 닉네임 중복 체크
+            if (isNicknameExists(nickname)) {
+                alert('이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해주세요!');
+                document.getElementById('nickname').focus();
                 return;
             }
 
@@ -1719,15 +1822,23 @@
                 age: testResults.age
             };
 
+            // 랭킹에 저장
+            saveToRanking(nickname, testResults.iq, testResults.classification.label, testResults.age);
+
             savePosts(post);
             loadPosts();
+
+            // 랭킹과 메인 페이지 게시글도 새로고침
+            refreshRanking();
+            loadMainPosts();
 
             // 폼 초기화
             document.getElementById('nickname').value = '';
             document.getElementById('message').value = '';
             document.getElementById('charCount').textContent = '0';
+            document.getElementById('nickCount').textContent = '0';
 
-            alert('🎉 자랑글이 등록되었습니다!');
+            alert('🎉 자랑글이 등록되었고 랭킹에 반영되었습니다!');
         }
 
         function savePosts(newPost) {
@@ -1783,21 +1894,139 @@
             return 'background: rgba(107, 114, 128, 0.15); color: #6b7280;';
         }
 
+        function refreshRanking() {
+            const rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+            const rankingList = document.getElementById('rankingList');
+            const rankingEmpty = document.getElementById('rankingEmpty');
+
+            if (rankings.length === 0) {
+                rankingList.style.display = 'none';
+                rankingEmpty.style.display = 'block';
+                return;
+            }
+
+            rankingList.style.display = 'block';
+            rankingEmpty.style.display = 'none';
+
+            // 상위 10명만 표시
+            const top10 = rankings.slice(0, 10);
+
+            rankingList.innerHTML = top10.map((rank, index) => {
+                const medalEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`;
+                const crownEmoji = index < 3 ? '👑' : '🧠';
+
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: ${getRankingBg(index)}; border-radius: 10px; border: 1px solid ${getRankingBorder(index)};">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.1rem;">${medalEmoji}</span>
+                            <div>
+                                <div style="font-weight: 600; color: #333333; display: flex; align-items: center; gap: 5px;">
+                                    ${crownEmoji} ${rank.nickname}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666666;">${rank.classification}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: ${getIQTextColor(rank.iq)}; font-size: 1.1rem;">
+                                IQ ${rank.iq}
+                            </div>
+                            <div style="font-size: 0.7rem; color: #999999;">${rank.timestamp.split(' ')[0]}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getRankingBg(index) {
+            if (index === 0) return 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 193, 7, 0.1))';
+            if (index === 1) return 'linear-gradient(135deg, rgba(192, 192, 192, 0.1), rgba(169, 169, 169, 0.1))';
+            if (index === 2) return 'linear-gradient(135deg, rgba(205, 127, 50, 0.1), rgba(184, 115, 51, 0.1))';
+            return 'rgba(0, 212, 255, 0.03)';
+        }
+
+        function getRankingBorder(index) {
+            if (index === 0) return 'rgba(255, 193, 7, 0.3)';
+            if (index === 1) return 'rgba(169, 169, 169, 0.3)';
+            if (index === 2) return 'rgba(184, 115, 51, 0.3)';
+            return 'rgba(0, 212, 255, 0.1)';
+        }
+
+        function getIQTextColor(iq) {
+            if (iq >= 130) return '#059669';
+            if (iq >= 120) return '#d97706';
+            if (iq >= 110) return '#8b5cf6';
+            if (iq >= 100) return '#0088cc';
+            return '#6b7280';
+        }
+
+        function loadMainPosts() {
+            const posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
+            const mainPostsList = document.getElementById('mainPostsList');
+            const mainPostsEmpty = document.getElementById('mainPostsEmpty');
+
+            if (posts.length === 0) {
+                mainPostsList.style.display = 'none';
+                mainPostsEmpty.style.display = 'block';
+                return;
+            }
+
+            mainPostsList.style.display = 'block';
+            mainPostsEmpty.style.display = 'none';
+
+            // 최신 5개만 표시
+            const recent5 = posts.slice(0, 5);
+
+            mainPostsList.innerHTML = recent5.map(post => `
+                <div style="background: rgba(0, 212, 255, 0.03); border-radius: 10px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(0, 212, 255, 0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-weight: 600; color: #00d4ff; font-size: 0.9rem;">🧠 ${post.nickname}</span>
+                            <span style="${getIQBadgeColor(post.iq)}; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 600;">
+                                IQ ${post.iq}
+                            </span>
+                        </div>
+                        <span style="color: #999; font-size: 0.75rem;">${post.timestamp.split(' ')[0]}</span>
+                    </div>
+                    <div style="color: #333; font-size: 0.9rem; line-height: 1.4;">
+                        ${post.message.length > 50 ? post.message.substring(0, 50) + '...' : post.message}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showFullBoard() {
+            document.querySelector('.main-grid').style.display = 'none';
+            document.querySelector('.intro-section#intro').style.display = 'none';
+            document.querySelector('.intro-section:has(h2:contains("평가"))').style.display = 'none';
+            document.getElementById('board').style.display = 'block';
+            loadPosts();
+        }
+
         // 글자 수 카운터
         document.addEventListener('DOMContentLoaded', function() {
             const messageTextarea = document.getElementById('message');
             const charCount = document.getElementById('charCount');
+            const nicknameInput = document.getElementById('nickname');
+            const nickCount = document.getElementById('nickCount');
 
             if (messageTextarea && charCount) {
                 messageTextarea.addEventListener('input', function() {
                     charCount.textContent = this.value.length;
                 });
             }
+
+            if (nicknameInput && nickCount) {
+                nicknameInput.addEventListener('input', function() {
+                    nickCount.textContent = this.value.length;
+                });
+            }
         });
 
-        // 페이지 로드 시 게시글 불러오기
+        // 페이지 로드 시 모든 데이터 불러오기
         window.addEventListener('load', () => {
             loadPosts();
+            refreshRanking();
+            loadMainPosts();
         });
 
         window.addEventListener('resize', () => { resize(); initParticles(); });
