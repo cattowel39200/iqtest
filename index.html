@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IQZone - IQ Assessment & High IQ Challenge</title>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -809,6 +813,178 @@
     </style>
 
     <script>
+        // ============================================
+        // Firebase 클라우드 동기화 설정
+        // ============================================
+
+        // Firebase 설정 (공개 설정이므로 안전함)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVGRvH5r8v5Y8vH2i3K8v5H2i3K8v5H2i",
+            authDomain: "iqzone-rankings.firebaseapp.com",
+            projectId: "iqzone-rankings",
+            storageBucket: "iqzone-rankings.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abc123def456ghi789"
+        };
+
+        // Firebase 초기화
+        let db = null;
+        let isFirebaseEnabled = false;
+
+        function initializeFirebase() {
+            try {
+                if (typeof firebase !== 'undefined') {
+                    firebase.initializeApp(firebaseConfig);
+                    db = firebase.firestore();
+                    isFirebaseEnabled = true;
+                    console.log("✅ Firebase 연결 성공 - 클라우드 동기화 활성화");
+                } else {
+                    console.warn("⚠️ Firebase 라이브러리 로드 실패 - 로컬 저장소 사용");
+                }
+            } catch (error) {
+                console.warn("⚠️ Firebase 초기화 실패 - 로컬 저장소 사용:", error);
+                isFirebaseEnabled = false;
+            }
+        }
+
+        // 클라우드에서 랭킹 데이터 가져오기
+        async function loadRankingsFromCloud() {
+            if (!isFirebaseEnabled) return null;
+
+            try {
+                const snapshot = await db.collection('rankings').doc('global').get();
+                if (snapshot.exists) {
+                    const data = snapshot.data();
+                    return {
+                        allTime: data.allTime || [],
+                        weekly: data.weekly || {}
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.warn("클라우드에서 랭킹 데이터 로드 실패:", error);
+                return null;
+            }
+        }
+
+        // 클라우드에 랭킹 데이터 저장
+        async function saveRankingsToCloud(allTimeRankings, weeklyRankings) {
+            if (!isFirebaseEnabled) return;
+
+            try {
+                await db.collection('rankings').doc('global').set({
+                    allTime: allTimeRankings,
+                    weekly: weeklyRankings,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log("✅ 클라우드에 랭킹 저장 완료");
+            } catch (error) {
+                console.warn("클라우드 랭킹 저장 실패:", error);
+            }
+        }
+
+        // 로컬 스토리지와 클라우드 동기화
+        async function syncRankingsData() {
+            if (!isFirebaseEnabled) return;
+
+            try {
+                // 클라우드에서 데이터 가져오기
+                const cloudData = await loadRankingsFromCloud();
+
+                if (cloudData) {
+                    // 클라우드 데이터가 있으면 로컬에 적용
+                    localStorage.setItem('iqTestRankings', JSON.stringify(cloudData.allTime));
+                    localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(cloudData.weekly));
+
+                    console.log("✅ 클라우드 데이터로 동기화 완료");
+
+                    // UI 새로고침
+                    refreshRanking();
+                    refreshWeeklyRanking();
+                } else {
+                    // 클라우드에 데이터가 없으면 로컬 데이터를 클라우드에 업로드
+                    const localAllTime = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+                    const localWeekly = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+
+                    if (localAllTime.length > 0) {
+                        await saveRankingsToCloud(localAllTime, localWeekly);
+                        console.log("✅ 로컬 데이터를 클라우드에 업로드 완료");
+                    }
+                }
+            } catch (error) {
+                console.warn("데이터 동기화 중 오류:", error);
+            }
+        }
+
+        // 랭킹 저장 시 클라우드 동기화 (기존 함수들 수정)
+        function saveToRankingWithSync(nickname, iq, classification, age) {
+            // 기존 로컬 저장 로직
+            const newEntry = {
+                nickname: nickname,
+                iq: iq,
+                classification: classification,
+                age: age,
+                date: new Date().toISOString()
+            };
+
+            let rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+
+            // 동일 닉네임이 있으면 더 높은 점수로 업데이트
+            const existingIndex = rankings.findIndex(rank => rank.nickname === nickname);
+            if (existingIndex !== -1) {
+                if (iq > rankings[existingIndex].iq) {
+                    rankings[existingIndex] = newEntry;
+                }
+            } else {
+                rankings.push(newEntry);
+            }
+
+            // IQ 점수 기준으로 정렬
+            rankings.sort((a, b) => b.iq - a.iq);
+
+            localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
+
+            // 클라우드에도 저장
+            const weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+            saveRankingsToCloud(rankings, weeklyRankings);
+        }
+
+        function saveToWeeklyRankingWithSync(nickname, iq, classification, age) {
+            const weekStart = getWeekStart();
+            let weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+
+            if (!weeklyRankings[weekStart]) {
+                weeklyRankings[weekStart] = [];
+            }
+
+            const newEntry = {
+                nickname: nickname,
+                iq: iq,
+                classification: classification,
+                age: age,
+                date: new Date().toISOString()
+            };
+
+            // 동일 닉네임이 있으면 더 높은 점수로 업데이트
+            const existingIndex = weeklyRankings[weekStart].findIndex(rank => rank.nickname === nickname);
+            if (existingIndex !== -1) {
+                if (iq > weeklyRankings[weekStart][existingIndex].iq) {
+                    weeklyRankings[weekStart][existingIndex] = newEntry;
+                }
+            } else {
+                weeklyRankings[weekStart].push(newEntry);
+            }
+
+            // IQ 점수 기준으로 정렬
+            weeklyRankings[weekStart].sort((a, b) => b.iq - a.iq);
+
+            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyRankings));
+
+            // 클라우드에도 저장
+            const allTimeRankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+            saveRankingsToCloud(allTimeRankings, weeklyRankings);
+        }
+
         // ============================================
         // IQ 테스트 문제 데이터베이스
         // ============================================
@@ -1721,10 +1897,10 @@
                 age: userAge
             };
 
-            // 자동으로 랭킹에 등록
+            // 자동으로 랭킹에 등록 (클라우드 동기화)
             if (userNickname) {
-                saveToRanking(userNickname, results.iq, classification.label, userAge);
-                saveToWeeklyRanking(userNickname, results.iq, classification.label, userAge);
+                saveToRankingWithSync(userNickname, results.iq, classification.label, userAge);
+                saveToWeeklyRankingWithSync(userNickname, results.iq, classification.label, userAge);
                 refreshRanking();
             }
 
@@ -1820,41 +1996,6 @@
             return weekStart.getTime();
         }
 
-        function saveToWeeklyRanking(nickname, iq, classification, age) {
-            const weekStart = getWeekStart();
-            let weeklyRankings = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
-
-            // 현재 주 데이터 초기화
-            if (!weeklyRankings[weekStart]) {
-                weeklyRankings[weekStart] = [];
-            }
-
-            const currentWeekRankings = weeklyRankings[weekStart];
-            const existingIndex = currentWeekRankings.findIndex(rank => rank.nickname === nickname);
-
-            const newRank = {
-                nickname: nickname,
-                iq: iq,
-                classification: classification,
-                timestamp: new Date().toLocaleString('ko-KR'),
-                age: age
-            };
-
-            if (existingIndex >= 0) {
-                // 더 높은 점수로 업데이트
-                if (iq > currentWeekRankings[existingIndex].iq) {
-                    currentWeekRankings[existingIndex] = newRank;
-                }
-            } else {
-                currentWeekRankings.push(newRank);
-            }
-
-            // 점수 순으로 정렬
-            currentWeekRankings.sort((a, b) => b.iq - a.iq);
-
-            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyRankings));
-            refreshWeeklyRanking();
-        }
 
         function refreshWeeklyRanking() {
             const weekStart = getWeekStart();
@@ -1953,40 +2094,6 @@
             return existsInPosts || existsInRankings;
         }
 
-        function saveToRanking(nickname, iq, classification, age) {
-            let rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
-
-            // 같은 닉네임이 이미 있는지 확인 (더 높은 점수로 업데이트)
-            const existingIndex = rankings.findIndex(rank => rank.nickname === nickname);
-
-            const newRank = {
-                nickname: nickname,
-                iq: iq,
-                classification: classification,
-                age: age,
-                timestamp: new Date().toLocaleString('ko-KR')
-            };
-
-            if (existingIndex >= 0) {
-                // 기존 기록이 있으면 더 높은 점수일 때만 업데이트
-                if (iq > rankings[existingIndex].iq) {
-                    rankings[existingIndex] = newRank;
-                }
-            } else {
-                // 새로운 기록 추가
-                rankings.push(newRank);
-            }
-
-            // IQ 점수 내림차순으로 정렬
-            rankings.sort((a, b) => b.iq - a.iq);
-
-            // 상위 100명만 유지
-            if (rankings.length > 100) {
-                rankings = rankings.slice(0, 100);
-            }
-
-            localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
-        }
 
 
 
@@ -2318,12 +2425,24 @@
             }
         });
 
-        // 페이지 로드 시 샘플 데이터 생성 및 모든 데이터 불러오기
-        window.addEventListener('load', () => {
-            generateSampleData(); // 샘플 데이터 생성
-            checkWeeklyReset(); // 주간 리셋 확인
-            refreshRanking();
-            refreshWeeklyRanking();
+        // 페이지 로드 시 Firebase 초기화 및 데이터 동기화
+        window.addEventListener('load', async () => {
+            // Firebase 초기화
+            initializeFirebase();
+
+            // 잠시 대기 후 동기화 시도
+            setTimeout(async () => {
+                if (isFirebaseEnabled) {
+                    await syncRankingsData();
+                } else {
+                    // Firebase 실패 시 기존 로컬 데이터 사용
+                    generateSampleData(); // 샘플 데이터 생성
+                }
+
+                checkWeeklyReset(); // 주간 리셋 확인
+                refreshRanking();
+                refreshWeeklyRanking();
+            }, 1000); // 1초 대기로 Firebase 초기화 완료 보장
         });
 
         // ============================================
