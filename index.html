@@ -519,7 +519,7 @@
         <!-- 시작 화면 -->
         <div class="intro-section" id="intro">
             <h2>IQ 테스트 시작</h2>
-            <p>5개 영역(패턴, 수열, 공간, 논리, 언어)을 측정하는 25문항 테스트입니다. 문제당 60초 제한시간이 있습니다.</p>
+            <p>CHC 이론 기반 5개 인지 영역을 측정하는 25문항 과학적 IQ 평가입니다. 문제당 60초 제한시간이 있습니다.</p>
 
             <!-- 사용자 정보 입력 -->
             <div style="background: rgba(0, 212, 255, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(0, 212, 255, 0.2);">
@@ -559,16 +559,16 @@
                         📊 다차원 분석
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        5개 인지 영역(패턴 인식, 수열 추론, 공간 추론, 논리 추론, 언어 유추)을 종합적으로 평가합니다.
+                        CHC 이론 기반 5개 영역: ①지각 추론 및 유동성 지능 ②수리 논리 및 패턴 인식 ③시공간 처리 능력 ④언어 및 논리 추론 ⑤언어 유추를 종합 평가합니다.
                     </p>
                 </div>
 
                 <div style="background: rgba(245, 158, 11, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(245, 158, 11, 0.2);">
                     <h4 style="color: #d97706; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        ⚖️ 난이도 가중치
+                        🧮 IRT 기반 평가
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        문제 난이도(쉬움~천재)에 따른 가중치와 응답 시간을 반영하여 정밀한 점수를 산출합니다.
+                        문항반응이론(IRT) 3모수 로지스틱 모형과 최우도추정(MLE)을 활용하여 과학적으로 능력을 측정합니다.
                     </p>
                 </div>
 
@@ -577,7 +577,7 @@
                         👥 나이별 보정
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        연령대별 인지능력 특성을 반영한 보정 로직을 적용하여 공정한 평가를 제공합니다.
+                        WAIS-IV/WISC-V 표준 규준과 Flynn Effect 보정(-0.3점/년)을 적용하여 과학적으로 나이를 보정합니다.
                     </p>
                 </div>
 
@@ -1985,7 +1985,7 @@
             const overallAbility = estimateAbilityMLE(itemParameters);
 
             // 영역별 능력 추정
-            ['pattern', 'numerical', 'spatial', 'logical', 'verbal'].forEach(category => {
+            ['perceptual', 'quantitative', 'spatial', 'logical', 'verbal'].forEach(category => {
                 const categoryItems = itemParameters.filter(item => item.category === category);
                 if (categoryItems.length > 0) {
                     categoryScores[category].ability = estimateAbilityMLE(categoryItems);
