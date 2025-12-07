@@ -555,6 +555,47 @@
             </div>
         </div>
 
+        <!-- 게시판 화면 -->
+        <div class="board-section" id="board" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="color: #00d4ff; margin: 0;">🏆 IQ 자랑 게시판</h2>
+                <button class="btn btn-secondary" onclick="showResults()" style="margin: 0;">← 결과로 돌아가기</button>
+            </div>
+
+            <!-- 글쓰기 폼 -->
+            <div class="intro-section" id="postForm">
+                <h3 style="color: #333333; margin-bottom: 20px;">✍️ 자랑하기</h3>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">닉네임:</label>
+                    <input type="text" id="nickname" placeholder="익명123" maxlength="20"
+                           style="width: 100%; padding: 10px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333333;">한마디:</label>
+                    <textarea id="message" placeholder="내 IQ 점수 자랑하고 싶어요! (최대 200자)" maxlength="200"
+                              style="width: 100%; height: 80px; padding: 10px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; resize: vertical;"></textarea>
+                    <div style="text-align: right; margin-top: 5px; font-size: 0.8rem; color: #666666;">
+                        <span id="charCount">0</span>/200
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="submitPost()" id="submitBtn">🚀 게시판에 등록하기</button>
+                </div>
+            </div>
+
+            <!-- 게시글 목록 -->
+            <div class="intro-section">
+                <h3 style="color: #333333; margin-bottom: 20px;">📋 최근 자랑 목록</h3>
+                <div id="postsList">
+                    <!-- 게시글들이 여기에 동적으로 추가됨 -->
+                </div>
+                <div id="emptyState" style="text-align: center; color: #999999; padding: 40px;">
+                    <p>아직 등록된 자랑글이 없습니다.</p>
+                    <p>첫 번째 자랑의 주인공이 되어보세요! 🎉</p>
+                </div>
+            </div>
+        </div>
+
         <!-- 테스트 화면 -->
         <div class="test-section" id="test">
             <div class="progress-bar">
@@ -645,7 +686,10 @@
                 </div>
             </div>
 
-            <button class="btn" onclick="location.reload()">다시 테스트하기</button>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+                <button class="btn" onclick="showBoard()">🏆 결과 자랑하기</button>
+                <button class="btn btn-secondary" onclick="location.reload()">다시 테스트하기</button>
+            </div>
         </div>
     </div>
 
@@ -1191,6 +1235,7 @@
         let startTime = null;
         let responseTimes = [];
         let userAge = null;
+        let testResults = null; // 테스트 결과 저장용
 
         // ============================================
         // 테스트 초기화 및 시작
@@ -1508,11 +1553,28 @@
         }
 
         function showResults() {
+            // 게시판에서 돌아온 경우 기존 결과 사용
+            if (testResults) {
+                document.getElementById('board').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+                return;
+            }
+
             document.getElementById('test').style.display = 'none';
             document.getElementById('results').style.display = 'block';
 
             const results = calculateResults();
             const classification = getIQClassification(results.iq);
+
+            // 결과 저장 (게시판에서 사용하기 위해)
+            testResults = {
+                iq: results.iq,
+                classification: classification,
+                categoryScores: results.categoryScores,
+                totalCorrect: results.totalCorrect,
+                totalQuestions: results.totalQuestions,
+                age: userAge
+            };
 
             // IQ 점수 표시
             document.getElementById('iqScore').textContent = results.iq;
@@ -1592,6 +1654,151 @@
             });
             requestAnimationFrame(animate);
         }
+
+        // ============================================
+        // 게시판 기능
+        // ============================================
+
+        function showBoard() {
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('board').style.display = 'block';
+            loadPosts();
+
+            // 사용자 IQ 정보를 폼에 미리 표시
+            if (testResults) {
+                document.getElementById('nickname').placeholder = `IQ${testResults.iq} 천재`;
+                document.getElementById('message').placeholder =
+                    `와! 내 IQ가 ${testResults.iq}점이 나왔어요! ${testResults.classification.label} 수준이래요 🎉`;
+            }
+        }
+
+        function generateRandomNickname() {
+            const adjectives = ['똑똑한', '천재', '영리한', '현명한', '재치있는', '창의적인', '논리적인', '직관적인'];
+            const nouns = ['두뇌왕', '아인슈타인', '뉴턴', '다빈치', '테슬라', '에디슨', '큐리', '호킹'];
+            const numbers = Math.floor(Math.random() * 9999) + 1;
+
+            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+
+            return `${adj}${noun}${numbers}`;
+        }
+
+        function submitPost() {
+            const nickname = document.getElementById('nickname').value.trim() || generateRandomNickname();
+            const message = document.getElementById('message').value.trim();
+
+            if (!testResults) {
+                alert('테스트를 먼저 완료해주세요!');
+                return;
+            }
+
+            if (!message) {
+                alert('자랑할 내용을 입력해주세요!');
+                document.getElementById('message').focus();
+                return;
+            }
+
+            // 욕설 필터링 (간단한 예시)
+            const badWords = ['바보', '멍청이', '바보야', '병신', '시발'];
+            const hasBadWord = badWords.some(word =>
+                nickname.toLowerCase().includes(word) || message.toLowerCase().includes(word)
+            );
+
+            if (hasBadWord) {
+                alert('적절하지 않은 언어가 포함되어 있습니다. 수정해주세요.');
+                return;
+            }
+
+            const post = {
+                id: Date.now(),
+                nickname: nickname,
+                message: message,
+                iq: testResults.iq,
+                classification: testResults.classification.label,
+                timestamp: new Date().toLocaleString('ko-KR'),
+                age: testResults.age
+            };
+
+            savePosts(post);
+            loadPosts();
+
+            // 폼 초기화
+            document.getElementById('nickname').value = '';
+            document.getElementById('message').value = '';
+            document.getElementById('charCount').textContent = '0';
+
+            alert('🎉 자랑글이 등록되었습니다!');
+        }
+
+        function savePosts(newPost) {
+            let posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
+            posts.unshift(newPost); // 최신글이 위로
+
+            // 최대 100개 게시글만 유지
+            if (posts.length > 100) {
+                posts = posts.slice(0, 100);
+            }
+
+            localStorage.setItem('iqTestPosts', JSON.stringify(posts));
+        }
+
+        function loadPosts() {
+            const posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
+            const postsList = document.getElementById('postsList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (posts.length === 0) {
+                postsList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            postsList.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            postsList.innerHTML = posts.map(post => `
+                <div style="background: rgba(0, 212, 255, 0.03); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(0, 212, 255, 0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <span style="font-weight: 600; color: #00d4ff;">🧠 ${post.nickname}</span>
+                            <span style="background: ${getIQBadgeColor(post.iq)}; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
+                                IQ ${post.iq}
+                            </span>
+                            <span style="color: #666; font-size: 0.8rem;">${post.classification}</span>
+                        </div>
+                        <span style="color: #999; font-size: 0.8rem;">${post.timestamp}</span>
+                    </div>
+                    <div style="color: #333; line-height: 1.5;">
+                        ${post.message}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getIQBadgeColor(iq) {
+            if (iq >= 130) return 'linear-gradient(135deg, #059669, #10b981); color: white;';
+            if (iq >= 120) return 'linear-gradient(135deg, #d97706, #f59e0b); color: white;';
+            if (iq >= 110) return 'linear-gradient(135deg, #8b5cf6, #a78bfa); color: white;';
+            if (iq >= 100) return 'background: rgba(0, 212, 255, 0.15); color: #0088cc;';
+            return 'background: rgba(107, 114, 128, 0.15); color: #6b7280;';
+        }
+
+        // 글자 수 카운터
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageTextarea = document.getElementById('message');
+            const charCount = document.getElementById('charCount');
+
+            if (messageTextarea && charCount) {
+                messageTextarea.addEventListener('input', function() {
+                    charCount.textContent = this.value.length;
+                });
+            }
+        });
+
+        // 페이지 로드 시 게시글 불러오기
+        window.addEventListener('load', () => {
+            loadPosts();
+        });
 
         window.addEventListener('resize', () => { resize(); initParticles(); });
         resize();
