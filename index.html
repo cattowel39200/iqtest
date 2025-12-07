@@ -1301,7 +1301,6 @@
             document.getElementById('intro').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'none';
             document.getElementById('evaluationSection').style.display = 'none';
-            document.getElementById('board').style.display = 'none';
             document.getElementById('test').style.display = 'block';
 
             loadQuestion(0);
@@ -1586,7 +1585,6 @@
         function showResults() {
             // 게시판에서 돌아온 경우 기존 결과 사용
             if (testResults) {
-                document.getElementById('board').style.display = 'none';
                 document.getElementById('results').style.display = 'block';
                 return;
             }
@@ -1595,7 +1593,6 @@
             document.getElementById('intro').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'none';
             document.getElementById('evaluationSection').style.display = 'none';
-            document.getElementById('board').style.display = 'none';
             document.getElementById('results').style.display = 'block';
 
             const results = calculateResults();
@@ -1705,7 +1702,7 @@
             const now = new Date();
             const day = now.getDay(); // 0: 일요일, 1: 월요일...
             const diff = now.getDate() - day + (day === 0 ? -6 : 1); // 월요일을 주의 시작으로
-            const weekStart = new Date(now.setDate(diff));
+            const weekStart = new Date(now.getFullYear(), now.getMonth(), diff);
             weekStart.setHours(0, 0, 0, 0);
             return weekStart.getTime();
         }
@@ -1878,148 +1875,7 @@
             localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
         }
 
-        function submitPost() {
-            const nickname = document.getElementById('nickname').value.trim();
-            const message = document.getElementById('message').value.trim();
 
-            if (!testResults) {
-                alert('테스트를 먼저 완료해주세요!');
-                return;
-            }
-
-            if (!nickname) {
-                alert('닉네임을 입력해주세요!');
-                document.getElementById('nickname').focus();
-                return;
-            }
-
-            if (nickname.length < 2) {
-                alert('닉네임은 최소 2글자 이상 입력해주세요!');
-                document.getElementById('nickname').focus();
-                return;
-            }
-
-            // 닉네임 중복 체크
-            if (isNicknameExists(nickname)) {
-                alert('이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해주세요!');
-                document.getElementById('nickname').focus();
-                return;
-            }
-
-            // 메시지가 비어있으면 기본 메시지 사용
-            const finalMessage = message || `내 IQ는 ${testResults.iq}점입니다! 🧠✨`;
-
-            // 욕설 필터링 (간단한 예시)
-            const badWords = ['바보', '멍청이', '바보야', '병신', '시발'];
-            const hasBadWord = badWords.some(word =>
-                nickname.toLowerCase().includes(word) || finalMessage.toLowerCase().includes(word)
-            );
-
-            if (hasBadWord) {
-                alert('적절하지 않은 언어가 포함되어 있습니다. 수정해주세요.');
-                return;
-            }
-
-            const post = {
-                id: Date.now(),
-                nickname: nickname,
-                message: finalMessage,
-                iq: testResults.iq,
-                classification: testResults.classification.label,
-                timestamp: new Date().toLocaleString('ko-KR'),
-                age: testResults.age
-            };
-
-            // 랭킹에 저장
-            saveToRanking(nickname, testResults.iq, testResults.classification.label, testResults.age);
-
-            savePosts(post);
-            loadPosts();
-
-            // 랭킹과 주간 랭킹도 새로고침
-            refreshRanking();
-            refreshWeeklyRanking();
-
-            // 폼 초기화
-            document.getElementById('nickname').value = '';
-            document.getElementById('message').value = '';
-            document.getElementById('charCount').textContent = '0';
-            document.getElementById('nickCount').textContent = '0';
-
-            alert('🎉 자랑글이 등록되었고 랭킹에 반영되었습니다!');
-
-            // 메인페이지로 이동
-            goToMainPage();
-        }
-
-        function goToMainPage() {
-            // 모든 섹션 숨기기
-            document.getElementById('test').style.display = 'none';
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('board').style.display = 'none';
-
-            // 메인페이지 섹션 표시
-            document.getElementById('intro').style.display = 'block';
-            document.getElementById('mainDashboard').style.display = 'grid';
-            document.getElementById('evaluationSection').style.display = 'block';
-
-            // 데이터 새로고침
-            refreshRanking();
-            refreshWeeklyRanking();
-        }
-
-        function savePosts(newPost) {
-            let posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
-            posts.unshift(newPost); // 최신글이 위로
-
-            // 최대 100개 게시글만 유지
-            if (posts.length > 100) {
-                posts = posts.slice(0, 100);
-            }
-
-            localStorage.setItem('iqTestPosts', JSON.stringify(posts));
-        }
-
-        function loadPosts() {
-            const posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
-            const postsList = document.getElementById('postsList');
-            const emptyState = document.getElementById('emptyState');
-
-            if (posts.length === 0) {
-                postsList.style.display = 'none';
-                emptyState.style.display = 'block';
-                return;
-            }
-
-            postsList.style.display = 'block';
-            emptyState.style.display = 'none';
-
-            postsList.innerHTML = posts.map(post => `
-                <div style="background: rgba(0, 212, 255, 0.03); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(0, 212, 255, 0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <span style="font-weight: 600; color: #00d4ff;">🧠 ${post.nickname}</span>
-                            <span style="background: ${getIQBadgeColor(post.iq)}; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
-                                IQ ${post.iq}
-                            </span>
-                            <span style="color: #666; font-size: 0.8rem;">${post.classification}</span>
-                        </div>
-                        <span style="color: #999; font-size: 0.8rem;">${post.timestamp}</span>
-                    </div>
-                    <div style="color: #333; line-height: 1.5;">
-                        ${post.message}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function getIQBadgeColor(iq) {
-            if (iq >= 130) return 'linear-gradient(135deg, #059669, #10b981); color: white;';
-            if (iq >= 120) return 'linear-gradient(135deg, #d97706, #f59e0b); color: white;';
-            if (iq >= 110) return 'linear-gradient(135deg, #8b5cf6, #a78bfa); color: white;';
-            if (iq >= 100) return 'background: rgba(0, 212, 255, 0.15); color: #0088cc;';
-            return 'background: rgba(107, 114, 128, 0.15); color: #6b7280;';
-        }
 
         function refreshRanking() {
             const rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
@@ -2186,48 +2042,6 @@
             return '#6b7280';
         }
 
-        function loadMainPosts() {
-            const posts = JSON.parse(localStorage.getItem('iqTestPosts') || '[]');
-            const mainPostsList = document.getElementById('mainPostsList');
-            const mainPostsEmpty = document.getElementById('mainPostsEmpty');
-
-            if (posts.length === 0) {
-                mainPostsList.style.display = 'none';
-                mainPostsEmpty.style.display = 'block';
-                return;
-            }
-
-            mainPostsList.style.display = 'block';
-            mainPostsEmpty.style.display = 'none';
-
-            // 최신 5개만 표시
-            const recent5 = posts.slice(0, 5);
-
-            mainPostsList.innerHTML = recent5.map(post => `
-                <div style="background: rgba(0, 212, 255, 0.03); border-radius: 10px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(0, 212, 255, 0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <span style="font-weight: 600; color: #00d4ff; font-size: 0.9rem;">🧠 ${post.nickname}</span>
-                            <span style="${getIQBadgeColor(post.iq)}; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 600;">
-                                IQ ${post.iq}
-                            </span>
-                        </div>
-                        <span style="color: #999; font-size: 0.75rem;">${post.timestamp.split(' ')[0]}</span>
-                    </div>
-                    <div style="color: #333; font-size: 0.9rem; line-height: 1.4;">
-                        ${post.message.length > 50 ? post.message.substring(0, 50) + '...' : post.message}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function showFullBoard() {
-            document.getElementById('mainDashboard').style.display = 'none';
-            document.getElementById('intro').style.display = 'none';
-            document.getElementById('evaluationSection').style.display = 'none';
-            document.getElementById('board').style.display = 'block';
-            loadPosts();
-        }
 
         // 샘플 데이터 생성 함수
         function generateSampleData() {
@@ -2339,10 +2153,16 @@
             // 로컬스토리지에 저장
             localStorage.setItem('iqTestRankings', JSON.stringify(rankings));
 
-            // 주간 랭킹 데이터도 생성 (현재 주)
-            const weekStart = getWeekStart ? getWeekStart() : new Date().getTime();
+            // 주간 랭킹 데이터도 생성 (현재 주) - 간단한 주차 계산
+            const now = new Date();
+            const day = now.getDay();
+            const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+            const weekStart = new Date(now.getFullYear(), now.getMonth(), diff);
+            weekStart.setHours(0, 0, 0, 0);
+            const weekStartTime = weekStart.getTime();
+
             const weeklyRankings = {};
-            weeklyRankings[weekStart] = rankings.slice(0, 15); // 상위 15명을 이번 주 랭킹으로
+            weeklyRankings[weekStartTime] = rankings.slice(0, 15); // 상위 15명을 이번 주 랭킹으로
             localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyRankings));
 
             console.log(`샘플 데이터 생성 완료: 랭킹 ${rankings.length}명, 게시글 ${posts.length}개`);
