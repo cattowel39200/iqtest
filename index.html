@@ -480,7 +480,7 @@
             <!-- 좌측: IQ 랭킹 -->
             <div class="intro-section" style="margin-bottom: 0;">
                 <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    🏆 IQ 랭킹 TOP 10
+                    🏆 IQ 랭킹 TOP 15
                     <button onclick="refreshRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
                 </h2>
                 <div id="rankingList">
@@ -1892,6 +1892,25 @@
             document.getElementById('nickCount').textContent = '0';
 
             alert('🎉 자랑글이 등록되었고 랭킹에 반영되었습니다!');
+
+            // 메인페이지로 이동
+            goToMainPage();
+        }
+
+        function goToMainPage() {
+            // 모든 섹션 숨기기
+            document.getElementById('test').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('board').style.display = 'none';
+
+            // 메인페이지 섹션 표시
+            document.getElementById('intro').style.display = 'block';
+            document.getElementById('mainDashboard').style.display = 'grid';
+            document.getElementById('evaluationSection').style.display = 'block';
+
+            // 데이터 새로고침
+            refreshRanking();
+            loadMainPosts();
         }
 
         function savePosts(newPost) {
@@ -1961,33 +1980,83 @@
             rankingList.style.display = 'block';
             rankingEmpty.style.display = 'none';
 
-            // 상위 10명만 표시
-            const top10 = rankings.slice(0, 10);
+            let html = '';
 
-            rankingList.innerHTML = top10.map((rank, index) => {
-                const medalEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`;
-                const crownEmoji = index < 3 ? '👑' : '🧠';
+            // 상위 15명 표시
+            const top15 = rankings.slice(0, 15);
+
+            // 상위 랭킹 표시
+            html += top15.map((rank, index) => {
+                const ranking = index + 1;
+                const medalIcon = getMedalIcon(ranking);
+                const isTopThree = ranking <= 3;
 
                 return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: ${getRankingBg(index)}; border-radius: 10px; border: 1px solid ${getRankingBorder(index)};">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 1.1rem;">${medalEmoji}</span>
-                            <div>
-                                <div style="font-weight: 600; color: #333333; display: flex; align-items: center; gap: 5px;">
-                                    ${crownEmoji} ${rank.nickname}
-                                </div>
-                                <div style="font-size: 0.8rem; color: #666666;">${rank.classification}</div>
+                    <div style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 6px; background: ${getRankingBg(index)}; border-radius: 8px; border: 1px solid ${getRankingBorder(index)};">
+                        <div style="width: 40px; text-align: center; font-size: ${isTopThree ? '1.2rem' : '0.9rem'}; font-weight: ${isTopThree ? 'bold' : 'normal'};">
+                            ${medalIcon}
+                        </div>
+                        <div style="flex: 1; margin-left: 8px;">
+                            <div style="font-weight: 600; color: #333333; font-size: 0.95rem;">
+                                ${rank.nickname}
                             </div>
                         </div>
                         <div style="text-align: right;">
-                            <div style="font-weight: 700; color: ${getIQTextColor(rank.iq)}; font-size: 1.1rem;">
-                                IQ ${rank.iq}
+                            <div style="font-weight: 700; color: ${getIQTextColor(rank.iq)}; font-size: 1rem;">
+                                ${rank.iq}
                             </div>
-                            <div style="font-size: 0.7rem; color: #999999;">${rank.timestamp.split(' ')[0]}</div>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            // 나의 등수 찾기 및 표시
+            if (userNickname) {
+                const myRankIndex = rankings.findIndex(rank => rank.nickname === userNickname);
+                if (myRankIndex >= 0 && myRankIndex >= 15) { // 15위 밖일 때만 표시
+                    const myRank = rankings[myRankIndex];
+                    const myRanking = myRankIndex + 1;
+
+                    html += `
+                        <div style="margin: 15px 0; border-top: 2px dashed #e0e0e0; padding-top: 15px;">
+                            <div style="text-align: center; font-size: 0.8rem; color: #666; margin-bottom: 8px;">나의 순위</div>
+                            <div style="display: flex; align-items: center; padding: 10px 12px; background: linear-gradient(90deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1)); border-radius: 10px; border: 2px solid rgba(0, 212, 255, 0.3);">
+                                <div style="width: 40px; text-align: center; font-size: 0.9rem; font-weight: bold;">
+                                    ${myRanking}위
+                                </div>
+                                <div style="flex: 1; margin-left: 8px;">
+                                    <div style="font-weight: 700; color: #00d4ff; font-size: 0.95rem;">
+                                        ${myRank.nickname} (나)
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 700; color: ${getIQTextColor(myRank.iq)}; font-size: 1rem;">
+                                        ${myRank.iq}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            rankingList.innerHTML = html;
+        }
+
+        function getMedalIcon(ranking) {
+            switch(ranking) {
+                case 1: return '🥇';
+                case 2: return '🥈';
+                case 3: return '🥉';
+                case 4: return '4️⃣';
+                case 5: return '5️⃣';
+                case 6: return '6️⃣';
+                case 7: return '7️⃣';
+                case 8: return '8️⃣';
+                case 9: return '9️⃣';
+                case 10: return '🔟';
+                default: return `${ranking}`;
+            }
         }
 
         function getRankingBg(index) {
