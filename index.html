@@ -253,18 +253,25 @@
         .options-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 30px;
+            gap: 20px;
+            margin-top: 35px;
         }
 
         .option {
             background: rgba(0, 0, 0, 0.02);
             border: 2px solid rgba(0, 0, 0, 0.1);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.4;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .option:hover {
@@ -275,6 +282,22 @@
         .option.selected {
             border-color: #00d4ff;
             background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* 문제 텍스트 시인성 개선 */
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .question-detail {
+            font-size: 1.1rem;
+            line-height: 1.4;
+            color: #444;
         }
 
         .option-label {
@@ -2523,17 +2546,21 @@
                 }
             }
 
-            // 카테고리별 점수 표시
-            setTimeout(() => {
-                const categories = ['perceptual', 'quantitative', 'spatial', 'logical', 'verbal'];
-                categories.forEach(cat => {
-                    const score = results.categoryScores[cat];
-                    const percentage = (score.correct / score.total) * 100;
+            // 카테고리별 점수 표시 (종합테스트에만 표시)
+            if (selectedTestType === 'comprehensive' && results.categoryScores) {
+                setTimeout(() => {
+                    const categories = ['perceptual', 'quantitative', 'spatial', 'logical', 'verbal'];
+                    categories.forEach(cat => {
+                        const score = results.categoryScores[cat];
+                        if (score) {
+                            const percentage = (score.correct / score.total) * 100;
 
-                    document.getElementById(`${cat}Bar`).style.width = `${percentage}%`;
-                    document.getElementById(`${cat}Score`).textContent = `${score.correct}/${score.total} (${Math.round(percentage)}%)`;
-                });
-            }, 100);
+                            document.getElementById(`${cat}Bar`).style.width = `${percentage}%`;
+                            document.getElementById(`${cat}Score`).textContent = `${score.correct}/${score.total} (${Math.round(percentage)}%)`;
+                        }
+                    });
+                }, 100);
+            }
         }
 
         // Brain Animation Script
