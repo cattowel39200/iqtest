@@ -796,7 +796,7 @@
                 <p class="percentile-info" id="percentile">상위 %</p>
             </div>
 
-            <div class="results-details">
+            <div class="results-details" id="categoryAnalysis">
                 <h3 style="margin-bottom: 30px; color: #333333;">영역별 분석</h3>
 
                 <div class="result-category">
@@ -2560,11 +2560,13 @@
             document.getElementById('results').style.display = 'block';
 
             const results = selectedTestType === 'comprehensive' ? calculateResults() : calculateNewTestResults();
+            console.log('결과 계산 완료:', results); // 디버깅용
             const classification = getIQClassification(results.score || results.iq);
+            console.log('분류 결과:', classification); // 디버깅용
 
             // 결과 저장 (게시판에서 사용하기 위해)
             testResults = {
-                iq: results.iq,
+                iq: results.iq || results.score, // iq가 없으면 score 사용
                 classification: classification,
                 categoryScores: results.categoryScores,
                 totalCorrect: results.totalCorrect,
@@ -2585,7 +2587,8 @@
 
             // 점수 표시 (테스트 유형에 따라 다르게)
             const finalScore = results.score || results.iq;
-            document.getElementById('iqScore').textContent = finalScore;
+            console.log('최종 점수:', finalScore, 'testType:', selectedTestType); // 디버깅용
+            document.getElementById('iqScore').textContent = finalScore || '--';
             document.getElementById('classLabel').textContent = classification.label;
             document.getElementById('classDesc').textContent = classification.desc;
 
@@ -2606,8 +2609,10 @@
                 }
             }
 
-            // 카테고리별 점수 표시 (종합테스트에만 표시)
+            // 카테고리별 분석 표시 여부 (종합테스트에만 표시)
+            const categoryAnalysisElement = document.getElementById('categoryAnalysis');
             if (selectedTestType === 'comprehensive' && results.categoryScores) {
+                categoryAnalysisElement.style.display = 'block';
                 setTimeout(() => {
                     const categories = ['perceptual', 'quantitative', 'spatial', 'logical', 'verbal'];
                     categories.forEach(cat => {
@@ -2620,6 +2625,9 @@
                         }
                     });
                 }, 100);
+            } else {
+                // 추가 3종 테스트에서는 영역별 분석 완전 숨기기
+                categoryAnalysisElement.style.display = 'none';
             }
         }
 
@@ -3361,7 +3369,7 @@
                             <div class="main-rank-number">${medalEmoji}</div>
                             <div class="main-rank-info">
                                 <div class="main-rank-nickname">${rank.nickname}</div>
-                                <div class="main-rank-score">${scoreText} • ${rank.age}세</div>
+                                <div class="main-rank-score">${scoreText}</div>
                             </div>
                         </div>
                     `;
