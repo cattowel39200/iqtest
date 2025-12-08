@@ -8,6 +8,7 @@
     <!-- Firebase CDN -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="new_test_types.js"></script>
     <style>
         * {
             margin: 0;
@@ -110,6 +111,20 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        /* 테스트 타입 카드 스타일 */
+        .test-type-card {
+            transition: all 0.3s ease;
+        }
+
+        .test-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-type-card.selected {
+            box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.3);
         }
 
         .btn:disabled {
@@ -496,21 +511,17 @@
                 </div>
             </div>
 
-            <!-- 우측: 주간 랭킹 -->
+            <!-- 우측: 최신 테스트 결과 -->
             <div class="intro-section" style="margin-bottom: 0;">
                 <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    📅 이번 주 랭킹
-                    <button onclick="refreshWeeklyRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+                    🏆 유형별 최고 기록
+                    <button onclick="refreshTypeRankings()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
                 </h2>
-                <div id="weeklyRankingList">
-                    <!-- 주간 랭킹이 여기에 표시됨 -->
-                </div>
-                <div id="weeklyRankingEmpty" style="text-align: center; color: #999999; padding: 20px;">
-                    <p>📊 아직 이번 주 랭킹이 없습니다</p>
-                    <p>첫 번째 주간 챔피언이 되어보세요!</p>
+                <div id="typeRankingSummary">
+                    <!-- 유형별 랭킹 요약이 여기에 표시됨 -->
                 </div>
                 <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #666666;">
-                    <span id="weeklyResetInfo">매주 월요일 자정에 초기화</span>
+                    <span>각 테스트 유형별 상위 랭커들</span>
                 </div>
             </div>
 
@@ -519,7 +530,7 @@
         <!-- 시작 화면 -->
         <div class="intro-section" id="intro">
             <h2>IQ 테스트 시작</h2>
-            <p>CHC 이론 기반 5개 인지 영역을 측정하는 25문항 과학적 IQ 평가입니다. 문제당 60초 제한시간이 있습니다.</p>
+            <p>다양한 난이도의 IQ 테스트를 선택하여 인지능력을 평가해보세요. 각 테스트마다 별도의 랭킹이 있습니다.</p>
 
             <!-- 사용자 정보 입력 -->
             <div style="background: rgba(0, 212, 255, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(0, 212, 255, 0.2);">
@@ -543,8 +554,61 @@
                 </p>
             </div>
 
+            <!-- 테스트 유형 선택 -->
+            <div style="background: rgba(123, 44, 191, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(123, 44, 191, 0.2);">
+                <h4 style="color: #7b2cbf; margin-bottom: 20px;">🎯 테스트 유형 선택</h4>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+                    <!-- 종합테스트 -->
+                    <div class="test-type-card selected" onclick="selectTestType('comprehensive')" style="border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 1.5rem;">🧠</span>
+                            <h5 style="color: #00d4ff; margin: 0;">종합테스트</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">25문항 • 약 25분</p>
+                        <p style="font-size: 0.85rem; color: #777;">CHC 이론 기반 5개 인지 영역 종합 평가</p>
+                    </div>
+
+                    <!-- 쉬움테스트 -->
+                    <div class="test-type-card" onclick="selectTestType('easy')" style="border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 1.5rem;">🟢</span>
+                            <h5 style="color: #22c55e; margin: 0;">쉬움테스트</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">10문항 • 약 10분</p>
+                        <p style="font-size: 0.85rem; color: #777;">기본적인 논리와 패턴 인식 문제</p>
+                    </div>
+
+                    <!-- 중간테스트 -->
+                    <div class="test-type-card" onclick="selectTestType('medium')" style="border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 1.5rem;">🟡</span>
+                            <h5 style="color: #f97316; margin: 0;">중간테스트</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">16문항 • 약 20분</p>
+                        <p style="font-size: 0.85rem; color: #777;">중급 수준의 추론과 패턴 분석</p>
+                    </div>
+
+                    <!-- 고난도테스트 -->
+                    <div class="test-type-card" onclick="selectTestType('hard')" style="border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 1.5rem;">🔴</span>
+                            <h5 style="color: #ef4444; margin: 0;">고난도테스트</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">24문항 • 약 40분</p>
+                        <p style="font-size: 0.85rem; color: #777;">고급 논리추론과 복합 패턴 분석</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: #666; font-size: 0.85rem;">
+                        선택된 테스트: <span id="selectedTestType" style="color: #7b2cbf; font-weight: bold;">종합테스트</span>
+                    </p>
+                </div>
+            </div>
+
             <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn" onclick="startTest()">🧠 테스트 시작하기</button>
+                <button class="btn" onclick="startTest()" id="startTestBtn">🧠 테스트 시작하기</button>
                 <button class="btn" onclick="showRankingPage()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">📊 랭킹 보기</button>
             </div>
         </div>
@@ -706,30 +770,66 @@
 
             <!-- 랭킹 탭 메뉴 -->
             <div style="display: flex; justify-content: center; margin-bottom: 30px; gap: 10px; flex-wrap: wrap;">
-                <button id="allTimeTab" class="ranking-tab active" onclick="showAllTimeRanking()">전체 랭킹</button>
-                <button id="weeklyTab" class="ranking-tab" onclick="showWeeklyRanking()">주간 랭킹</button>
+                <button id="comprehensiveTab" class="ranking-tab active" onclick="showTestRanking('comprehensive')">🧠 종합테스트</button>
+                <button id="easyTab" class="ranking-tab" onclick="showTestRanking('easy')">🟢 쉬움</button>
+                <button id="mediumTab" class="ranking-tab" onclick="showTestRanking('medium')">🟡 중간</button>
+                <button id="hardTab" class="ranking-tab" onclick="showTestRanking('hard')">🔴 고난도</button>
             </div>
 
-            <!-- 전체 랭킹 섹션 -->
-            <div id="allTimeRanking" class="ranking-section">
+            <!-- 종합테스트 랭킹 섹션 -->
+            <div id="comprehensiveRanking" class="ranking-section">
                 <div class="ranking-header">
-                    <h3>🌟 역대 최고 기록</h3>
-                    <div id="expandAllTimeBtn" style="text-align: center; margin-top: 20px;">
-                        <button class="btn" onclick="expandAllTimeRanking()" style="font-size: 0.9rem; padding: 8px 16px;">더 많은 랭킹 보기 ▼</button>
-                    </div>
+                    <h3 style="color: #00d4ff; margin: 0; text-align: center; margin-bottom: 20px;">
+                        🧠 종합테스트 랭킹 TOP 10
+                    </h3>
+                    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                        25문항 • 정확도 + 시간 기반 점수
+                    </p>
                 </div>
-                <div id="allTimeRankingList" class="ranking-list"></div>
-                <div id="myAllTimeRank" class="my-rank-section"></div>
+                <div id="comprehensiveRankingList" class="ranking-list"></div>
+                <div id="myComprehensiveRank" class="my-rank-section"></div>
             </div>
 
-            <!-- 주간 랭킹 섹션 -->
-            <div id="weeklyRankingSection" class="ranking-section" style="display: none;">
+            <!-- 쉬움테스트 랭킹 섹션 -->
+            <div id="easyRanking" class="ranking-section" style="display: none;">
                 <div class="ranking-header">
-                    <h3>📅 이번 주 랭킹</h3>
-                    <p style="font-size: 0.9rem; color: #666; text-align: center; margin-bottom: 20px;">매주 월요일 새롭게 시작됩니다</p>
+                    <h3 style="color: #22c55e; margin: 0; text-align: center; margin-bottom: 20px;">
+                        🟢 쉬움테스트 랭킹 TOP 10
+                    </h3>
+                    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                        10문항 • 정확도 + 시간 기반 점수
+                    </p>
                 </div>
-                <div id="weeklyRankingList" class="ranking-list"></div>
-                <div id="myWeeklyRank" class="my-rank-section"></div>
+                <div id="easyRankingList" class="ranking-list"></div>
+                <div id="myEasyRank" class="my-rank-section"></div>
+            </div>
+
+            <!-- 중간테스트 랭킹 섹션 -->
+            <div id="mediumRanking" class="ranking-section" style="display: none;">
+                <div class="ranking-header">
+                    <h3 style="color: #f97316; margin: 0; text-align: center; margin-bottom: 20px;">
+                        🟡 중간테스트 랭킹 TOP 10
+                    </h3>
+                    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                        16문항 • 정확도 + 시간 기반 점수
+                    </p>
+                </div>
+                <div id="mediumRankingList" class="ranking-list"></div>
+                <div id="myMediumRank" class="my-rank-section"></div>
+            </div>
+
+            <!-- 고난도테스트 랭킹 섹션 -->
+            <div id="hardRanking" class="ranking-section" style="display: none;">
+                <div class="ranking-header">
+                    <h3 style="color: #ef4444; margin: 0; text-align: center; margin-bottom: 20px;">
+                        🔴 고난도테스트 랭킹 TOP 10
+                    </h3>
+                    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                        24문항 • 정확도 + 시간 기반 점수
+                    </p>
+                </div>
+                <div id="hardRankingList" class="ranking-list"></div>
+                <div id="myHardRank" class="my-rank-section"></div>
             </div>
 
             <!-- 뒤로 가기 버튼 -->
@@ -1013,6 +1113,46 @@
             // 클라우드에도 저장
             const allTimeRankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
             saveRankingsToCloud(allTimeRankings, weeklyRankings);
+        }
+
+        // 유형별 랭킹 저장 함수
+        function saveToTypeRanking(nickname, score, classification, age, testType, results) {
+            const storageKey = `iqTest_${testType}_Rankings`;
+            let rankings = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+            const newEntry = {
+                nickname: nickname,
+                score: score,
+                classification: classification,
+                age: age,
+                date: new Date().toISOString(),
+                testType: testType,
+                testName: results.testName || testType,
+                accuracyScore: results.accuracyScore,
+                timeBonus: results.timeBonus,
+                timeEfficiency: results.timeEfficiency,
+                totalCorrect: results.totalCorrect,
+                totalQuestions: results.totalQuestions,
+                averageTime: results.averageTime
+            };
+
+            // 동일 닉네임이 있으면 더 높은 점수로 업데이트
+            const existingIndex = rankings.findIndex(rank => rank.nickname === nickname);
+            if (existingIndex !== -1) {
+                if (score > rankings[existingIndex].score) {
+                    rankings[existingIndex] = newEntry;
+                }
+            } else {
+                rankings.push(newEntry);
+            }
+
+            // 점수 기준으로 정렬
+            rankings.sort((a, b) => b.score - a.score);
+
+            localStorage.setItem(storageKey, JSON.stringify(rankings));
+
+            // Firebase에도 저장 (나중에 구현)
+            console.log(`${testType} 랭킹 저장 완료:`, newEntry);
         }
 
         // ============================================
@@ -1687,6 +1827,54 @@
         let userAge = null;
         let userNickname = null;
         let testResults = null; // 테스트 결과 저장용
+        let selectedTestType = 'comprehensive'; // 선택된 테스트 유형
+        let currentTestConfig = null; // 현재 테스트 설정
+
+        // ============================================
+        // 테스트 유형 선택 및 관리
+        // ============================================
+
+        function selectTestType(type) {
+            selectedTestType = type;
+
+            // 모든 카드에서 선택 효과 제거
+            document.querySelectorAll('.test-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // 선택된 카드에 효과 추가
+            event.target.closest('.test-type-card').classList.add('selected');
+
+            // 선택된 테스트 표시 업데이트
+            const typeNames = {
+                comprehensive: '종합테스트',
+                easy: '쉬움테스트',
+                medium: '중간테스트',
+                hard: '고난도테스트'
+            };
+
+            document.getElementById('selectedTestType').textContent = typeNames[type];
+        }
+
+        // 새로운 점수 계산 시스템 (정확도 + 시간 기반)
+        function calculateScore(correctAnswers, totalQuestions, averageTime, maxTime) {
+            // 정확도 점수 (0-100)
+            const accuracyScore = (correctAnswers / totalQuestions) * 100;
+
+            // 시간 보너스 (빠를수록 높음, 0-20)
+            const timeEfficiency = Math.max(0, (maxTime - averageTime) / maxTime);
+            const timeBonus = timeEfficiency * 20;
+
+            // 최종 점수 = 정확도 점수 + 시간 보너스
+            const finalScore = Math.round(accuracyScore + timeBonus);
+
+            return {
+                finalScore: Math.max(0, Math.min(120, finalScore)), // 0-120 제한
+                accuracyScore: Math.round(accuracyScore),
+                timeBonus: Math.round(timeBonus),
+                timeEfficiency: Math.round(timeEfficiency * 100)
+            };
+        }
 
         // ============================================
         // 테스트 초기화 및 시작
@@ -1730,26 +1918,39 @@
             userNickname = nickname;
             userAge = age;
 
-            // 모든 카테고리에서 문제 수집 및 섞기
-            allQuestions = [
-                // 1. 도형 관련 문제들 (지각 추론 + 시공간 처리)
-                ...shuffleArray(questions.perceptual),
-                ...shuffleArray(questions.spatial),
-                // 2. 숫자/논리 관련 문제들 (수리 논리 + 논리 추론 + 언어)
-                ...shuffleArray(questions.quantitative),
-                ...shuffleArray(questions.logical),
-                ...shuffleArray(questions.verbal)
-            ];
-
-            // 정확히 40문항으로 제한
-            allQuestions = allQuestions.slice(0, 40);
+            // 선택된 테스트 유형에 따라 문제 로드
+            if (selectedTestType === 'comprehensive') {
+                // 기존 종합테스트 (기존 questions 사용)
+                allQuestions = [
+                    ...shuffleArray(questions.perceptual),
+                    ...shuffleArray(questions.spatial),
+                    ...shuffleArray(questions.quantitative),
+                    ...shuffleArray(questions.logical),
+                    ...shuffleArray(questions.verbal)
+                ];
+                allQuestions = allQuestions.slice(0, 25);
+                currentTestConfig = {
+                    name: '종합테스트',
+                    timeLimit: 60,
+                    totalQuestions: 25
+                };
+            } else {
+                // 새로운 테스트 유형 (testTypes 사용)
+                const testConfig = testTypes[selectedTestType];
+                allQuestions = shuffleArray([...testConfig.questions]);
+                currentTestConfig = {
+                    name: testConfig.name,
+                    timeLimit: testConfig.timePerQuestion,
+                    totalQuestions: testConfig.totalQuestions
+                };
+            }
 
             // 답변 배열 초기화
             answers = new Array(allQuestions.length).fill(null);
             responseTimes = new Array(allQuestions.length).fill(null);
 
             // 디버깅: 문제 로드 확인
-            console.log('총 문제 개수:', allQuestions.length);
+            console.log(`${currentTestConfig.name} 시작:`, allQuestions.length + '문항');
             console.log('첫 번째 문제:', allQuestions[0]);
 
             document.getElementById('intro').style.display = 'none';
@@ -1780,7 +1981,13 @@
             // 진행 상황 업데이트
             document.getElementById('progress').style.width = `${((index + 1) / allQuestions.length) * 100}%`;
             document.getElementById('questionNum').textContent = `문제 ${index + 1}/${allQuestions.length}`;
-            document.getElementById('categoryBadge').textContent = q.categoryName;
+
+            // 카테고리 표시 (종합테스트는 기존 방식, 새 테스트는 타입 표시)
+            if (selectedTestType === 'comprehensive') {
+                document.getElementById('categoryBadge').textContent = q.categoryName;
+            } else {
+                document.getElementById('categoryBadge').textContent = q.type || '일반';
+            }
 
             // 난이도 표시 업데이트
             const difficultyBadge = document.getElementById('difficultyBadge');
@@ -1823,6 +2030,11 @@
 
         function renderQuestionContent(q) {
             let html = `<p class="question-text">${q.question}</p>`;
+
+            // 새 테스트 타입의 추가 질문 텍스트 처리
+            if (q.questionText) {
+                html += `<div class="question-detail" style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; font-family: monospace;">${q.questionText}</div>`;
+            }
 
             if (q.matrix) {
                 html += '<div class="matrix-grid">';
@@ -1873,7 +2085,7 @@
 
         function startTimer() {
             clearInterval(timer);
-            timeLeft = 60;
+            timeLeft = currentTestConfig ? currentTestConfig.timeLimit : 60;
             updateTimerDisplay();
 
             timer = setInterval(() => {
@@ -2022,6 +2234,45 @@
                 reliability: reliability,
                 confidenceInterval: confidenceInterval,
                 measurement_error: calculateStandardError(overallAbility, itemParameters)
+            };
+        }
+
+        // 새로운 테스트 유형 결과 계산 (정확도 + 시간 기반)
+        function calculateNewTestResults() {
+            let totalCorrect = 0;
+            let totalTime = 0;
+            let validResponses = 0;
+
+            // 정답 수 및 평균 시간 계산
+            for (let i = 0; i < allQuestions.length; i++) {
+                if (answers[i] !== null) {
+                    if (answers[i] === allQuestions[i].correct) {
+                        totalCorrect++;
+                    }
+                    if (responseTimes[i] && responseTimes[i] < (currentTestConfig.timeLimit * 1000)) {
+                        totalTime += responseTimes[i];
+                        validResponses++;
+                    }
+                }
+            }
+
+            const averageTime = validResponses > 0 ? totalTime / validResponses / 1000 : currentTestConfig.timeLimit;
+            const maxTime = currentTestConfig.timeLimit;
+
+            // 새로운 점수 계산 시스템 사용
+            const scoreResult = calculateScore(totalCorrect, allQuestions.length, averageTime, maxTime);
+
+            return {
+                score: scoreResult.finalScore,
+                iq: scoreResult.finalScore, // 호환성을 위해
+                accuracyScore: scoreResult.accuracyScore,
+                timeBonus: scoreResult.timeBonus,
+                timeEfficiency: scoreResult.timeEfficiency,
+                totalCorrect,
+                totalQuestions: allQuestions.length,
+                averageTime: Math.round(averageTime),
+                testType: selectedTestType,
+                testName: currentTestConfig.name
             };
         }
 
@@ -2226,8 +2477,8 @@
             document.getElementById('evaluationSection').style.display = 'none';
             document.getElementById('results').style.display = 'block';
 
-            const results = calculateResults();
-            const classification = getIQClassification(results.iq);
+            const results = selectedTestType === 'comprehensive' ? calculateResults() : calculateNewTestResults();
+            const classification = getIQClassification(results.score || results.iq);
 
             // 결과 저장 (게시판에서 사용하기 위해)
             testResults = {
@@ -2239,18 +2490,29 @@
                 age: userAge
             };
 
-            // 자동으로 랭킹에 등록 (클라우드 동기화)
+            // 자동으로 랭킹에 등록 (유형별)
             if (userNickname) {
-                saveToRankingWithSync(userNickname, results.iq, classification.label, userAge);
-                saveToWeeklyRankingWithSync(userNickname, results.iq, classification.label, userAge);
+                if (selectedTestType === 'comprehensive') {
+                    saveToRankingWithSync(userNickname, results.iq, classification.label, userAge);
+                } else {
+                    saveToTypeRanking(userNickname, results.score, classification.label, userAge, selectedTestType, results);
+                }
                 refreshRanking();
             }
 
-            // IQ 점수 표시
-            document.getElementById('iqScore').textContent = results.iq;
+            // 점수 표시 (테스트 유형에 따라 다르게)
+            const finalScore = results.score || results.iq;
+            document.getElementById('iqScore').textContent = finalScore;
             document.getElementById('classLabel').textContent = classification.label;
             document.getElementById('classDesc').textContent = classification.desc;
-            document.getElementById('percentile').textContent = `상위 ${(100 - classification.percentile).toFixed(1)}% (백분위 ${classification.percentile})`;
+
+            if (selectedTestType === 'comprehensive') {
+                document.getElementById('percentile').textContent = `상위 ${(100 - classification.percentile).toFixed(1)}% (백분위 ${classification.percentile})`;
+            } else {
+                // 새로운 테스트 타입은 상세 점수 분석 표시
+                const scoreDetail = `정확도: ${results.accuracyScore}점 + 시간보너스: ${results.timeBonus}점 (총 ${finalScore}점)`;
+                document.getElementById('percentile').textContent = scoreDetail;
+            }
 
             // IRT 기반 측정 정보 추가 표시 (있다면)
             if (results.measurementError) {
@@ -2794,6 +3056,9 @@
                 refreshRanking();
                 refreshWeeklyRanking();
             }, 1000); // 1초 대기로 Firebase 초기화 완료 보장
+
+            // 유형별 랭킹 요약 새로고침
+            refreshTypeRankings();
         });
 
         // ============================================
@@ -2812,8 +3077,8 @@
             // 랭킹 페이지 표시
             document.getElementById('rankingPage').style.display = 'block';
 
-            // 기본적으로 전체 랭킹 표시
-            showAllTimeRanking();
+            // 기본적으로 종합테스트 랭킹 표시
+            showTestRanking('comprehensive');
         }
 
         // 메인으로 돌아가기
@@ -2827,32 +3092,153 @@
             document.getElementById('evaluationSection').style.display = 'block';
         }
 
-        // 전체 랭킹 탭 표시
-        function showAllTimeRanking() {
-            // 탭 활성화 상태 변경
-            document.getElementById('allTimeTab').classList.add('active');
-            document.getElementById('weeklyTab').classList.remove('active');
+        // 유형별 랭킹 탭 표시
+        function showTestRanking(testType) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.ranking-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
 
-            // 섹션 표시/숨기기
-            document.getElementById('allTimeRanking').style.display = 'block';
-            document.getElementById('weeklyRankingSection').style.display = 'none';
+            // 선택된 탭 활성화
+            document.getElementById(`${testType}Tab`).classList.add('active');
 
-            // 전체 랭킹 데이터 새로 고침
-            refreshAllTimeRankingPage();
+            // 모든 랭킹 섹션 숨기기
+            document.querySelectorAll('.ranking-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // 선택된 랭킹 섹션 표시
+            document.getElementById(`${testType}Ranking`).style.display = 'block';
+
+            // 해당 유형 랭킹 데이터 새로 고침
+            refreshTestRankingPage(testType);
         }
 
-        // 주간 랭킹 탭 표시
-        function showWeeklyRanking() {
-            // 탭 활성화 상태 변경
-            document.getElementById('allTimeTab').classList.remove('active');
-            document.getElementById('weeklyTab').classList.add('active');
+        // 유형별 랭킹 페이지 새로고침
+        function refreshTestRankingPage(testType) {
+            let rankings;
+            let storageKey;
 
-            // 섹션 표시/숨기기
-            document.getElementById('allTimeRanking').style.display = 'none';
-            document.getElementById('weeklyRankingSection').style.display = 'block';
+            if (testType === 'comprehensive') {
+                // 종합테스트는 기존 방식
+                rankings = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
+                storageKey = 'iqTestRankings';
+            } else {
+                // 새로운 테스트 유형
+                storageKey = `iqTest_${testType}_Rankings`;
+                rankings = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            }
 
-            // 주간 랭킹 데이터 새로 고침
-            refreshWeeklyRankingPage();
+            const rankingList = document.getElementById(`${testType}RankingList`);
+            const myRankSection = document.getElementById(`my${testType.charAt(0).toUpperCase() + testType.slice(1)}Rank`);
+
+            if (rankings.length === 0) {
+                rankingList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">아직 등록된 랭킹이 없습니다.<br>첫 번째 랭커가 되어보세요!</div>';
+                if (myRankSection) myRankSection.style.display = 'none';
+                return;
+            }
+
+            // TOP 10만 표시
+            const top10 = rankings.slice(0, 10);
+
+            rankingList.innerHTML = top10.map((rank, index) => {
+                const ranking = index + 1;
+                const medalEmoji = ranking === 1 ? '🥇' : ranking === 2 ? '🥈' : ranking === 3 ? '🥉' : '';
+                const scoreText = testType === 'comprehensive' ? `IQ ${rank.iq}` : `${rank.score}점`;
+
+                let detailInfo = '';
+                if (testType !== 'comprehensive' && rank.accuracyScore !== undefined) {
+                    detailInfo = `<div style="font-size: 0.8rem; color: #888; margin-top: 4px;">정확도: ${rank.accuracyScore}점, 시간보너스: ${rank.timeBonus}점</div>`;
+                }
+
+                return `
+                    <div class="ranking-item">
+                        <div class="rank-number">${medalEmoji || ranking}</div>
+                        <div class="rank-info">
+                            <div class="rank-nickname">${rank.nickname}</div>
+                            <div class="rank-details">
+                                <span class="rank-score">${scoreText}</span>
+                                <span class="rank-age">${rank.age}세</span>
+                            </div>
+                            ${detailInfo}
+                        </div>
+                        <div class="rank-date">${new Date(rank.date).toLocaleDateString('ko-KR')}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 내 순위 표시
+            if (userNickname && myRankSection) {
+                const myRankIndex = rankings.findIndex(r => r.nickname === userNickname);
+                if (myRankIndex >= 0) {
+                    const myRank = rankings[myRankIndex];
+                    const myRanking = myRankIndex + 1;
+                    const myScoreText = testType === 'comprehensive' ? `IQ ${myRank.iq}` : `${myRank.score}점`;
+
+                    myRankSection.style.display = 'block';
+                    myRankSection.innerHTML = `
+                        <div style="text-align: center; background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 10px; margin-top: 20px;">
+                            <h4 style="color: #00d4ff; margin-bottom: 10px;">내 순위</h4>
+                            <div style="font-size: 1.1rem;">
+                                <strong>${myRanking}위</strong> / ${rankings.length}명 중
+                                <span style="color: ${getIQTextColor(myRank.score || myRank.iq)}; font-weight: bold; margin-left: 10px;">${myScoreText}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    myRankSection.style.display = 'none';
+                }
+            }
+        }
+
+        // 유형별 랭킹 요약 새로고침
+        function refreshTypeRankings() {
+            const typeRankingSummary = document.getElementById('typeRankingSummary');
+            if (!typeRankingSummary) return;
+
+            const testTypes = [
+                { key: 'comprehensive', name: '종합', emoji: '🧠', storage: 'iqTestRankings' },
+                { key: 'easy', name: '쉬움', emoji: '🟢', storage: 'iqTest_easy_Rankings' },
+                { key: 'medium', name: '중간', emoji: '🟡', storage: 'iqTest_medium_Rankings' },
+                { key: 'hard', name: '고난도', emoji: '🔴', storage: 'iqTest_hard_Rankings' }
+            ];
+
+            let html = '';
+
+            testTypes.forEach(type => {
+                const rankings = JSON.parse(localStorage.getItem(type.storage) || '[]');
+                const topRanker = rankings.length > 0 ? rankings[0] : null;
+
+                if (topRanker) {
+                    const scoreText = type.key === 'comprehensive' ? `IQ ${topRanker.iq}` : `${topRanker.score}점`;
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">${type.emoji}</span>
+                                <span style="font-weight: 500;">${type.name}</span>
+                            </div>
+                            <div style="text-align: right; font-size: 0.9rem;">
+                                <div style="font-weight: bold; color: #00d4ff;">${topRanker.nickname}</div>
+                                <div style="color: #666;">${scoreText}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">${type.emoji}</span>
+                                <span style="font-weight: 500;">${type.name}</span>
+                            </div>
+                            <div style="text-align: right; font-size: 0.9rem; color: #999;">
+                                <div>데이터 없음</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            typeRankingSummary.innerHTML = html;
         }
 
         // 전체 랭킹 페이지용 데이터 새로고침
