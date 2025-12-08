@@ -300,6 +300,47 @@
             color: #444;
         }
 
+        /* 메인 화면 랭킹 테이블 스타일 */
+        .main-ranking-table {
+            font-size: 0.9rem;
+        }
+
+        .main-ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .main-ranking-item:hover {
+            background-color: rgba(0, 212, 255, 0.05);
+        }
+
+        .main-rank-number {
+            width: 25px;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .main-rank-info {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .main-rank-nickname {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .main-rank-score {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
         .option-label {
             font-size: 1.1rem;
             color: #333333;
@@ -516,38 +557,56 @@
             <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
         </header>
 
-        <!-- 랭킹 & 게시판 섹션 -->
-        <div class="main-grid" id="mainDashboard" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <!-- 4가지 유형별 랭킹 테이블 -->
+        <div class="main-grid" id="mainDashboard" style="margin-bottom: 40px;">
+            <h2 style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                🏆 유형별 랭킹 TOP 5
+                <button onclick="refreshAllTypeRankings()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+            </h2>
 
-            <!-- 좌측: IQ 랭킹 -->
-            <div class="intro-section" style="margin-bottom: 0;">
-                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    🏆 IQ 랭킹 TOP 10
-                    <button onclick="refreshRanking()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
-                </h2>
-                <div id="rankingList">
-                    <!-- 랭킹 목록이 여기에 표시됨 -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+
+                <!-- 종합테스트 랭킹 -->
+                <div class="intro-section" style="margin-bottom: 0;">
+                    <h3 style="color: #00d4ff; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">
+                        🧠 종합테스트
+                    </h3>
+                    <div id="mainComprehensiveRanking" class="main-ranking-table">
+                        <!-- 종합테스트 랭킹이 여기에 표시됨 -->
+                    </div>
                 </div>
-                <div id="rankingEmpty" style="text-align: center; color: #999999; padding: 20px;">
-                    <p>🎯 아직 랭킹이 없습니다</p>
-                    <p>첫 번째 랭커가 되어보세요!</p>
+
+                <!-- 쉬움테스트 랭킹 -->
+                <div class="intro-section" style="margin-bottom: 0;">
+                    <h3 style="color: #22c55e; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">
+                        🟢 쉬움테스트
+                    </h3>
+                    <div id="mainEasyRanking" class="main-ranking-table">
+                        <!-- 쉬움테스트 랭킹이 여기에 표시됨 -->
+                    </div>
                 </div>
+
+                <!-- 중간테스트 랭킹 -->
+                <div class="intro-section" style="margin-bottom: 0;">
+                    <h3 style="color: #f97316; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">
+                        🟡 중간테스트
+                    </h3>
+                    <div id="mainMediumRanking" class="main-ranking-table">
+                        <!-- 중간테스트 랭킹이 여기에 표시됨 -->
+                    </div>
+                </div>
+
+                <!-- 고난도테스트 랭킹 -->
+                <div class="intro-section" style="margin-bottom: 0;">
+                    <h3 style="color: #ef4444; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">
+                        🔴 고난도테스트
+                    </h3>
+                    <div id="mainHardRanking" class="main-ranking-table">
+                        <!-- 고난도테스트 랭킹이 여기에 표시됨 -->
+                    </div>
+                </div>
+
             </div>
-
-            <!-- 우측: 최신 테스트 결과 -->
-            <div class="intro-section" style="margin-bottom: 0;">
-                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    🏆 유형별 최고 기록
-                    <button onclick="refreshTypeRankings()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
-                </h2>
-                <div id="typeRankingSummary">
-                    <!-- 유형별 랭킹 요약이 여기에 표시됨 -->
-                </div>
-                <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #666666;">
-                    <span>각 테스트 유형별 상위 랭커들</span>
-                </div>
-            </div>
-
         </div>
 
         <!-- 시작 화면 -->
@@ -2521,6 +2580,7 @@
                     saveToTypeRanking(userNickname, results.score, classification.label, userAge, selectedTestType, results);
                 }
                 refreshRanking();
+                refreshAllTypeRankings(); // 메인 랭킹도 새로고침
             }
 
             // 점수 표시 (테스트 유형에 따라 다르게)
@@ -3084,8 +3144,8 @@
                 refreshWeeklyRanking();
             }, 1000); // 1초 대기로 Firebase 초기화 완료 보장
 
-            // 유형별 랭킹 요약 새로고침
-            refreshTypeRankings();
+            // 메인 화면 4가지 유형별 랭킹 새로고침
+            refreshAllTypeRankings();
         });
 
         // ============================================
@@ -3266,6 +3326,49 @@
             });
 
             typeRankingSummary.innerHTML = html;
+        }
+
+        // 메인 화면 4가지 유형별 랭킹 새로고침
+        function refreshAllTypeRankings() {
+            const testTypes = [
+                { key: 'comprehensive', storage: 'iqTestRankings', elementId: 'mainComprehensiveRanking' },
+                { key: 'easy', storage: 'iqTest_easy_Rankings', elementId: 'mainEasyRanking' },
+                { key: 'medium', storage: 'iqTest_medium_Rankings', elementId: 'mainMediumRanking' },
+                { key: 'hard', storage: 'iqTest_hard_Rankings', elementId: 'mainHardRanking' }
+            ];
+
+            testTypes.forEach(type => {
+                const rankings = JSON.parse(localStorage.getItem(type.storage) || '[]');
+                const element = document.getElementById(type.elementId);
+
+                if (!element) return;
+
+                if (rankings.length === 0) {
+                    element.innerHTML = '<div style="text-align: center; color: #999; padding: 20px; font-size: 0.9rem;">데이터 없음</div>';
+                    return;
+                }
+
+                // TOP 5만 표시
+                const top5 = rankings.slice(0, 5);
+
+                const html = top5.map((rank, index) => {
+                    const ranking = index + 1;
+                    const medalEmoji = ranking === 1 ? '🥇' : ranking === 2 ? '🥈' : ranking === 3 ? '🥉' : ranking;
+                    const scoreText = type.key === 'comprehensive' ? `IQ ${rank.iq}` : `${rank.score}점`;
+
+                    return `
+                        <div class="main-ranking-item">
+                            <div class="main-rank-number">${medalEmoji}</div>
+                            <div class="main-rank-info">
+                                <div class="main-rank-nickname">${rank.nickname}</div>
+                                <div class="main-rank-score">${scoreText} • ${rank.age}세</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                element.innerHTML = html;
+            });
         }
 
         // 전체 랭킹 페이지용 데이터 새로고침
