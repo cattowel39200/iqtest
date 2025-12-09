@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IQZone - IQ Assessment & High IQ Challenge</title>
 
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* 반응형 컨테이너 스타일 */
@@ -28,22 +25,6 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .ranking-grid-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .ranking-column {
-            background: rgba(248, 249, 250, 0.8);
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .main-ranking-table {
-            font-size: 0.8rem;
-        }
 
         /* 스마트폰 최적화 */
         @media (max-width: 480px) {
@@ -57,19 +38,6 @@
                 border-radius: 12px;
             }
 
-            .ranking-grid-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-
-            .ranking-column {
-                padding: 8px;
-                border-radius: 8px;
-            }
-
-            .main-ranking-table {
-                font-size: 0.7rem;
-            }
 
             header {
                 padding: 35px 15px !important;
@@ -207,18 +175,8 @@
                 padding: 0 15px;
             }
 
-            .ranking-grid-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
 
-            .ranking-column {
-                padding: 10px;
-            }
 
-            .main-ranking-table {
-                font-size: 0.75rem;
-            }
 
             header h1 {
                 font-size: 2.6rem !important;
@@ -260,10 +218,6 @@
 
         /* 데스크톱 최적화 */
         @media (min-width: 769px) {
-            .ranking-grid-container {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 15px;
-            }
 
             /* 데스크톱 테스트 화면 가독성 개선 */
             .question-text {
@@ -287,69 +241,7 @@
 </head>
 
 <body>
-    <!-- 상단 로그인 영역 -->
-    <div id="userAuthSection" style="background: rgba(0, 212, 255, 0.05); border-bottom: 1px solid rgba(0, 212, 255, 0.1); padding: 10px 20px; text-align: right;">
-        <div id="notLoggedInSection">
-            <button id="loginBtn" onclick="toggleAuthForm()" style="background: #00d4ff; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 10px;">로그인/회원가입</button>
-        </div>
-        <div id="loggedInSection" style="display: none;">
-            <span id="userInfo" style="color: #333; margin-right: 15px;">
-                안녕하세요, <span id="userDisplay">닉네임님</span>
-            </span>
-            <button id="logoutBtn" onclick="logout()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">로그아웃</button>
-        </div>
-    </div>
 
-    <!-- 로그인/회원가입 폼 -->
-    <div id="authForm" style="display: none; background: white; border: 2px solid #00d4ff; border-radius: 12px; padding: 25px; margin: 20px auto; max-width: 400px; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2); position: relative; z-index: 1000;">
-        <!-- 탭 메뉴 -->
-        <div style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd;">
-            <button id="loginTab" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; border-bottom: 2px solid #00d4ff; color: #00d4ff; font-weight: 500;">로그인</button>
-            <button id="registerTab" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; color: #666;">회원가입</button>
-        </div>
-
-        <!-- 로그인 폼 -->
-        <div id="loginForm">
-            <h3 style="color: #00d4ff; margin-bottom: 20px; text-align: center;">로그인</h3>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">닉네임:</label>
-                <input type="text" id="loginNicknameInput" placeholder="닉네임을 입력하세요" onkeypress="handleLoginKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">비밀번호:</label>
-                <input type="password" id="loginPasswordInput" placeholder="비밀번호를 입력하세요" onkeypress="handleLoginKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="attemptLogin()" style="background: #00d4ff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">로그인</button>
-                <button onclick="toggleAuthForm()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">취소</button>
-            </div>
-        </div>
-
-        <!-- 회원가입 폼 -->
-        <div id="registerForm" style="display: none;">
-            <h3 style="color: #00d4ff; margin-bottom: 20px; text-align: center;">회원가입</h3>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">닉네임:</label>
-                <input type="text" id="registerNicknameInput" placeholder="닉네임을 입력하세요" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">나이:</label>
-                <input type="number" id="registerAgeInput" placeholder="나이를 입력하세요" min="1" max="120" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">비밀번호:</label>
-                <input type="password" id="registerPasswordInput" placeholder="비밀번호를 입력하세요 (4글자 이상)" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">비밀번호 확인:</label>
-                <input type="password" id="confirmPasswordInput" placeholder="비밀번호를 다시 입력하세요" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="attemptRegister()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">회원가입</button>
-                <button onclick="toggleAuthForm()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">취소</button>
-            </div>
-        </div>
-    </div>
 
     <!-- 메인 헤더 베너 -->
     <header style="text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3b82f6 100%); color: white; margin-bottom: 30px; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
@@ -370,13 +262,13 @@
                 </p>
             </div>
 
-            <!-- 무료 회원가입 안내 카드 -->
+            <!-- IQ 테스트 안내 카드 -->
             <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15)); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 20px; padding: 16px 30px; margin: 25px auto 0 auto; max-width: 450px; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.2);">
                 <p style="margin: 0; font-size: 1.1rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); color: #ffffff;">
-                    ✨ 닉네임만으로 <span style="color: #FFD700; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">무료 회원가입</span> 가능!
+                    ✨ 지금 바로 <span style="color: #FFD700; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">무료 IQ 테스트</span> 시작!
                 </p>
                 <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: #f1f5f9; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
-                    간편 가입으로 개인 기록 관리 및 랭킹 참여
+                    과학적 방법론으로 당신의 지능을 정확히 측정
                 </p>
             </div>
         </div>
