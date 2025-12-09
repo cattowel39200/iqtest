@@ -534,6 +534,11 @@ function startTest() {
     if (evaluationSection) evaluationSection.style.display = 'none';
     const rankingSection = document.querySelector('.ranking-grid-container');
     if (rankingSection) rankingSection.style.display = 'none';
+
+    // 메인 베너 숨기기
+    const headerBanner = document.querySelector('header');
+    if (headerBanner) headerBanner.style.display = 'none';
+
     document.getElementById('test').style.display = 'block';
 
     loadQuestion(0);
@@ -1198,6 +1203,10 @@ function goBackToMain() {
     if (evaluationSection) evaluationSection.style.display = 'block';
     const rankingSection = document.querySelector('.ranking-grid-container');
     if (rankingSection) rankingSection.style.display = 'block';
+
+    // 메인 베너 다시 보이기
+    const headerBanner = document.querySelector('header');
+    if (headerBanner) headerBanner.style.display = 'block';
 }
 
 // ============================================
