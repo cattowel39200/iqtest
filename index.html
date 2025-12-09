@@ -10,63 +10,259 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* 반응형 컨테이너 스타일 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 공통 카드 스타일 */
+        .intro-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .ranking-grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ranking-column {
+            background: rgba(248, 249, 250, 0.8);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .main-ranking-table {
+            font-size: 0.8rem;
+        }
+
+        /* 스마트폰 최적화 */
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0 10px;
+            }
+
+            .intro-section {
+                padding: 15px;
+                margin-bottom: 15px;
+                border-radius: 12px;
+            }
+
+            .ranking-grid-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .ranking-column {
+                padding: 8px;
+                border-radius: 8px;
+            }
+
+            .main-ranking-table {
+                font-size: 0.7rem;
+            }
+
+            header {
+                padding: 25px 15px !important;
+            }
+
+            header h1 {
+                font-size: 1.8rem !important;
+            }
+
+            header p {
+                font-size: 0.9rem !important;
+            }
+
+            .test-type-card {
+                padding: 15px !important;
+                margin-bottom: 10px !important;
+            }
+
+            /* 스마트폰에서 테스트 카드 2x2 그리드 */
+            .intro-section > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+
+            /* 스마트폰에서 평가 방식 카드 1열로 */
+            .intro-section div[style*="repeat(auto-fit"] {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+
+            #authForm {
+                margin: 10px !important;
+                padding: 15px !important;
+                max-width: calc(100% - 20px) !important;
+            }
+        }
+
+        /* 태블릿 최적화 */
+        @media (max-width: 768px) and (min-width: 481px) {
+            .main-container {
+                padding: 0 15px;
+            }
+
+            .ranking-grid-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .ranking-column {
+                padding: 10px;
+            }
+
+            .main-ranking-table {
+                font-size: 0.75rem;
+            }
+
+            header h1 {
+                font-size: 2.2rem !important;
+            }
+        }
+
+        /* 데스크톱 최적화 */
+        @media (min-width: 769px) {
+            .ranking-grid-container {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap:
-    10px;">
-    🏆 유형별 랭킹 TOP 10
-    <button onclick="refreshAllTypeRankings()"
-        style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
-    </h2>
-
-    <div class="ranking-grid-container">
-
-        <!-- 쉬움테스트 랭킹 -->
-        <div class="intro-section ranking-card" style="margin-bottom: 0;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <h3 style="color: #22c55e; margin: 0; font-size: 0.95rem;">🟢 쉬움</h3>
-                <div id="myEasyRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-            </div>
-            <div id="mainEasyRanking" class="main-ranking-table">
-                <!-- 쉬움테스트 랭킹이 여기에 표시됨 -->
-            </div>
+    <!-- 상단 로그인 영역 -->
+    <div id="userAuthSection" style="background: rgba(0, 212, 255, 0.05); border-bottom: 1px solid rgba(0, 212, 255, 0.1); padding: 10px 20px; text-align: right;">
+        <div id="notLoggedInSection">
+            <button id="loginBtn" onclick="toggleAuthForm()" style="background: #00d4ff; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 10px;">로그인/회원가입</button>
         </div>
-
-        <!-- 중간테스트 랭킹 -->
-        <div class="intro-section ranking-card" style="margin-bottom: 0;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <h3 style="color: #f97316; margin: 0; font-size: 0.95rem;">🟡 중간</h3>
-                <div id="myMediumRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-            </div>
-            <div id="mainMediumRanking" class="main-ranking-table">
-                <!-- 중간테스트 랭킹이 여기에 표시됨 -->
-            </div>
+        <div id="loggedInSection" style="display: none;">
+            <span id="userInfo" style="color: #333; margin-right: 15px;">
+                안녕하세요, <span id="userDisplay">닉네임님</span>
+            </span>
+            <button id="logoutBtn" onclick="logout()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">로그아웃</button>
         </div>
-
-        <!-- 고난도테스트 랭킹 -->
-        <div class="intro-section ranking-card" style="margin-bottom: 0;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <h3 style="color: #ef4444; margin: 0; font-size: 0.95rem;">🔴 고난도</h3>
-                <div id="myHardRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-            </div>
-            <div id="mainHardRanking" class="main-ranking-table">
-                <!-- 고난도테스트 랭킹이 여기에 표시됨 -->
-            </div>
-        </div>
-
-        <!-- 종합테스트 랭킹 (마지막 배치) -->
-        <div class="intro-section ranking-card" style="margin-bottom: 0;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <h3 style="color: #00d4ff; margin: 0; font-size: 0.95rem;">🧠 종합</h3>
-                <div id="myComprehensiveRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-            </div>
-            <div id="mainComprehensiveRanking" class="main-ranking-table">
-                <!-- 종합테스트 랭킹이 여기에 표시됨 -->
-            </div>
-        </div>
-
     </div>
+
+    <!-- 로그인/회원가입 폼 -->
+    <div id="authForm" style="display: none; background: white; border: 2px solid #00d4ff; border-radius: 12px; padding: 25px; margin: 20px auto; max-width: 400px; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2); position: relative; z-index: 1000;">
+        <!-- 탭 메뉴 -->
+        <div style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd;">
+            <button id="loginTab" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; border-bottom: 2px solid #00d4ff; color: #00d4ff; font-weight: 500;">로그인</button>
+            <button id="registerTab" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px; border: none; background: none; cursor: pointer; color: #666;">회원가입</button>
+        </div>
+
+        <!-- 로그인 폼 -->
+        <div id="loginForm">
+            <h3 style="color: #00d4ff; margin-bottom: 20px; text-align: center;">로그인</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">닉네임:</label>
+                <input type="text" id="loginNicknameInput" placeholder="닉네임을 입력하세요" onkeypress="handleLoginKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">비밀번호:</label>
+                <input type="password" id="loginPasswordInput" placeholder="비밀번호를 입력하세요" onkeypress="handleLoginKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="attemptLogin()" style="background: #00d4ff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">로그인</button>
+                <button onclick="toggleAuthForm()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">취소</button>
+            </div>
+        </div>
+
+        <!-- 회원가입 폼 -->
+        <div id="registerForm" style="display: none;">
+            <h3 style="color: #00d4ff; margin-bottom: 20px; text-align: center;">회원가입</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">닉네임:</label>
+                <input type="text" id="registerNicknameInput" placeholder="닉네임을 입력하세요" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">나이:</label>
+                <input type="number" id="registerAgeInput" placeholder="나이를 입력하세요" min="1" max="120" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">비밀번호:</label>
+                <input type="password" id="registerPasswordInput" placeholder="비밀번호를 입력하세요 (4글자 이상)" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">비밀번호 확인:</label>
+                <input type="password" id="confirmPasswordInput" placeholder="비밀번호를 다시 입력하세요" onkeypress="handleRegisterKeypress(event)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="attemptRegister()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">회원가입</button>
+                <button onclick="toggleAuthForm()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 헤더 베너 -->
+    <header style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h1 style="margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 700;">🧠 IQZone</h1>
+            <p style="margin: 0; font-size: 1.2rem; opacity: 0.9;">과학적 IQ 측정과 인지능력 평가</p>
+            <p style="margin: 10px 0 0 0; font-size: 1rem; opacity: 0.8;">CHC 이론 기반 다차원 지능 분석 시스템</p>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+
+        <!-- 통합 랭킹 카드 -->
+        <div class="intro-section" style="margin-bottom: 30px; padding: 20px; border-radius: 15px; background: rgba(255, 255, 255, 0.8); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #333; font-size: 1.2rem;">🏆 유형별 랭킹 TOP 3</h2>
+                <button onclick="refreshAllTypeRankings()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff; margin-left: 10px;">🔄</button>
+            </div>
+
+            <div class="ranking-grid-container">
+                <!-- 쉬움테스트 랭킹 -->
+                <div class="ranking-column">
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <h3 style="color: #22c55e; margin: 0; font-size: 0.9rem;">🟢 쉬움</h3>
+                        <div id="myEasyRank" style="font-size: 0.7rem; color: #666; margin-top: 2px;"></div>
+                    </div>
+                    <div id="mainEasyRanking" class="main-ranking-table"></div>
+                </div>
+
+                <!-- 중간테스트 랭킹 -->
+                <div class="ranking-column">
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <h3 style="color: #f97316; margin: 0; font-size: 0.9rem;">🟡 중간</h3>
+                        <div id="myMediumRank" style="font-size: 0.7rem; color: #666; margin-top: 2px;"></div>
+                    </div>
+                    <div id="mainMediumRanking" class="main-ranking-table"></div>
+                </div>
+
+                <!-- 고난도테스트 랭킹 -->
+                <div class="ranking-column">
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <h3 style="color: #ef4444; margin: 0; font-size: 0.9rem;">🔴 고난도</h3>
+                        <div id="myHardRank" style="font-size: 0.7rem; color: #666; margin-top: 2px;"></div>
+                    </div>
+                    <div id="mainHardRanking" class="main-ranking-table"></div>
+                </div>
+
+                <!-- 종합테스트 랭킹 -->
+                <div class="ranking-column">
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <h3 style="color: #00d4ff; margin: 0; font-size: 0.9rem;">🧠 종합</h3>
+                        <div id="myComprehensiveRank" style="font-size: 0.7rem; color: #666; margin-top: 2px;"></div>
+                    </div>
+                    <div id="mainComprehensiveRanking" class="main-ranking-table"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 시작 화면 -->
@@ -322,8 +518,10 @@
             <button class="btn" onclick="goBackToMain()" style="background: #6c757d; color: white;">🏠 메인으로
                 돌아가기</button>
         </div>
+        </div>
     </div>
-    </div>
+
+    </div> <!-- 메인 컨테이너 닫기 -->
 
     <script src="new_questions.js"></script>
     <script src="new_test_types.js"></script>

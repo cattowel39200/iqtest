@@ -108,13 +108,97 @@ function initializeFirebase() {
 }
 
 // ============================================
+// Password Hashing Utility
+// ============================================
+
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash.toString();
+}
+
+function hashPassword(password, salt) {
+    return simpleHash(password + salt);
+}
+
+function generateSalt() {
+    return Math.random().toString(36).substring(2, 15);
+}
+
+// ============================================
+// User Database Management
+// ============================================
+
+const UserDatabase = {
+    getUsers() {
+        return JSON.parse(localStorage.getItem('iqTestUsers') || '{}');
+    },
+
+    saveUsers(users) {
+        localStorage.setItem('iqTestUsers', JSON.stringify(users));
+    },
+
+    userExists(nickname) {
+        const users = this.getUsers();
+        return users.hasOwnProperty(nickname);
+    },
+
+    createUser(nickname, age, password) {
+        const users = this.getUsers();
+
+        if (this.userExists(nickname)) {
+            return { success: false, message: '이미 존재하는 닉네임입니다.' };
+        }
+
+        const salt = generateSalt();
+        const hashedPassword = hashPassword(password, salt);
+
+        users[nickname] = {
+            nickname,
+            age,
+            password: hashedPassword,
+            salt,
+            createdAt: new Date().toISOString(),
+            lastLogin: null
+        };
+
+        this.saveUsers(users);
+        return { success: true, message: '회원가입이 완료되었습니다.' };
+    },
+
+    authenticateUser(nickname, password) {
+        const users = this.getUsers();
+
+        if (!this.userExists(nickname)) {
+            return { success: false, message: '존재하지 않는 닉네임입니다.' };
+        }
+
+        const user = users[nickname];
+        const hashedPassword = hashPassword(password, user.salt);
+
+        if (hashedPassword === user.password) {
+            // Update last login
+            user.lastLogin = new Date().toISOString();
+            this.saveUsers(users);
+            return { success: true, user };
+        } else {
+            return { success: false, message: '비밀번호가 올바르지 않습니다.' };
+        }
+    }
+};
+
+// ============================================
 // User Management
 // ============================================
 
 const UserManager = {
     currentUser: null,
     init() {
-        const saved = localStorage.getItem('iqTestUser');
+        const saved = localStorage.getItem('iqTestCurrentUser');
         if (saved) {
             this.currentUser = JSON.parse(saved);
             this.updateUI();
@@ -123,15 +207,41 @@ const UserManager = {
     getCurrentUser() {
         return this.currentUser;
     },
-    login(nickname, age) {
-        this.currentUser = { nickname, age, loginDate: new Date().toISOString() };
-        localStorage.setItem('iqTestUser', JSON.stringify(this.currentUser));
-        this.updateUI();
-        return true;
+    login(nickname, password) {
+        const authResult = UserDatabase.authenticateUser(nickname, password);
+
+        if (authResult.success) {
+            this.currentUser = {
+                nickname: authResult.user.nickname,
+                age: authResult.user.age,
+                loginDate: new Date().toISOString()
+            };
+            localStorage.setItem('iqTestCurrentUser', JSON.stringify(this.currentUser));
+            this.updateUI();
+            return { success: true, message: `${nickname}님, 로그인되었습니다!` };
+        } else {
+            return authResult;
+        }
+    },
+    register(nickname, age, password) {
+        const createResult = UserDatabase.createUser(nickname, age, password);
+
+        if (createResult.success) {
+            // 회원가입 후 자동 로그인
+            this.currentUser = {
+                nickname,
+                age,
+                loginDate: new Date().toISOString()
+            };
+            localStorage.setItem('iqTestCurrentUser', JSON.stringify(this.currentUser));
+            this.updateUI();
+        }
+
+        return createResult;
     },
     logout() {
         this.currentUser = null;
-        localStorage.removeItem('iqTestUser');
+        localStorage.removeItem('iqTestCurrentUser');
         this.updateUI();
         location.reload();
     },
@@ -172,34 +282,173 @@ const UserManager = {
     }
 };
 
-function toggleRegisterForm() {
-    const form = document.getElementById('registerForm');
+function toggleAuthForm() {
+    const form = document.getElementById('authForm');
     if (form) {
         form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            switchAuthTab('login'); // 기본적으로 로그인 탭 활성화
+        }
+    }
+}
+
+function switchAuthTab(tab) {
+    const loginTab = document.getElementById('loginTab');
+    const registerTab = document.getElementById('registerTab');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+
+    if (tab === 'login') {
+        loginTab.style.borderBottom = '2px solid #00d4ff';
+        loginTab.style.color = '#00d4ff';
+        registerTab.style.borderBottom = 'none';
+        registerTab.style.color = '#666';
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+    } else {
+        registerTab.style.borderBottom = '2px solid #00d4ff';
+        registerTab.style.color = '#00d4ff';
+        loginTab.style.borderBottom = 'none';
+        loginTab.style.color = '#666';
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
     }
 }
 
 function attemptLogin() {
-    const nickname = document.getElementById('nicknameInput').value.trim();
-    const age = parseInt(document.getElementById('ageInput').value);
+    const nicknameInput = document.getElementById('loginNicknameInput');
+    const passwordInput = document.getElementById('loginPasswordInput');
 
-    if (!nickname || !age) {
-        alert('닉네임과 나이를 입력해주세요.');
+    if (!nicknameInput || !passwordInput) {
+        alert('입력 폼을 찾을 수 없습니다.');
         return;
     }
 
-    if (UserManager.login(nickname, age)) {
-        alert('로그인되었습니다.');
-        toggleRegisterForm();
+    const nickname = nicknameInput.value.trim();
+    const password = passwordInput.value;
+
+    // 입력 검증
+    if (!nickname) {
+        alert('닉네임을 입력해주세요.');
+        nicknameInput.focus();
+        return;
+    }
+
+    if (!password) {
+        alert('비밀번호를 입력해주세요.');
+        passwordInput.focus();
+        return;
+    }
+
+    const loginResult = UserManager.login(nickname, password);
+
+    if (loginResult.success) {
+        alert(loginResult.message);
+        toggleAuthForm();
+        // 입력 필드 초기화
+        nicknameInput.value = '';
+        passwordInput.value = '';
+    } else {
+        alert(loginResult.message);
+        passwordInput.focus();
     }
 }
 
 function attemptRegister() {
-    attemptLogin();
+    const nicknameInput = document.getElementById('registerNicknameInput');
+    const ageInput = document.getElementById('registerAgeInput');
+    const passwordInput = document.getElementById('registerPasswordInput');
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+
+    if (!nicknameInput || !ageInput || !passwordInput || !confirmPasswordInput) {
+        alert('입력 폼을 찾을 수 없습니다.');
+        return;
+    }
+
+    const nickname = nicknameInput.value.trim();
+    const age = parseInt(ageInput.value);
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    // 입력 검증
+    if (!nickname) {
+        alert('닉네임을 입력해주세요.');
+        nicknameInput.focus();
+        return;
+    }
+
+    if (nickname.length < 2) {
+        alert('닉네임은 2글자 이상 입력해주세요.');
+        nicknameInput.focus();
+        return;
+    }
+
+    if (nickname.length > 10) {
+        alert('닉네임은 10글자 이하로 입력해주세요.');
+        nicknameInput.focus();
+        return;
+    }
+
+    if (!age || isNaN(age)) {
+        alert('나이를 올바르게 입력해주세요.');
+        ageInput.focus();
+        return;
+    }
+
+    if (age < 5 || age > 120) {
+        alert('나이는 5세에서 120세 사이로 입력해주세요.');
+        ageInput.focus();
+        return;
+    }
+
+    if (!password) {
+        alert('비밀번호를 입력해주세요.');
+        passwordInput.focus();
+        return;
+    }
+
+    if (password.length < 4) {
+        alert('비밀번호는 4글자 이상 입력해주세요.');
+        passwordInput.focus();
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert('비밀번호가 일치하지 않습니다.');
+        confirmPasswordInput.focus();
+        return;
+    }
+
+    const registerResult = UserManager.register(nickname, age, password);
+
+    if (registerResult.success) {
+        alert(registerResult.message + ' 자동으로 로그인됩니다.');
+        toggleAuthForm();
+        // 입력 필드 초기화
+        nicknameInput.value = '';
+        ageInput.value = '';
+        passwordInput.value = '';
+        confirmPasswordInput.value = '';
+    } else {
+        alert(registerResult.message);
+        nicknameInput.focus();
+    }
 }
 
 function logout() {
     UserManager.logout();
+}
+
+function handleLoginKeypress(event) {
+    if (event.key === 'Enter') {
+        attemptLogin();
+    }
+}
+
+function handleRegisterKeypress(event) {
+    if (event.key === 'Enter') {
+        attemptRegister();
+    }
 }
 
 // ============================================
@@ -250,7 +499,7 @@ function startTest() {
     const currentUser = UserManager.getCurrentUser();
     if (!currentUser) {
         alert('테스트를 시작하려면 로그인이 필요합니다.');
-        toggleRegisterForm();
+        toggleAuthForm();
         return;
     }
 
@@ -281,8 +530,10 @@ function startTest() {
     responseTimes = new Array(allQuestions.length).fill(null);
 
     document.getElementById('intro').style.display = 'none';
-    document.getElementById('mainDashboard').style.display = 'none';
-    document.getElementById('evaluationSection').style.display = 'none';
+    const evaluationSection = document.getElementById('evaluationSection');
+    if (evaluationSection) evaluationSection.style.display = 'none';
+    const rankingSection = document.querySelector('.ranking-grid-container');
+    if (rankingSection) rankingSection.style.display = 'none';
     document.getElementById('test').style.display = 'block';
 
     loadQuestion(0);
@@ -854,9 +1105,49 @@ function refreshWeeklyRanking() {
 }
 
 function refreshAllTypeRankings() {
-    ['comprehensive', 'logic', 'spatial', 'memory'].forEach(type => {
+    ['comprehensive', 'easy', 'medium', 'hard'].forEach(type => {
         if (typeof refreshTestRankingPage === 'function') refreshTestRankingPage(type);
+        refreshMainTypeRanking(type);
     });
+}
+
+function refreshMainTypeRanking(type) {
+    const key = type === 'comprehensive' ? 'iqTestRankings' : `iqTest_${type}_Rankings`;
+    const rankings = JSON.parse(localStorage.getItem(key) || '[]');
+    const mainRankingElement = document.getElementById(`main${type.charAt(0).toUpperCase() + type.slice(1)}Ranking`);
+
+    if (!mainRankingElement) return;
+
+    if (rankings.length === 0) {
+        mainRankingElement.innerHTML = '<div style="text-align: center; color: #999; padding: 15px; font-size: 0.8rem;">등록된 기록이 없습니다</div>';
+        return;
+    }
+
+    const top3Rankings = rankings.slice(0, 3); // 상위 3명만 표시
+    let html = top3Rankings.map((rank, index) => `
+        <div style="display: flex; align-items: center; padding: 4px 6px; margin-bottom: 2px; background: ${index < 3 ? getRankingBg(index) : 'rgba(0,0,0,0.02)'}; border-radius: 4px; font-size: 0.7rem;">
+            <div style="width: 16px; text-align: center; font-weight: bold; color: ${index < 3 ? '#007bff' : '#666'}; font-size: 0.65rem;">${getMedalIcon(index)}</div>
+            <div style="flex: 1; margin-left: 4px; overflow: hidden;">
+                <div style="font-weight: 600; color: #333; font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rank.nickname}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 600; color: #007bff; font-size: 0.65rem;">${rank.iq}</div>
+            </div>
+        </div>
+    `).join('');
+
+    // 본인 순위 표시
+    if (UserManager.currentUser) {
+        const userRank = rankings.findIndex(r => r.nickname === UserManager.currentUser.nickname);
+        if (userRank !== -1) {
+            const userRankElement = document.getElementById(`my${type.charAt(0).toUpperCase() + type.slice(1)}Rank`);
+            if (userRankElement) {
+                userRankElement.textContent = `내 순위: ${userRank + 1}등 (IQ ${rankings[userRank].iq})`;
+            }
+        }
+    }
+
+    mainRankingElement.innerHTML = html;
 }
 
 function refreshTestRankingPage(type) {
@@ -885,6 +1176,28 @@ function showTestRanking(type) {
     document.querySelectorAll('.ranking-section').forEach(s => s.style.display = 'none');
     document.getElementById(`${type}Ranking`).style.display = 'block';
     refreshTestRankingPage(type);
+}
+
+function showRankingPage() {
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    const evaluationSection = document.getElementById('evaluationSection');
+    if (evaluationSection) evaluationSection.style.display = 'none';
+    const rankingSection = document.querySelector('.ranking-grid-container');
+    if (rankingSection) rankingSection.style.display = 'none';
+    document.getElementById('rankingPage').style.display = 'block';
+
+    // 종합테스트 탭을 기본으로 선택
+    showTestRanking('comprehensive');
+}
+
+function goBackToMain() {
+    document.getElementById('rankingPage').style.display = 'none';
+    document.getElementById('intro').style.display = 'block';
+    const evaluationSection = document.getElementById('evaluationSection');
+    if (evaluationSection) evaluationSection.style.display = 'block';
+    const rankingSection = document.querySelector('.ranking-grid-container');
+    if (rankingSection) rankingSection.style.display = 'block';
 }
 
 // ============================================
@@ -973,4 +1286,5 @@ window.onload = function () {
         animate();
     }
     refreshRanking();
+    refreshAllTypeRankings();
 };
