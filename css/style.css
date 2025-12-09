@@ -1,5 +1,5 @@
 /* ============================================
-   New Application Styles
+   Shape IQ Test Styles - Auto-Generated Puzzles
    ============================================ */
 
 /* Basic reset and layout */
@@ -26,27 +26,476 @@ body {
 .header {
     text-align: center;
     color: white;
-    padding: 50px 20px;
+    padding: 40px 20px;
 }
 
 .header h1 {
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
 }
 
 /* Main content area */
 .main-content {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
-    padding: 40px;
+    padding: 30px;
     margin: 20px auto;
     box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     text-align: center;
 }
 
-/* Responsive design */
+/* Difficulty Selection Styles */
+.difficulty-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.diff-btn {
+    background: white;
+    border: 3px solid transparent;
+    border-radius: 15px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-family: inherit;
+}
+
+.diff-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.diff-easy {
+    border-color: #4CAF50;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f4fdf4 100%);
+}
+
+.diff-medium {
+    border-color: #FF9800;
+    background: linear-gradient(135deg, #fff8e1 0%, #fffdf7 100%);
+}
+
+.diff-hard {
+    border-color: #f44336;
+    background: linear-gradient(135deg, #ffebee 0%, #fef8f8 100%);
+}
+
+.diff-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.diff-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.diff-desc {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.diff-time {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+}
+
+/* Puzzle Interface Styles */
+.puzzle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.current-difficulty {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.back-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #5a6fd8;
+}
+
+/* Sequence Display Styles */
+.sequence-container {
+    margin: 30px 0;
+}
+
+.sequence-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.sequence-arrow {
+    font-size: 2rem;
+    color: #667eea;
+    margin-top: 10px;
+}
+
+.missing-indicator {
+    font-size: 3rem;
+    color: #999;
+    background: #f8f8f8;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 2px dashed #ccc;
+}
+
+.sequence-item.arrow {
+    font-size: 2rem;
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* Grid Display Styles */
+.grid-display {
+    display: inline-block;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+.grid-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.grid-row:last-child {
+    margin-bottom: 0;
+}
+
+.grid-cell {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.grid-cell.missing {
+    background: #f0f0f0;
+    border-style: dashed;
+    border-color: #999;
+}
+
+.missing-shape {
+    font-size: 2rem;
+    color: #999;
+}
+
+/* Shape Rendering Styles */
+.shape-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+}
+
+.shape {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+/* Shape Types */
+.shape.circle {
+    border-radius: 50%;
+    border: 3px solid;
+}
+
+.shape.triangle {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 52px solid;
+    border-radius: 0;
+}
+
+.shape.square {
+    border-radius: 8px;
+    border: 3px solid;
+}
+
+.shape.pentagon {
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    border: 3px solid;
+    border-radius: 0;
+}
+
+.shape.hexagon {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    border: 3px solid;
+    border-radius: 0;
+}
+
+/* Colors */
+.shape.black {
+    border-color: #333;
+}
+
+.shape.gray {
+    border-color: #888;
+}
+
+.shape.white {
+    border-color: #333;
+    background-color: white;
+}
+
+.shape.black.triangle {
+    border-bottom-color: #333;
+    border-left-color: transparent;
+    border-right-color: transparent;
+}
+
+.shape.gray.triangle {
+    border-bottom-color: #888;
+}
+
+.shape.white.triangle {
+    border-bottom-color: white;
+    border: 3px solid #333;
+    border-top: none;
+}
+
+/* Fill Types */
+.shape.empty {
+    background-color: transparent;
+}
+
+.shape.quarter {
+    background: linear-gradient(90deg, currentColor 25%, transparent 25%);
+}
+
+.shape.half {
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+
+.shape.full {
+    background-color: currentColor;
+}
+
+.shape.black.quarter {
+    background: linear-gradient(90deg, #333 25%, transparent 25%);
+}
+
+.shape.black.half {
+    background: linear-gradient(90deg, #333 50%, transparent 50%);
+}
+
+.shape.black.full {
+    background-color: #333;
+}
+
+/* Sizes */
+.shape.small {
+    width: 40px;
+    height: 40px;
+}
+
+.shape.small.triangle {
+    border-left-width: 20px;
+    border-right-width: 20px;
+    border-bottom-width: 35px;
+}
+
+.shape.large {
+    width: 80px;
+    height: 80px;
+}
+
+.shape.large.triangle {
+    border-left-width: 40px;
+    border-right-width: 40px;
+    border-bottom-width: 70px;
+}
+
+/* Dots */
+.dots-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background-color: #333;
+    border-radius: 50%;
+}
+
+/* Options Styles */
+.options-section {
+    margin: 30px 0;
+}
+
+.options-section h4 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.option-item {
+    background: white;
+    border: 3px solid #e0e6ff;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.option-item:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.option-item.correct {
+    border-color: #4CAF50;
+    background: #e8f9ec;
+    animation: correctPulse 0.6s ease;
+}
+
+.option-item.wrong {
+    border-color: #f44336;
+    background: #ffeaea;
+    animation: wrongShake 0.6s ease;
+}
+
+@keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Feedback Styles */
+.feedback {
+    margin: 25px 0;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.feedback.success {
+    background: #e8f9ec;
+    border: 2px solid #4CAF50;
+    color: #2e7d2e;
+}
+
+.feedback.error {
+    background: #ffeaea;
+    border: 2px solid #f44336;
+    color: #c62828;
+}
+
+.feedback-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.feedback-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.rule-explanation {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+/* Controls */
+.controls {
+    margin-top: 25px;
+}
+
+#nextPuzzleBtn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#nextPuzzleBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     .header h1 {
         font-size: 2rem;
@@ -55,5 +504,67 @@ body {
     .main-content {
         padding: 20px;
         margin: 10px;
+    }
+
+    .difficulty-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .puzzle-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .sequence-display {
+        gap: 10px;
+    }
+
+    .shape {
+        width: 50px;
+        height: 50px;
+    }
+
+    .shape.triangle {
+        border-left-width: 25px;
+        border-right-width: 25px;
+        border-bottom-width: 43px;
+    }
+
+    .options-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .grid-cell {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .options-container {
+        grid-template-columns: 1fr;
+    }
+
+    .shape {
+        width: 45px;
+        height: 45px;
+    }
+
+    .shape.triangle {
+        border-left-width: 22px;
+        border-right-width: 22px;
+        border-bottom-width: 38px;
+    }
+
+    .grid-cell {
+        width: 50px;
+        height: 50px;
+    }
+
+    .grid-row {
+        gap: 8px;
     }
 }

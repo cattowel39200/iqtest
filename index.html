@@ -3,31 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Application</title>
+    <title>🧠 도형 IQ 테스트 - 자동 생성 퍼즐</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <!-- Header Section -->
         <header class="header">
-            <h1>🚀 New Application</h1>
-            <p>Ready to build something amazing</p>
+            <h1>🧠 도형 IQ 테스트</h1>
+            <p>AI가 자동 생성하는 무한 도형 퍼즐</p>
         </header>
 
-        <!-- Main Content Section -->
-        <main class="main-content">
-            <h2>Welcome to Your Clean Slate</h2>
-            <p>This is a fresh start - all previous IQ test data and functionality has been removed.</p>
-            <p>You can now build whatever you want from this clean foundation.</p>
+        <!-- Difficulty Selection -->
+        <div id="difficultySelection" class="main-content">
+            <h2>난이도를 선택하세요</h2>
+            <p>각 난이도별로 다른 알고리즘이 문제를 자동 생성합니다</p>
 
-            <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                <h3>Ready for Development</h3>
-                <p>Start building your new features here!</p>
+            <div class="difficulty-row">
+                <button class="diff-btn diff-easy" onclick="startQuiz('easy')">
+                    <div class="diff-icon">🟢</div>
+                    <div class="diff-title">초급</div>
+                    <div class="diff-desc">도형 개수/크기만 바뀌는 쉬운 문제</div>
+                    <div class="diff-time">예상 시간: 1-2분</div>
+                </button>
+
+                <button class="diff-btn diff-medium" onclick="startQuiz('medium')">
+                    <div class="diff-icon">🟡</div>
+                    <div class="diff-title">중급</div>
+                    <div class="diff-desc">두 가지 규칙(모양+점, 회전+색상)이 섞인 문제</div>
+                    <div class="diff-time">예상 시간: 2-3분</div>
+                </button>
+
+                <button class="diff-btn diff-hard" onclick="startQuiz('hard')">
+                    <div class="diff-icon">🔴</div>
+                    <div class="diff-title">고급</div>
+                    <div class="diff-desc">3×3 그리드, 합/차, 복합 규칙 문제</div>
+                    <div class="diff-time">예상 시간: 3-5분</div>
+                </button>
             </div>
-        </main>
+        </div>
+
+        <!-- Puzzle Interface -->
+        <div id="puzzleInterface" class="main-content" style="display: none;">
+            <div class="puzzle-header">
+                <div class="current-difficulty">
+                    <span id="currentDiffText">초급</span> 난이도
+                </div>
+                <button class="back-btn" onclick="backToSelection()">다른 난이도 선택</button>
+            </div>
+
+            <!-- Sequence Display Area -->
+            <div class="sequence-container">
+                <h3>다음 패턴을 보고 빈칸에 들어갈 도형을 선택하세요</h3>
+                <div id="sequenceDisplay" class="sequence-display">
+                    <!-- 도형 시퀀스가 여기에 표시됩니다 -->
+                </div>
+                <div class="sequence-arrow">↓</div>
+                <div class="missing-indicator">?</div>
+            </div>
+
+            <!-- Grid Display Area (for hard difficulty) -->
+            <div id="gridContainer" class="grid-container" style="display: none;">
+                <h3>그리드의 규칙을 찾아 빈칸을 채우세요</h3>
+                <div id="gridDisplay" class="grid-display">
+                    <!-- 3x3 그리드가 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="options-section">
+                <h4>정답을 선택하세요:</h4>
+                <div id="optionsContainer" class="options-container">
+                    <!-- 보기들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- Feedback -->
+            <div id="feedback" class="feedback"></div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button id="nextPuzzleBtn" onclick="generateNewPuzzle()" style="display: none;">
+                    새로운 문제 생성
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- Scripts -->
+    <script src="js/shape-generator.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

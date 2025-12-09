@@ -1,0 +1,507 @@
+ 도형 문제 자동 생성 규칙(알고리즘 설계)
+
+사이트용 난이도 선택 UI 설계 + 예시 코드
+
+1️⃣ 도형 문제 자동 생성 규칙 (알고리즘화)
+0. 기본 개념 설계
+
+먼저 “도형”을 코드에서 어떻게 표현할지 잡아야 합니다.
+
+type ShapeType = 'circle' | 'triangle' | 'square' | 'pentagon' | 'hexagon';
+type FillType  = 'empty' | 'half' | 'quarter' | 'full';
+type ColorType = 'black' | 'gray' | 'white';
+type SizeType  = 'small' | 'medium' | 'large';
+
+interface Shape {
+  type: ShapeType;
+  fill: FillType;
+  color: ColorType;
+  rotation: number;   // 0, 90, 180, 270
+  size: SizeType;
+  dots?: number;      // 안에 있는 점 개수 (옵션)
+}
+
+interface Puzzle {
+  difficulty: 'easy' | 'medium' | 'hard';
+  sequence: Shape[];      // 문제에 보여줄 도형들
+  options: Shape[];       // 보기들
+  correctIndex: number;   // 정답 인덱스
+  ruleDescription?: string; // (관리자용 설명)
+}
+
+
+이렇게 정리해두면,
+**“규칙 = 각 단계에서 어떻게 속성을 바꾸는 함수인가”**로 생각하면 됩니다.
+
+1. 초급 알고리즘 (단일 규칙)
+
+하나의 속성만 변화시키는 타입입니다.
+
+1-1. 개수 증가 수열 (● 개수)
+
+규칙: n번째 도형의 점 개수 = base + step * n
+
+예: base=1, step=1 → 1,2,3,4,5…
+
+function generateEasyCountPuzzle(): Puzzle {
+  const length = 4; // 보여줄 도형 개수
+  const base = 1;
+  const step = 1;
+
+  const sequence: Shape[] = [];
+  for (let i = 0; i < length; i++) {
+    sequence.push({
+      type: 'circle',
+      fill: 'empty',
+      color: 'black',
+      rotation: 0,
+      size: 'medium',
+      dots: base + step * i
+    });
+  }
+
+  const correctDots = base + step * length;
+
+  // 보기 생성 (정답 + 근처 값들)
+  const optionsDots = new Set<number>([correctDots]);
+  while (optionsDots.size < 4) {
+    const delta = Math.floor(Math.random() * 3) + 1; // 1~3
+    optionsDots.add(correctDots + (Math.random() < 0.5 ? delta : -delta));
+  }
+  const dotsArray = Array.from(optionsDots);
+  const correctIndex = dotsArray.indexOf(correctDots);
+
+  const options: Shape[] = dotsArray.map(d => ({
+    type: 'circle',
+    fill: 'empty',
+    color: 'black',
+    rotation: 0,
+    size: 'medium',
+    dots: d
+  }));
+
+  return {
+    difficulty: 'easy',
+    sequence,
+    options,
+    correctIndex,
+    ruleDescription: '점 개수가 1씩 증가하는 규칙'
+  };
+}
+
+1-2. 변 개수 수열 (원→삼→사→오→육각형)
+
+규칙: 도형 type 배열을 순환
+
+const polygonOrder: ShapeType[] = ['circle','triangle','square','pentagon','hexagon'];
+
+function nextPolygon(current: ShapeType): ShapeType {
+  const idx = polygonOrder.indexOf(current);
+  return polygonOrder[(idx + 1) % polygonOrder.length];
+}
+
+
+문제 생성: 시작 도형 랜덤, 4~5단계 수열 생성, 다음 도형을 보기에서 찾게.
+
+1-3. 채움 정도 순환 (빈→¼→½→전체→빈…)
+
+규칙: fillOrder 배열 순환
+
+const fillOrder: FillType[] = ['empty','quarter','half','full'];
+
+function nextFill(current: FillType): FillType {
+  const idx = fillOrder.indexOf(current);
+  return fillOrder[(idx + 1) % fillOrder.length];
+}
+
+2. 중급 알고리즘 (2개 속성 동시 변화)
+
+두 가지 속성을 동시에 규칙적으로 바꾸는 유형입니다.
+
+2-1. 모양 순환 + 점 개수 증가
+
+모양: circle → triangle → square → circle → …
+
+점: 1,2,3,4,5,6 … 증가
+
+const typeOrder: ShapeType[] = ['circle','triangle','square'];
+
+function generateMediumShapeDotsPuzzle(): Puzzle {
+  const length = 5;
+  const sequence: Shape[] = [];
+  let dots = 1;
+
+  for (let i=0; i<length; i++) {
+    sequence.push({
+      type: typeOrder[i % typeOrder.length],
+      fill: 'empty',
+      color: 'black',
+      rotation: 0,
+      size: 'medium',
+      dots
+    });
+    dots++;
+  }
+
+  const correctShape: Shape = {
+    type: typeOrder[length % typeOrder.length],
+    fill: 'empty',
+    color: 'black',
+    rotation: 0,
+    size: 'medium',
+    dots
+  };
+
+  // 보기 생성: 모양/점 숫자를 살짝 틀리게 섞어서 4개
+  const options: Shape[] = [];
+  const correctIndex = Math.floor(Math.random()*4);
+
+  for (let i=0; i<4; i++) {
+    if (i === correctIndex) {
+      options.push(correctShape);
+    } else {
+      options.push({
+        ...correctShape,
+        type: (Math.random() < 0.5 ? correctShape.type : typeOrder[(typeOrder.indexOf(correctShape.type)+1)%typeOrder.length]),
+        dots: correctShape.dots! + (Math.random()<0.5 ? -1 : 1)
+      });
+    }
+  }
+
+  return {
+    difficulty: 'medium',
+    sequence,
+    options,
+    correctIndex,
+    ruleDescription: '모양 순환 + 점 개수 1씩 증가'
+  };
+}
+
+2-2. 회전 + 색상 교대
+
+회전: 0 → 90 → 180 → 270 → 0 …
+
+색상: 검정 ↔ 흰색 교대
+
+규칙 함수만 있으면 응용 쉬움:
+
+function nextRotation(r: number): number {
+  return (r + 90) % 360;
+}
+
+function toggleColor(c: ColorType): ColorType {
+  return c === 'black' ? 'white' : 'black';
+}
+
+3. 고급 알고리즘 (그리드 + 합성 규칙)
+
+3×3 행열 + “행/열별 계산 규칙” 같은 멘사 느낌 문제.
+
+3-1. 3×3 그리드 – “세 번째 칸 = 앞 두 칸의 합”
+
+예:
+
+1행: 점 1, 2, 3
+
+2행: 점 2, 3, 5
+
+3행: 점 3, 4, ? → 정답 7
+
+interface GridPuzzle extends Puzzle {
+  grid: Shape[][]; // 3x3
+  missingCell: {row: number, col: number};
+}
+
+function generateHardGridSumPuzzle(): GridPuzzle {
+  const rows = 3;
+  const cols = 3;
+  const grid: Shape[][] = [];
+
+  // 임의 base 값 설정
+  const baseRow1Col1 = 1;
+  const baseDiff = 1;
+
+  for (let r=0; r<rows; r++) {
+    const row: Shape[] = [];
+    const a = baseRow1Col1 + r * baseDiff;
+    const b = a + 1;
+    const c = a + b; // 합
+
+    [a,b,c].forEach(dots => {
+      row.push({
+        type: 'circle',
+        fill: 'empty',
+        color: 'black',
+        rotation: 0,
+        size: 'medium',
+        dots
+      });
+    });
+    grid.push(row);
+  }
+
+  // 마지막 칸을 빈칸으로
+  const missingRow = 2, missingCol = 2;
+  const correctDots = grid[missingRow][missingCol].dots!;
+  grid[missingRow][missingCol].dots = undefined; // 화면상 빈칸 처리
+
+  // 보기
+  const optionsDots = new Set<number>([correctDots]);
+  while (optionsDots.size < 4) {
+    const delta = Math.floor(Math.random()*3)+1;
+    optionsDots.add(correctDots + (Math.random()<0.5 ? delta : -delta));
+  }
+  const dotsArr = Array.from(optionsDots);
+  const correctIndex = dotsArr.indexOf(correctDots);
+
+  const options: Shape[] = dotsArr.map(d => ({
+    type: 'circle',
+    fill: 'empty',
+    color: 'black',
+    rotation: 0,
+    size: 'medium',
+    dots: d
+  }));
+
+  return {
+    difficulty: 'hard',
+    sequence: [], // grid 기반이라 비워둬도 됨
+    options,
+    correctIndex,
+    ruleDescription: '각 행에서 3번째 칸 = 1번째 + 2번째',
+    grid,
+    missingCell: {row: missingRow, col: missingCol}
+  };
+}
+
+3-2. 도형 연산 규칙 (변 개수 합)
+
+규칙:
+
+삼각형(3) + 사각형(4) = 오각형(5)
+
+typeToSides(type) 정의 후,
+
+합 = sides(a) + sides(b) - something 같은 형태로도 확장 가능.
+
+4. 난이도별 자동 생성 전략 요약
+
+easy:
+
+단일 속성(개수, 크기, 회전, 채움, 색상)만 규칙
+
+시각적으로 바로 느껴지는 패턴 위주
+
+medium:
+
+2개의 속성을 동시에 바꿈 (모양 + 점, 회전 + 색상 등)
+
+한 번에 규칙이 안 보이지만, 조금만 생각하면 보이는 정도
+
+hard:
+
+2D 그리드(3×3 / 2×3)
+
+행/열 규칙, 합/차, 다단계 규칙(“위 + 왼쪽 = 현재”)
+
+도형 연산 개념(변 개수, 점 개수, 색/회전 섞임)
+
+2️⃣ 사이트용 난이도 선택 UI 설계
+
+이제 이 자동 생성 함수들을 UI에서 어떻게 고르게 할지입니다.
+
+1. UX 플로우
+
+메인 화면에서 난이도 선택:
+
+[초급] [중급] [고급] 버튼/카드
+
+난이도 선택하면:
+
+해당 난이도용 문제를 generateXXXPuzzle() 함수로 생성
+
+도형 렌더링:
+
+sequence / grid / options 을 Canvas, SVG, div+CSS로 그림
+
+유저가 보기 클릭 → 정답/오답 피드백 → 다음 문제 버튼
+
+2. 난이도 선택 UI 레이아웃(개념)
+--------------------------------------------------
+|   로고 / 사이트 이름                            |
+--------------------------------------------------
+|   오늘의 도형 IQ 테스트                         |
+|   난이도를 선택하세요                           |
+--------------------------------------------------
+|  [ 🟢 초급 ]  [ 🟡 중급 ]  [ 🔴 고급 ]           |
+|   (간단 설명 / 예상 시간 / 추천 대상)           |
+--------------------------------------------------
+|   선택 후 아래에 문제 영역 표시                 |
+--------------------------------------------------
+|   [도형 문제 화면]                              |
+--------------------------------------------------
+
+3. HTML/CSS/JS 예시 (간단 버전)
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>도형 IQ 테스트</title>
+<style>
+body { font-family: system-ui, sans-serif; background:#f5f7fb; margin:0; padding:20px; }
+.container { max-width:900px; margin:0 auto; }
+.difficulty-row { display:flex; gap:12px; margin-bottom:20px; }
+.diff-btn {
+  flex:1; padding:16px; border-radius:14px; border:none;
+  cursor:pointer; font-size:18px; font-weight:600;
+}
+.diff-easy { background:#e0ffe4; }
+.diff-medium { background:#fff9d6; }
+.diff-hard { background:#ffe0e0; }
+.card {
+  background:#fff; border-radius:16px; padding:24px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+.options { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+.option {
+  flex:1 1 100px; min-width:120px; padding:12px; border-radius:12px;
+  border:2px solid #dde1f0; text-align:center; cursor:pointer;
+}
+.option.correct { border-color:#4caf50; background:#e8f9ec; }
+.option.wrong { border-color:#f44336; background:#ffeaea; }
+#feedback { margin-top:10px; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>도형 IQ 테스트</h1>
+  <p>난이도를 선택하고 문제를 풀어보세요.</p>
+
+  <div class="difficulty-row">
+    <button class="diff-btn diff-easy" onclick="startQuiz('easy')">🟢 초급</button>
+    <button class="diff-btn diff-medium" onclick="startQuiz('medium')">🟡 중급</button>
+    <button class="diff-btn diff-hard" onclick="startQuiz('hard')">🔴 고급</button>
+  </div>
+
+  <div id="puzzle-card" class="card" style="display:none;">
+    <div id="puzzle-visual">[도형 표시 영역]</div>
+    <div class="options" id="options"></div>
+    <div id="feedback"></div>
+  </div>
+</div>
+
+<script>
+// 여기 generateEasy/Medium/HardPuzzle은 위에서 설계한 것들이 들어간다고 보면 됩니다.
+// 데모용으로 아주 단순한 문자열 기반 퍼즐을 넣겠습니다.
+
+function fakeGeneratePuzzle(level){
+  if(level === 'easy'){
+    return {
+      difficulty:'easy',
+      sequence: ['●','●●','●●●','●●●●'],
+      options: ['●●','●●●●●','●●●','●●●●●●'],
+      correctIndex:1
+    }
+  }
+  if(level === 'medium'){
+    return {
+      difficulty:'medium',
+      sequence: ['○(1)','▲(2)','■(3)','○(4)','▲(5)'],
+      options: ['■(5)','■(6)','○(6)','▲(6)'],
+      correctIndex:1
+    }
+  }
+  return {
+    difficulty:'hard',
+    sequence: ['1,2 -> 3','2,3 -> 5','3,4 -> ?'],
+    options: ['6','7','8','9'],
+    correctIndex:1
+  }
+}
+
+let currentPuzzle = null;
+
+function startQuiz(level){
+  currentPuzzle = fakeGeneratePuzzle(level); // 실제로는 generateEasyCountPuzzle() 등 호출
+  document.getElementById('puzzle-card').style.display = 'block';
+  renderPuzzle();
+}
+
+function renderPuzzle(){
+  const vis = document.getElementById('puzzle-visual');
+  const opts = document.getElementById('options');
+  const fb = document.getElementById('feedback');
+
+  fb.textContent = '';
+  // 간단히 sequence를 문자열로 그냥 보여주는 버전
+  vis.innerHTML = `<div>수열: ${currentPuzzle.sequence.join(' → ')} → ?</div>`;
+
+  opts.innerHTML = '';
+  currentPuzzle.options.forEach((opt, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt;
+    div.onclick = () => choose(idx, div);
+    opts.appendChild(div);
+  });
+}
+
+function choose(idx, div){
+  const fb = document.getElementById('feedback');
+  const optionDivs = document.querySelectorAll('.option');
+  optionDivs.forEach(o=>o.onclick=null); // 한 번만 선택 가능
+
+  if(idx === currentPuzzle.correctIndex){
+    div.classList.add('correct');
+    fb.textContent = '정답입니다! 🎉';
+  } else {
+    div.classList.add('wrong');
+    optionDivs[currentPuzzle.correctIndex].classList.add('correct');
+    fb.textContent = '아쉽어요! 정답이 표시되었습니다.';
+  }
+}
+</script>
+</body>
+</html>
+
+
+실제 서비스에서는 여기서
+fakeGeneratePuzzle() → 앞에서 만든 난이도별 생성 함수들로 교체하면 됩니다.
+
+4. 난이도 선택 UX 포인트
+
+초급 버튼에 설명
+
+“도형 개수/크기만 바뀌는 쉬운 문제”
+
+중급 버튼에 설명
+
+“두 가지 규칙(모양+점, 회전+색상)이 섞인 문제”
+
+고급 버튼에 설명
+
+“3×3 그리드, 합/차, 복합 규칙 문제”
+
+그리고:
+
+문제 풀고 나면 “이 난이도로 계속 풀기 / 다른 난이도 가기” CTA 버튼
+
+“고급 3개 이상 맞히면 상위 10%” 같은 카피 넣으면 몰입도↑
+
+정리하면
+
+알고리즘 쪽:
+
+도형을 데이터 구조로 정의하고
+
+“속성을 어떻게 한 단계씩 바꿀지”를 함수로 만들면
+
+초급–중급–고급 문제를 무한히 자동 생성 가능
+
+UI 쪽:
+
+난이도 선택 → 난이도별 생성 함수 호출
+
+문제 렌더 → 보기 클릭 → 피드백
+
+이 구조만 잡으면 나중에 문제 타입을 계속 추가해도 확장 쉬움
