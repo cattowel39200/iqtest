@@ -408,7 +408,18 @@ class StreamController {
                 shape.style.lineHeight = '1.2';
             }
 
+            // Add color styling
+            if (shapeData.color === 'gray') {
+                shape.style.opacity = '0.6';
+            } else if (shapeData.color === 'white') {
+                shape.style.backgroundColor = 'white';
+                shape.style.border = '2px solid #333';
+            }
+
             container.appendChild(shape);
+        } else if (shapeData.display) {
+            // Simple text display for demo problems
+            container.innerHTML = `<div style="font-size: 2rem; font-weight: bold;">${shapeData.display}</div>`;
         } else {
             // Fallback display
             container.innerHTML = '<div style="font-size: 2rem;">●</div>';
