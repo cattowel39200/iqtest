@@ -529,42 +529,6 @@
             .intro-section div[style*="grid-template-columns: 1fr 1fr"] {
                 grid-template-columns: 1fr !important;
             }
-
-            /* 모바일에서도 4개 랭킹을 한 줄에 표시 */
-            #mainDashboard div[style*="grid-template-columns: repeat(4, 1fr)"] {
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 8px !important;
-            }
-
-            /* 모바일에서 랭킹 카드 크기 조정 */
-            #mainDashboard .intro-section {
-                padding: 10px 8px !important;
-                font-size: 0.75rem !important;
-            }
-
-            #mainDashboard .intro-section h3 {
-                font-size: 0.8rem !important;
-                margin-bottom: 8px !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-
-            /* 작은 모바일에서도 4개 랭킹을 한 줄에 유지 */
-            #mainDashboard div[style*="grid-template-columns: repeat(4, 1fr)"] {
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 5px !important;
-            }
-
-            #mainDashboard .intro-section {
-                padding: 8px 5px !important;
-                font-size: 0.7rem !important;
-            }
-
-            #mainDashboard .intro-section h3 {
-                font-size: 0.75rem !important;
-                margin-bottom: 6px !important;
-            }
         }
 
         /* Ranking Page Styles */
@@ -636,5 +600,74 @@
             .ranking-tab {
                 padding: 10px 16px;
                 font-size: 0.9rem;
+            }
+        }
+
+        /* 랭킹 그리드 컨테이너 (4열 유지) */
+        .ranking-grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* 랭킹 카드 스타일 */
+        .ranking-card {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+
+            /* 모바일에서도 4열 유지 */
+            .ranking-grid-container {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 5px !important;
+            }
+
+            .ranking-card {
+                padding: 8px 2px !important;
+                border-radius: 8px;
+            }
+
+            .ranking-card h3 {
+                font-size: 0.7rem !important;
+                margin-bottom: 5px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .main-ranking-table {
+                font-size: 0.65rem !important;
+            }
+
+            .main-ranking-item {
+                padding: 4px 2px !important;
+            }
+
+            .main-rank-number {
+                width: 15px !important;
+                font-size: 0.7rem !important;
+            }
+
+            .main-rank-info {
+                margin-left: 4px !important;
+            }
+
+            .main-rank-nickname {
+                font-size: 0.7rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 40px;
+                /* 닉네임 길이 제한 */
+            }
+
+            .main-rank-score {
+                display: none;
+                /* 공간 부족 시 점수 숨김 또는 조정 */
             }
         }

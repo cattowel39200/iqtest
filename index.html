@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
     <!-- Firebase CDN -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -20,232 +21,231 @@
     <div class="container">
         <header>
             <h1>IQZone</h1>
-            <p>怨쇳븰??臾몄젣 ?ㅺ퀎 湲곕컲 醫낇빀 ?몄??λ젰 ?됯?</p>
+            <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
         </header>
 
-        <!-- ?ъ슜???곹깭 ?쒖떆 ?곸뿭 -->
-        <div id="userStatusSection" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1)); border-radius: 15px; padding: 20px; margin-bottom: 30px; text-align: center;">
-            <!-- 濡쒓렇?몃릺吏 ?딆? ?곹깭 -->
+        <!-- 사용자 상태 표시 영역 -->
+        <div id="userStatusSection"
+            style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1)); border-radius: 15px; padding: 20px; margin-bottom: 30px; text-align: center;">
+            <!-- 로그인되지 않은 상태 -->
             <div id="notLoggedInSection">
-                <h3 style="color: #333; margin-bottom: 15px;">?뱷 ?됰꽕?꾩쑝濡??뚯썝媛?낇븯湲?/h3>
-                <p style="color: #666; margin-bottom: 20px;">?됰꽕?꾧낵 ?섏씠瑜??낅젰?섍퀬 ?뚯썝媛???먮뒗 濡쒓렇?명븯?몄슂</p>
+                <h3 style="color: #333; margin-bottom: 15px;">닉네임으로 간편 회원가입/로그인</h3>
+                <p style="color: #666; margin-bottom: 20px;">닉네임과 나이를 입력하고 시작하세요</p>
                 <div style="display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                    <input type="text" id="loginNickname" placeholder="?됰꽕???낅젰" maxlength="20"
-                           style="padding: 10px 15px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; min-width: 150px;">
-                    <input type="number" id="loginAge" placeholder="?섏씠" min="8" max="120"
-                           style="padding: 10px 15px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; width: 80px;">
-                    <button onclick="attemptLogin()" style="background: #00d4ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">濡쒓렇??/button>
-                    <button onclick="attemptRegister()" style="background: #7b2cbf; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">?뚯썝媛??/button>
+                    <input type="text" id="loginNickname" placeholder="닉네임 입력" maxlength="20"
+                        style="padding: 10px 15px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; min-width: 150px;">
+                    <input type="number" id="loginAge" placeholder="나이" min="8" max="120"
+                        style="padding: 10px 15px; border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; width: 80px;">
+                    <button onclick="attemptLogin()"
+                        style="background: #00d4ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">로그인</button>
+                    <button onclick="attemptRegister()"
+                        style="background: #7b2cbf; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">회원가입</button>
                 </div>
-                <p style="color: #888; font-size: 0.85rem; margin-top: 15px;">?뮕 湲곗〈 ?됰꽕?꾩씠 ?덉쑝硫?濡쒓렇?? ?놁쑝硫??뚯썝媛?낇븯?몄슂</p>
+                <p style="color: #888; font-size: 0.85rem; margin-top: 15px;">* 기존 닉네임이 있으면 로그인, 없으면 회원가입하세요</p>
             </div>
 
-            <!-- 濡쒓렇?몃맂 ?곹깭 -->
+            <!-- 로그인된 상태 -->
             <div id="loggedInSection" style="display: none;">
-                <h3 style="color: #333; margin-bottom: 10px;">?몝 ?섏쁺?⑸땲??</h3>
+                <h3 style="color: #333; margin-bottom: 10px;">환영합니다!</h3>
                 <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.2rem;">?뤇截?/span>
+                        <span style="font-size: 1.2rem;">👤</span>
                         <strong id="currentUserNickname" style="color: #00d4ff;"></strong>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.2rem;">?뱤</span>
-                        <span>?뚯뒪?? <strong id="userTotalTests" style="color: #7b2cbf;">0</strong>??/span>
+                        <span style="font-size: 1.2rem;">📝</span>
+                        <span>테스트 <strong id="userTotalTests" style="color: #7b2cbf;">0</strong>회</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.2rem;">?쭬</span>
-                        <span>理쒓퀬 IQ: <strong id="userBestIQ" style="color: #22c55e;">-</strong></span>
+                        <span style="font-size: 1.2rem;">🧠</span>
+                        <span>최고 IQ: <strong id="userBestIQ" style="color: #22c55e;">-</strong></span>
                     </div>
-                    <button onclick="logout()" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">濡쒓렇?꾩썐</button>
+                    <button onclick="logout()"
+                        style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">로그아웃</button>
                 </div>
             </div>
         </div>
 
-        <!-- 4媛吏 ?좏삎蹂???궧 ?뚯씠釉?-->
+        <!-- 4가지 유형별 랭킹 테이블 (한 줄에 모두 표시) -->
         <div class="main-grid" id="mainDashboard" style="margin-bottom: 40px;">
-            <h2 style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                ?룇 ?좏삎蹂???궧 TOP 10
-                <button onclick="refreshAllTypeRankings()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">?봽</button>
+            <h2
+                style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                🏆 유형별 랭킹 TOP 10
+                <button onclick="refreshAllTypeRankings()"
+                    style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
             </h2>
 
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+            <div class="ranking-grid-container">
 
-                <!-- ?ъ??뚯뒪????궧 -->
-                <div class="intro-section" style="margin-bottom: 0;">
+                <!-- 쉬움테스트 랭킹 -->
+                <div class="intro-section ranking-card" style="margin-bottom: 0;">
                     <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="color: #22c55e; margin: 0; font-size: 0.95rem;">?윟 ?ъ??뚯뒪??/h3>
+                        <h3 style="color: #22c55e; margin: 0; font-size: 0.95rem;">🟢 쉬움</h3>
                         <div id="myEasyRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
                     </div>
                     <div id="mainEasyRanking" class="main-ranking-table">
-                        <!-- ?ъ??뚯뒪????궧???ш린???쒖떆??-->
+                        <!-- 쉬움테스트 랭킹이 여기에 표시됨 -->
                     </div>
                 </div>
 
-                <!-- 以묎컙?뚯뒪????궧 -->
-                <div class="intro-section" style="margin-bottom: 0;">
+                <!-- 중간테스트 랭킹 -->
+                <div class="intro-section ranking-card" style="margin-bottom: 0;">
                     <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="color: #f97316; margin: 0; font-size: 0.95rem;">?윞 以묎컙?뚯뒪??/h3>
+                        <h3 style="color: #f97316; margin: 0; font-size: 0.95rem;">🟡 중간</h3>
                         <div id="myMediumRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
                     </div>
                     <div id="mainMediumRanking" class="main-ranking-table">
-                        <!-- 以묎컙?뚯뒪????궧???ш린???쒖떆??-->
+                        <!-- 중간테스트 랭킹이 여기에 표시됨 -->
                     </div>
                 </div>
 
-                <!-- 怨좊궃?꾪뀒?ㅽ듃 ??궧 -->
-                <div class="intro-section" style="margin-bottom: 0;">
+                <!-- 고난도테스트 랭킹 -->
+                <div class="intro-section ranking-card" style="margin-bottom: 0;">
                     <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="color: #ef4444; margin: 0; font-size: 0.95rem;">?뵶 怨좊궃?꾪뀒?ㅽ듃</h3>
+                        <h3 style="color: #ef4444; margin: 0; font-size: 0.95rem;">🔴 고난도</h3>
                         <div id="myHardRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
                     </div>
                     <div id="mainHardRanking" class="main-ranking-table">
-                        <!-- 怨좊궃?꾪뀒?ㅽ듃 ??궧???ш린???쒖떆??-->
+                        <!-- 고난도테스트 랭킹이 여기에 표시됨 -->
                     </div>
                 </div>
 
-                <!-- 醫낇빀?뚯뒪????궧 (留덉?留?諛곗튂) -->
-                <div class="intro-section" style="margin-bottom: 0;">
+                <!-- 종합테스트 랭킹 (마지막 배치) -->
+                <div class="intro-section ranking-card" style="margin-bottom: 0;">
                     <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="color: #00d4ff; margin: 0; font-size: 0.95rem;">?쭬 醫낇빀?뚯뒪??/h3>
+                        <h3 style="color: #00d4ff; margin: 0; font-size: 0.95rem;">🧠 종합</h3>
                         <div id="myComprehensiveRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
                     </div>
                     <div id="mainComprehensiveRanking" class="main-ranking-table">
-                        <!-- 醫낇빀?뚯뒪????궧???ш린???쒖떆??-->
+                        <!-- 종합테스트 랭킹이 여기에 표시됨 -->
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- ?쒖옉 ?붾㈃ -->
+        <!-- 시작 화면 -->
         <div class="intro-section" id="intro">
-            <h2>IQ ?뚯뒪???쒖옉</h2>
-            <p>?ㅼ뼇???쒖씠?꾩쓽 IQ ?뚯뒪?몃? ?좏깮?섏뿬 ?몄??λ젰???됯??대낫?몄슂. 媛??뚯뒪?몃쭏??蹂꾨룄????궧???덉뒿?덈떎.</p>
+            <h2>IQ 테스트 시작</h2>
+            <p>다양한 난이도의 IQ 테스트를 선택하여 인지능력을 평가해보세요. 선택 즉시 테스트가 시작됩니다.</p>
 
-            <!-- 濡쒓렇?몃맂 ?ъ슜???뺣낫 ?쒖떆 -->
-            <div id="loggedInUserInfo" style="background: rgba(0, 212, 255, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(0, 212, 255, 0.2); display: none;">
-                <h4 style="color: #00d4ff; margin-bottom: 15px;">???ъ슜???뺣낫</h4>
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                    <div style="display: flex; gap: 20px;">
-                        <span><strong>?됰꽕??</strong> <span id="testUserNickname" style="color: #00d4ff;"></span></span>
-                        <span><strong>?섏씠:</strong> <span id="testUserAge" style="color: #7b2cbf;"></span>??/span>
-                    </div>
-                    <span style="color: #22c55e; font-size: 0.9rem;">?렞 ?뚯뒪??寃곌낵媛 媛쒖씤 湲곕줉????λ맗?덈떎</span>
-                </div>
-            </div>
-
-
-            <!-- ?뚯뒪???좏삎 ?좏깮 -->
-            <div style="background: rgba(123, 44, 191, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(123, 44, 191, 0.2);">
-                <h4 style="color: #7b2cbf; margin-bottom: 20px;">?렞 ?뚯뒪???좏삎 ?좏깮</h4>
+            <!-- 테스트 유형 선택 (종합테스트 마지막 배치) -->
+            <div
+                style="background: rgba(123, 44, 191, 0.05); border-radius: 15px; padding: 25px; margin: 25px 0; border: 1px solid rgba(123, 44, 191, 0.2);">
+                <h4 style="color: #7b2cbf; margin-bottom: 20px;">🎯 테스트 유형 선택 (클릭 시 바로 시작)</h4>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-                    <!-- 醫낇빀?뚯뒪??-->
-                    <div class="test-type-card selected" onclick="selectTestType('comprehensive')" style="border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                    <!-- 쉬움테스트 -->
+                    <div class="test-type-card" onclick="selectTestType('easy')"
+                        style="border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 1.5rem;">?쭬</span>
-                            <h5 style="color: #00d4ff; margin: 0;">醫낇빀?뚯뒪??/h5>
+                            <span style="font-size: 1.5rem;">🟢</span>
+                            <h5 style="color: #22c55e; margin: 0;">쉬움테스트</h5>
                         </div>
-                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">25臾명빆 ????25遺?/p>
-                        <p style="font-size: 0.85rem; color: #777;">CHC ?대줎 湲곕컲 5媛??몄? ?곸뿭 醫낇빀 ?됯?</p>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">10문항 • 약 10분</p>
+                        <p style="font-size: 0.85rem; color: #777;">기본적인 논리와 패턴 인식 문제</p>
                     </div>
 
-                    <!-- ?ъ??뚯뒪??-->
-                    <div class="test-type-card" onclick="selectTestType('easy')" style="border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                    <!-- 중간테스트 -->
+                    <div class="test-type-card" onclick="selectTestType('medium')"
+                        style="border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 1.5rem;">?윟</span>
-                            <h5 style="color: #22c55e; margin: 0;">?ъ??뚯뒪??/h5>
+                            <span style="font-size: 1.5rem;">🟡</span>
+                            <h5 style="color: #f97316; margin: 0;">중간테스트</h5>
                         </div>
-                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">10臾명빆 ????10遺?/p>
-                        <p style="font-size: 0.85rem; color: #777;">湲곕낯?곸씤 ?쇰━? ?⑦꽩 ?몄떇 臾몄젣</p>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">16문항 • 약 20분</p>
+                        <p style="font-size: 0.85rem; color: #777;">중급 수준의 추론과 패턴 분석</p>
                     </div>
 
-                    <!-- 以묎컙?뚯뒪??-->
-                    <div class="test-type-card" onclick="selectTestType('medium')" style="border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                    <!-- 고난도테스트 -->
+                    <div class="test-type-card" onclick="selectTestType('hard')"
+                        style="border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 1.5rem;">?윞</span>
-                            <h5 style="color: #f97316; margin: 0;">以묎컙?뚯뒪??/h5>
+                            <span style="font-size: 1.5rem;">🔴</span>
+                            <h5 style="color: #ef4444; margin: 0;">고난도테스트</h5>
                         </div>
-                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">16臾명빆 ????20遺?/p>
-                        <p style="font-size: 0.85rem; color: #777;">以묎툒 ?섏???異붾줎怨??⑦꽩 遺꾩꽍</p>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">24문항 • 약 40분</p>
+                        <p style="font-size: 0.85rem; color: #777;">고급 논리추론과 복합 패턴 분석</p>
                     </div>
 
-                    <!-- 怨좊궃?꾪뀒?ㅽ듃 -->
-                    <div class="test-type-card" onclick="selectTestType('hard')" style="border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
+                    <!-- 종합테스트 (마지막 배치) -->
+                    <div class="test-type-card selected" onclick="selectTestType('comprehensive')"
+                        style="border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s ease;">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 1.5rem;">?뵶</span>
-                            <h5 style="color: #ef4444; margin: 0;">怨좊궃?꾪뀒?ㅽ듃</h5>
+                            <span style="font-size: 1.5rem;">🧠</span>
+                            <h5 style="color: #00d4ff; margin: 0;">종합테스트</h5>
                         </div>
-                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">24臾명빆 ????40遺?/p>
-                        <p style="font-size: 0.85rem; color: #777;">怨좉툒 ?쇰━異붾줎怨?蹂듯빀 ?⑦꽩 遺꾩꽍</p>
+                        <p style="font-size: 0.9rem; color: #666; margin: 8px 0;">25문항 • 약 25분</p>
+                        <p style="font-size: 0.85rem; color: #777;">CHC 이론 기반 5개 인지 영역 종합 평가</p>
                     </div>
-                </div>
-
-                <div style="text-align: center; margin-top: 20px;">
-                    <p style="color: #666; font-size: 0.85rem;">
-                        ?좏깮???뚯뒪?? <span id="selectedTestType" style="color: #7b2cbf; font-weight: bold;">醫낇빀?뚯뒪??/span>
-                    </p>
                 </div>
             </div>
 
         </div>
 
-        <!-- ?됯? 諛⑹떇 ?ㅻ챸 ?뱀뀡 -->
+        <!-- 평가 방식 설명 섹션 -->
         <div class="intro-section" id="evaluationSection" style="margin-top: 20px;">
-            <h2>?뵮 ?됯? 諛⑹떇</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+            <h2>📊 평가 방식</h2>
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
 
-                <div style="background: rgba(16, 185, 129, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <div
+                    style="background: rgba(16, 185, 129, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(16, 185, 129, 0.2);">
                     <h4 style="color: #059669; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        ?뱤 ?ㅼ감??遺꾩꽍
+                        🧠 다차원 분석
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        CHC ?대줎 湲곕컲 5媛??곸뿭: ?좎?媛?異붾줎 諛??좊룞??吏???≪닔由??쇰━ 諛??⑦꽩 ?몄떇 ??떆怨듦컙 泥섎━ ?λ젰 ?ｌ뼵??諛??쇰━ 異붾줎 ?ㅼ뼵???좎텛瑜?醫낇빀 ?됯??⑸땲??
+                        CHC 이론 기반 5개 영역: 유동성 추론, 결정성 지식, 수리 논리, 패턴 인식, 시공간 처리 능력을 종합 평가합니다.
                     </p>
                 </div>
 
-                <div style="background: rgba(245, 158, 11, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                <div
+                    style="background: rgba(245, 158, 11, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(245, 158, 11, 0.2);">
                     <h4 style="color: #d97706; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        ?㎜ IRT 湲곕컲 ?됯?
+                        📈 IRT 기반 평가
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        臾명빆諛섏쓳?대줎(IRT) 3紐⑥닔 濡쒖??ㅽ떛 紐⑦삎怨?理쒖슦?꾩텛??MLE)???쒖슜?섏뿬 怨쇳븰?곸쑝濡??λ젰??痢≪젙?⑸땲??
+                        문항반응이론(IRT) 3모수 로지스틱 모형과 최우추정법(MLE)을 사용하여 과학적으로 능력을 측정합니다.
                     </p>
                 </div>
 
-                <div style="background: rgba(139, 92, 246, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                <div
+                    style="background: rgba(139, 92, 246, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
                     <h4 style="color: #8b5cf6; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        ?뫁 ?섏씠蹂?蹂댁젙
+                        👶 나이별 보정
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        WAIS-IV/WISC-V ?쒖? 洹쒖?怨?Flynn Effect 蹂댁젙(-0.3???????곸슜?섏뿬 怨쇳븰?곸쑝濡??섏씠瑜?蹂댁젙?⑸땲??
+                        WAIS-IV/WISC-V 국제 규준과 Flynn Effect 보정(-0.3점/년)을 적용하여 과학적으로 나이를 보정합니다.
                     </p>
                 </div>
 
-                <div style="background: rgba(239, 68, 68, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                <div
+                    style="background: rgba(239, 68, 68, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(239, 68, 68, 0.2);">
                     <h4 style="color: #dc2626; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        ?뱢 ?쒖???泥숇룄
+                        📏 국제 척도
                     </h4>
                     <p style="color: #555555; font-size: 0.9rem; line-height: 1.5;">
-                        援?젣 ?쒖? IQ 泥숇룄(?됯퇏 100, ?쒖??몄감 15)瑜?湲곕컲?쇰줈 ?먯닔瑜??곗텧?⑸땲??
+                        국제 표준 IQ 척도(평균 100, 표준편차 15)를 기반으로 점수를 산출합니다.
                     </p>
                 </div>
 
             </div>
 
-            <div style="background: rgba(0, 212, 255, 0.03); border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid rgba(0, 212, 255, 0.15);">
-                <h4 style="color: #00d4ff; margin-bottom: 12px;">?뱥 ?됯? 湲곗?</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 0.85rem;">
-                    <div><span style="color: #059669;">??130+ 留ㅼ슦 ?곗닔</span> (?곸쐞 2%)</div>
-                    <div><span style="color: #d97706;">??120-129 ?곗닔</span> (?곸쐞 10%)</div>
-                    <div><span style="color: #8b5cf6;">??110-119 ?됯퇏??/span> (?곸쐞 25%)</div>
-                    <div><span style="color: #6b7280;">??90-109 ?됯퇏</span> (50%)</div>
+            <div
+                style="background: rgba(0, 212, 255, 0.03); border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid rgba(0, 212, 255, 0.15);">
+                <h4 style="color: #00d4ff; margin-bottom: 12px;">📊 평가 기준</h4>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 0.85rem;">
+                    <div><span style="color: #059669;">● 130+ 매우 우수</span> (상위 2%)</div>
+                    <div><span style="color: #d97706;">● 120-129 우수</span> (상위 10%)</div>
+                    <div><span style="color: #8b5cf6;">● 110-119 평균 상</span> (상위 25%)</div>
+                    <div><span style="color: #6b7280;">● 90-109 평균</span> (50%)</div>
                 </div>
             </div>
         </div>
 
 
-        <!-- ?뚯뒪???붾㈃ -->
+        <!-- 테스트 화면 -->
         <div class="test-section" id="test">
             <div class="progress-bar">
                 <div class="progress-fill" id="progress"></div>
@@ -253,128 +253,136 @@
 
             <div class="question-card">
                 <div class="question-header">
-                    <span class="question-number" id="questionNum">臾몄젣 1/25</span>
+                    <span class="question-number" id="questionNum">문제 1/25</span>
                     <div>
-                        <span class="category-badge" id="categoryBadge">?⑦꽩 ?몄떇</span>
-                        <span class="difficulty-badge" id="difficultyBadge">?ъ?</span>
+                        <span class="category-badge" id="categoryBadge">패턴 인식</span>
+                        <span class="difficulty-badge" id="difficultyBadge">쉬움</span>
                     </div>
-                    <span class="timer" id="timer">60珥?/span>
+                    <span class="timer" id="timer">60초</span>
                 </div>
 
                 <div id="questionContent">
-                    <!-- 臾몄젣 ?댁슜???숈쟻?쇰줈 ?쎌엯??-->
+                    <!-- 문제 내용이 동적으로 삽입됨 -->
                 </div>
 
                 <div class="options-grid" id="optionsGrid">
-                    <!-- ?좏깮吏媛 ?숈쟻?쇰줈 ?쎌엯??-->
+                    <!-- 선택지가 동적으로 삽입됨 -->
                 </div>
 
                 <div class="nav-buttons">
-                    <button class="btn btn-secondary" onclick="skipQuestion()">嫄대꼫?곌린</button>
-                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>?ㅼ쓬 臾몄젣</button>
+                    <button class="btn btn-secondary" onclick="skipQuestion()">건너뛰기</button>
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>다음 문제</button>
                 </div>
             </div>
         </div>
 
-        <!-- 寃곌낵 ?붾㈃ -->
+        <!-- 결과 화면 -->
         <div class="results-section" id="results">
-            <h2>?뚯뒪???꾨즺!</h2>
+            <h2>테스트 완료!</h2>
 
             <div class="score-circle">
                 <span class="score-number" id="iqScore">--</span>
-                <span class="score-label">IQ ?먯닔</span>
+                <span class="score-label">IQ 점수</span>
             </div>
 
             <div class="iq-classification" id="iqClass">
-                <h3 id="classLabel">遺꾨쪟</h3>
-                <p id="classDesc">?ㅻ챸</p>
-                <p class="percentile-info" id="percentile">?곸쐞 %</p>
+                <h3 id="classLabel">분류</h3>
+                <p id="classDesc">설명</p>
+                <p class="percentile-info" id="percentile">상위 %</p>
+                <p id="measurementInfo" style="font-size: 0.8rem; color: #888; margin-top: 5px;"></p>
             </div>
 
-            <!-- ?곸뿭蹂?遺꾩꽍? JavaScript?먯꽌 ?숈쟻?쇰줈 ?앹꽦??-->
+            <!-- 영역별 분석은 JavaScript에서 동적으로 생성됨 -->
             <div id="categoryAnalysis" style="display: none;"></div>
 
-            <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn" onclick="location.reload()">?ㅼ떆 ?뚯뒪?명븯湲?/button>
-                <button class="btn" onclick="showRankingPage()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">??궧 蹂닿린</button>
+            <div
+                style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn" onclick="location.reload()">다시 테스트하기</button>
+                <button class="btn" onclick="showRankingPage()"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">랭킹 보기</button>
             </div>
         </div>
 
-        <!-- ??궧 ?섏씠吏 -->
+        <!-- 랭킹 페이지 -->
         <div class="ranking-page" id="rankingPage" style="display: none;">
-            <h2>?룇 IQ ??궧</h2>
+            <h2>🏆 IQ 랭킹</h2>
 
-            <!-- ??궧 ??硫붾돱 -->
+            <!-- 랭킹 탭 메뉴 -->
             <div style="display: flex; justify-content: center; margin-bottom: 30px; gap: 10px; flex-wrap: wrap;">
-                <button id="comprehensiveTab" class="ranking-tab active" onclick="showTestRanking('comprehensive')">?쭬 醫낇빀?뚯뒪??/button>
-                <button id="easyTab" class="ranking-tab" onclick="showTestRanking('easy')">?윟 ?ъ?</button>
-                <button id="mediumTab" class="ranking-tab" onclick="showTestRanking('medium')">?윞 以묎컙</button>
-                <button id="hardTab" class="ranking-tab" onclick="showTestRanking('hard')">?뵶 怨좊궃??/button>
+                <button id="comprehensiveTab" class="ranking-tab active" onclick="showTestRanking('comprehensive')">🧠
+                    종합테스트</button>
+                <button id="easyTab" class="ranking-tab" onclick="showTestRanking('easy')">🟢 쉬움</button>
+                <button id="mediumTab" class="ranking-tab" onclick="showTestRanking('medium')">🟡 중간</button>
+                <button id="hardTab" class="ranking-tab" onclick="showTestRanking('hard')">🔴 고난도</button>
             </div>
 
-            <!-- 醫낇빀?뚯뒪????궧 ?뱀뀡 -->
+            <!-- 종합테스트 랭킹 섹션 -->
             <div id="comprehensiveRanking" class="ranking-section">
                 <div class="ranking-header">
                     <h3 style="color: #00d4ff; margin: 0; text-align: center; margin-bottom: 20px;">
-                        ?쭬 醫낇빀?뚯뒪????궧 TOP 10
+                        🧠 종합테스트 랭킹 TOP 10
                     </h3>
                     <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
-                        25臾명빆 ???뺥솗??+ ?쒓컙 湲곕컲 ?먯닔
+                        25문항 • 정확도 + 시간 기반 점수
                     </p>
                 </div>
                 <div id="comprehensiveRankingList" class="ranking-list"></div>
                 <div id="myComprehensiveRank" class="my-rank-section"></div>
             </div>
 
-            <!-- ?ъ??뚯뒪????궧 ?뱀뀡 -->
+            <!-- 쉬움테스트 랭킹 섹션 -->
             <div id="easyRanking" class="ranking-section" style="display: none;">
                 <div class="ranking-header">
                     <h3 style="color: #22c55e; margin: 0; text-align: center; margin-bottom: 20px;">
-                        ?윟 ?ъ??뚯뒪????궧 TOP 10
+                        🟢 쉬움테스트 랭킹 TOP 10
                     </h3>
                     <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
-                        10臾명빆 ???뺥솗??+ ?쒓컙 湲곕컲 ?먯닔
+                        10문항 • 정확도 + 시간 기반 점수
                     </p>
                 </div>
                 <div id="easyRankingList" class="ranking-list"></div>
                 <div id="myEasyRank" class="my-rank-section"></div>
             </div>
 
-            <!-- 以묎컙?뚯뒪????궧 ?뱀뀡 -->
+            <!-- 중간테스트 랭킹 섹션 -->
             <div id="mediumRanking" class="ranking-section" style="display: none;">
                 <div class="ranking-header">
                     <h3 style="color: #f97316; margin: 0; text-align: center; margin-bottom: 20px;">
-                        ?윞 以묎컙?뚯뒪????궧 TOP 10
+                        🟡 중간테스트 랭킹 TOP 10
                     </h3>
                     <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
-                        16臾명빆 ???뺥솗??+ ?쒓컙 湲곕컲 ?먯닔
+                        16문항 • 정확도 + 시간 기반 점수
                     </p>
                 </div>
                 <div id="mediumRankingList" class="ranking-list"></div>
                 <div id="myMediumRank" class="my-rank-section"></div>
             </div>
 
-            <!-- 怨좊궃?꾪뀒?ㅽ듃 ??궧 ?뱀뀡 -->
+            <!-- 고난도테스트 랭킹 섹션 -->
             <div id="hardRanking" class="ranking-section" style="display: none;">
                 <div class="ranking-header">
                     <h3 style="color: #ef4444; margin: 0; text-align: center; margin-bottom: 20px;">
-                        ?뵶 怨좊궃?꾪뀒?ㅽ듃 ??궧 TOP 10
+                        🔴 고난도테스트 랭킹 TOP 10
                     </h3>
                     <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px;">
-                        24臾명빆 ???뺥솗??+ ?쒓컙 湲곕컲 ?먯닔
+                        24문항 • 정확도 + 시간 기반 점수
                     </p>
                 </div>
                 <div id="hardRankingList" class="ranking-list"></div>
                 <div id="myHardRank" class="my-rank-section"></div>
             </div>
 
-            <!-- ?ㅻ줈 媛湲?踰꾪듉 -->
+            <!-- 메인으로 가기 버튼 -->
             <div style="text-align: center; margin-top: 40px;">
-                <button class="btn" onclick="goBackToMain()" style="background: #6c757d; color: white;">?룧 硫붿씤?쇰줈 ?뚯븘媛湲?/button>
+                <button class="btn" onclick="goBackToMain()" style="background: #6c757d; color: white;">🏠 메인으로
+                    돌아가기</button>
             </div>
         </div>
     </div>
 
-<script src="new_questions.js"></script>
-<script src="new_test_types.js"></script>
-<script src="js/app.js"></script>
+    <script src="new_questions.js"></script>
+    <script src="new_test_types.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
