@@ -106,39 +106,66 @@ async function syncRankingsData() {
         return;
     }
 
-    console.log("Starting rankings data synchronization...");
+    console.log("Starting comprehensive rankings data synchronization...");
 
     try {
-        const cloudData = await loadRankingsFromCloud();
+        // 모든 테스트 타입별로 동기화
+        const testTypes = [
+            { key: 'iqTestRankings', name: '종합' },
+            { key: 'iqTest_easy_Rankings', name: '쉬움' },
+            { key: 'iqTest_medium_Rankings', name: '보통' },
+            { key: 'iqTest_hard_Rankings', name: '어려움' }
+        ];
 
-        if (cloudData && cloudData.allTime && cloudData.allTime.length > 0) {
-            console.log(`Found ${cloudData.allTime.length} rankings in cloud`);
-            localStorage.setItem('iqTestRankings', JSON.stringify(cloudData.allTime));
-            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(cloudData.weekly || {}));
-            console.log("Rankings synced from cloud to local storage");
-            refreshRanking();
-            refreshWeeklyRanking();
-        } else {
-            console.log("No cloud data found, checking local data...");
-            const localAllTime = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
-            const localWeekly = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+        for (const testType of testTypes) {
+            try {
+                console.log(`Syncing ${testType.name} test rankings...`);
 
-            if (localAllTime.length > 0) {
-                console.log(`Uploading ${localAllTime.length} local rankings to cloud`);
-                await saveRankingsToCloud(localAllTime, localWeekly);
-                console.log("Local rankings uploaded to cloud successfully");
-            } else {
-                console.log("No local rankings to upload");
+                // 클라우드 데이터 확인
+                const snapshot = await db.collection('rankings').doc(testType.key).get();
+
+                if (snapshot.exists) {
+                    const cloudData = snapshot.data();
+                    if (cloudData.rankings && cloudData.rankings.length > 0) {
+                        console.log(`Found ${cloudData.rankings.length} ${testType.name} rankings in cloud`);
+                        localStorage.setItem(testType.key, JSON.stringify(cloudData.rankings));
+                    }
+                } else {
+                    // 클라우드에 데이터가 없으면 로컬 데이터를 업로드
+                    const localData = JSON.parse(localStorage.getItem(testType.key) || '[]');
+                    if (localData.length > 0) {
+                        console.log(`Uploading ${localData.length} local ${testType.name} rankings to cloud`);
+                        await db.collection('rankings').doc(testType.key).set({
+                            rankings: localData,
+                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                }
+            } catch (error) {
+                console.warn(`Failed to sync ${testType.name} rankings:`, error);
             }
         }
 
+        // 주간 랭킹 동기화 (기존 로직 유지)
+        const weeklySnapshot = await db.collection('rankings').doc('weekly').get();
+        if (weeklySnapshot.exists) {
+            const weeklyData = weeklySnapshot.data();
+            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(weeklyData.weekly || {}));
+        }
+
+        // 사용자 데이터 동기화
         if (UserManager && typeof UserManager.syncUserData === 'function') {
             await UserManager.syncUserData();
             console.log("User data sync completed");
         }
 
+        // 모든 랭킹 표시 새로고침
+        refreshRanking();
+        refreshAllTypeRankings();
+        console.log("All rankings synchronized successfully");
+
     } catch (error) {
-        console.error("Error during ranking sync:", error);
+        console.error("Error during comprehensive ranking sync:", error);
         console.error("Sync error details:", {
             name: error.name,
             message: error.message,
@@ -993,7 +1020,7 @@ function getIQClassification(iq) {
     return { label: '인지기능 저하 의심', desc: '하위 2.1% 범위로 전문가 평가를 권장합니다.', percentile: 2.1 };
 }
 
-function showResults() {
+async function showResults() {
     document.getElementById('test').style.display = 'none';
     document.getElementById('results').style.display = 'block';
 
@@ -1071,7 +1098,7 @@ function showResults() {
         if (selectedTestType === 'comprehensive') {
             saveToRankingWithSync(UserManager.currentUser.nickname, results.iq, classification.label, UserManager.currentUser.age);
         } else {
-            saveToTypeRanking(UserManager.currentUser.nickname, results.iq, classification.label, UserManager.currentUser.age, selectedTestType, results);
+            await saveToTypeRanking(UserManager.currentUser.nickname, results.iq, classification.label, UserManager.currentUser.age, selectedTestType, results);
         }
     }
 
@@ -1109,7 +1136,7 @@ function saveToRankingWithSync(nickname, iq, classification, age) {
     saveRankingsToCloud(rankings, weeklyRankings);
 }
 
-function saveToTypeRanking(nickname, iq, classification, age, type, results) {
+async function saveToTypeRanking(nickname, iq, classification, age, type, results) {
     const key = `iqTest_${type}_Rankings`;
     let rankings = JSON.parse(localStorage.getItem(key) || '[]');
     const newEntry = { nickname, iq, classification, age, date: new Date().toISOString(), type, score: results.score };
@@ -1122,6 +1149,19 @@ function saveToTypeRanking(nickname, iq, classification, age, type, results) {
     }
     rankings.sort((a, b) => b.iq - a.iq);
     localStorage.setItem(key, JSON.stringify(rankings));
+
+    // 클라우드에도 저장
+    if (isFirebaseEnabled && db) {
+        try {
+            await db.collection('rankings').doc(key).set({
+                rankings: rankings,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log(`${type} test ranking saved to cloud`);
+        } catch (error) {
+            console.warn(`Failed to save ${type} ranking to cloud:`, error);
+        }
+    }
 }
 
 function refreshRanking() {
@@ -1479,6 +1519,9 @@ window.onload = function () {
     // 커뮤니티 활성화를 위한 샘플 데이터 생성
     generateSampleRankings();
 
-    refreshRanking();
-    refreshAllTypeRankings();
+    // Firebase 동기화 완료 후 랭킹 표시
+    setTimeout(() => {
+        refreshRanking();
+        refreshAllTypeRankings();
+    }, 2000); // Firebase 초기화 대기
 };
