@@ -72,33 +72,44 @@
             }
 
             header {
-                padding: 25px 15px !important;
+                padding: 35px 15px !important;
             }
 
             header h1 {
-                font-size: 1.8rem !important;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.4) !important;
+                font-size: 2.2rem !important;
+                text-shadow: 3px 3px 6px rgba(0,0,0,0.6) !important;
+                letter-spacing: 1px !important;
+            }
+
+            header div:first-of-type {
+                margin-bottom: 15px !important;
+            }
+
+            header div[style*="background: linear-gradient(90deg"] {
+                font-size: 1rem !important;
             }
 
             header p {
-                font-size: 0.9rem !important;
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.4) !important;
+                font-size: 0.85rem !important;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.5) !important;
             }
 
             /* 스마트폰 무료 회원가입 안내 최적화 */
             header div[style*="backdrop-filter"] {
-                margin: 10px auto 0 auto !important;
-                padding: 10px 15px !important;
-                max-width: 90% !important;
-                border-radius: 20px !important;
+                margin: 15px auto 0 auto !important;
+                padding: 12px 20px !important;
+                max-width: 95% !important;
+                border-radius: 15px !important;
             }
 
             header div[style*="backdrop-filter"] p:first-child {
-                font-size: 0.9rem !important;
+                font-size: 0.95rem !important;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.6) !important;
             }
 
             header div[style*="backdrop-filter"] p:last-child {
-                font-size: 0.75rem !important;
+                font-size: 0.8rem !important;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.6) !important;
             }
 
             .test-type-card {
@@ -210,12 +221,22 @@
             }
 
             header h1 {
-                font-size: 2.2rem !important;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+                font-size: 2.6rem !important;
+                text-shadow: 3px 3px 6px rgba(0,0,0,0.5) !important;
+                letter-spacing: 1.5px !important;
+            }
+
+            header div[style*="background: linear-gradient(90deg"] {
+                font-size: 1.2rem !important;
             }
 
             header p {
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.4) !important;
+            }
+
+            header div[style*="backdrop-filter"] p:first-child {
+                font-size: 1rem !important;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important;
             }
 
             /* 태블릿 테스트 화면 최적화 */
@@ -331,18 +352,30 @@
     </div>
 
     <!-- 메인 헤더 베너 -->
-    <header style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px; position: relative;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-            <h1 style="margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🧠 IQZone</h1>
-            <p style="margin: 0; font-size: 1.2rem; font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">과학적 IQ 측정과 인지능력 평가</p>
-            <p style="margin: 10px 0 15px 0; font-size: 1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">CHC 이론 기반 다차원 지능 분석 시스템</p>
+    <header style="text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3b82f6 100%); color: white; margin-bottom: 30px; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+        <!-- 배경 패턴 오버레이 -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
 
-            <!-- 무료 회원가입 안내 -->
-            <div style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 12px 25px; margin: 15px auto 0 auto; max-width: 400px; backdrop-filter: blur(10px);">
-                <p style="margin: 0; font-size: 1rem; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); color: #ffffff;">
-                    ✨ 닉네임만으로 <span style="color: #FFD700; font-weight: 700;">무료 회원가입</span> 가능!
+        <div style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 1;">
+            <!-- 메인 로고와 타이틀 -->
+            <div style="margin-bottom: 20px;">
+                <h1 style="margin: 0 0 15px 0; font-size: 3rem; font-weight: 800; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); color: #ffffff; letter-spacing: 2px;">
+                    🧠 IQZone
+                </h1>
+                <div style="background: linear-gradient(90deg, #ffffff, #e0e7ff, #ffffff); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.3rem; font-weight: 600; text-shadow: none; margin-bottom: 8px;">
+                    과학적 IQ 측정과 인지능력 평가
+                </div>
+                <p style="margin: 0; font-size: 1rem; color: #e0e7ff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.4);">
+                    CHC 이론 기반 다차원 지능 분석 시스템
                 </p>
-                <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.9; text-shadow: 1px 1px 2px rgba(0,0,0,0.4);">
+            </div>
+
+            <!-- 무료 회원가입 안내 카드 -->
+            <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15)); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 20px; padding: 16px 30px; margin: 25px auto 0 auto; max-width: 450px; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.2);">
+                <p style="margin: 0; font-size: 1.1rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); color: #ffffff;">
+                    ✨ 닉네임만으로 <span style="color: #FFD700; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">무료 회원가입</span> 가능!
+                </p>
+                <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: #f1f5f9; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
                     간편 가입으로 개인 기록 관리 및 랭킹 참여
                 </p>
             </div>
