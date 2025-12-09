@@ -41,6 +41,20 @@ body {
     opacity: 0.9;
 }
 
+/* Site title link styling */
+.site-title {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.site-title:hover {
+    color: #f1f5f9;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    transform: scale(1.02);
+}
+
 /* Main content area */
 .main-content {
     background: rgba(255, 255, 255, 0.95);
