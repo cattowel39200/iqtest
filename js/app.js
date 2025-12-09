@@ -1378,6 +1378,81 @@ const securityLog = {
 };
 function performSecurityChecks() { /* ... */ }
 
+// Sample Data Generation for Community Activation
+function generateSampleRankings() {
+    const sampleNicknames = [
+        'IQ마스터', '천재소년', '퍼즐킹', '논리왕', '브레인파워', '스마트걸', '아인슈타인jr', '멘사멤버',
+        '수학천재', '창의왕', '사고력짱', '지능왕', '퀴즈마스터', '문제해결사', '똑똑이', '영재소녀',
+        '논리마스터', '패턴킹', '분석가', '추론왕', '계산왕', '기억력짱', '집중력킹', '인지왕',
+        '두뇌파워', '사고왕', '지혜자', '명석한뇌', '뛰어난두뇌', '빠른사고'
+    ];
+
+    const classifications = ['천재급', '영재급', '우수', '평균이상', '평균'];
+
+    // 각 테스트 타입별 샘플 데이터 생성
+    const testTypes = [
+        { key: 'iqTestRankings', name: '종합' },
+        { key: 'iqTest_easy_Rankings', name: '쉬움' },
+        { key: 'iqTest_medium_Rankings', name: '보통' },
+        { key: 'iqTest_hard_Rankings', name: '어려움' }
+    ];
+
+    testTypes.forEach(testType => {
+        const existingData = JSON.parse(localStorage.getItem(testType.key) || '[]');
+
+        // 이미 데이터가 충분히 있으면 건너뛰기
+        if (existingData.length >= 15) return;
+
+        const sampleData = [];
+        const usedNicknames = new Set(existingData.map(item => item.nickname));
+
+        // 난이도별로 IQ 점수 범위 조정
+        let iqRange;
+        switch (testType.name) {
+            case '쉬움': iqRange = [110, 140]; break;
+            case '보통': iqRange = [120, 150]; break;
+            case '어려움': iqRange = [130, 160]; break;
+            default: iqRange = [115, 155]; // 종합
+        }
+
+        for (let i = 0; i < 20; i++) {
+            let nickname;
+            do {
+                nickname = sampleNicknames[Math.floor(Math.random() * sampleNicknames.length)];
+            } while (usedNicknames.has(nickname));
+
+            usedNicknames.add(nickname);
+
+            const iq = Math.floor(Math.random() * (iqRange[1] - iqRange[0] + 1)) + iqRange[0];
+            const classification = iq >= 145 ? '천재급' :
+                                 iq >= 135 ? '영재급' :
+                                 iq >= 125 ? '우수' :
+                                 iq >= 115 ? '평균이상' : '평균';
+
+            // 날짜를 최근 30일 내에서 랜덤하게 생성
+            const randomDays = Math.floor(Math.random() * 30);
+            const date = new Date();
+            date.setDate(date.getDate() - randomDays);
+
+            sampleData.push({
+                nickname: nickname,
+                iq: iq,
+                classification: classification,
+                date: date.toISOString()
+            });
+        }
+
+        // 기존 데이터와 합치고 IQ 점수로 정렬
+        const combinedData = [...existingData, ...sampleData]
+            .sort((a, b) => b.iq - a.iq)
+            .slice(0, 50); // 최대 50개로 제한
+
+        localStorage.setItem(testType.key, JSON.stringify(combinedData));
+    });
+
+    console.log('Sample ranking data generated for community activation!');
+}
+
 // Initialization
 window.onload = function () {
     initializeFirebase();
@@ -1388,6 +1463,10 @@ window.onload = function () {
         initParticles();
         animate();
     }
+
+    // 커뮤니티 활성화를 위한 샘플 데이터 생성
+    generateSampleRankings();
+
     refreshRanking();
     refreshAllTypeRankings();
 };
