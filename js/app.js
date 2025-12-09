@@ -286,355 +286,6 @@ function saveToTypeRanking(nickname, score, classification, age, testType, resul
 // ============================================
 
 // ?꾩뿭 蹂??
-let currentUser = null;
-let isLoggedIn = false;
-
-// ?ъ슜??愿由??대옒??
-const UserManager = {
-    // ?ъ슜???곗씠??援ъ“ ?앹꽦
-    createUserData(nickname, age) {
-        return {
-            nickname: nickname,
-            age: age,
-            registeredAt: Date.now(),
-            profile: {
-                totalTests: 0,
-                bestIQ: 0,
-                averageIQ: 0,
-                testTypes: {
-                    comprehensive: { count: 0, bestIQ: 0, scores: [] },
-                    easy: { count: 0, bestScore: 0, scores: [] },
-                    medium: { count: 0, bestScore: 0, scores: [] },
-                    hard: { count: 0, bestScore: 0, scores: [] }
-                }
-            },
-            testHistory: []
-        };
-    },
-
-    // ?됰꽕??議댁옱 ?뺤씤 (媛뺥솕??踰꾩쟾)
-    async isNicknameExists(nickname) {
-        try {
-            // 濡쒖뺄?ㅽ넗由ъ??먯꽌 ?뺤씤
-            const localUsers = JSON.parse(localStorage.getItem('iqTestUsers') || '{}');
-            const localExists = Object.values(localUsers).some(user =>
-                user.nickname.toLowerCase() === nickname.toLowerCase()
-            );
-
-            if (localExists) return true;
-
-            // Firebase?먯꽌 ?뺤씤 (異붽? 蹂댁븞)
-            if (isFirebaseEnabled && db) {
-                const snapshot = await db.collection('users').where('nickname', '==', nickname).get();
-                return !snapshot.empty;
-            }
-
-            return false;
-        } catch (error) {
-            console.error('?됰꽕???뺤씤 以??ㅻ쪟:', error);
-            return false;
-        }
-    },
-
-    // ?ъ슜?????
-    async saveUser(userData) {
-        try {
-            const userId = this.generateUserId(userData.nickname);
-
-            // 濡쒖뺄?ㅽ넗由ъ??????
-            const users = JSON.parse(localStorage.getItem('iqTestUsers') || '{}');
-            users[userId] = userData;
-            localStorage.setItem('iqTestUsers', JSON.stringify(users));
-
-            // Firebase?먮룄 ???
-            if (isFirebaseEnabled && db) {
-                await db.collection('users').doc(userId).set(userData);
-            }
-
-            return userId;
-        } catch (error) {
-            console.error('?ъ슜?????以??ㅻ쪟:', error);
-            throw error;
-        }
-    },
-
-    // ?ъ슜??遺덈윭?ㅺ린
-    async getUser(nickname) {
-        try {
-            // 濡쒖뺄?ㅽ넗由ъ??먯꽌 癒쇱? 寃??
-            const users = JSON.parse(localStorage.getItem('iqTestUsers') || '{}');
-            const localUser = Object.values(users).find(user =>
-                user.nickname.toLowerCase() === nickname.toLowerCase()
-            );
-
-            if (localUser) return localUser;
-
-            // Firebase?먯꽌 寃??
-            if (isFirebaseEnabled && db) {
-                const snapshot = await db.collection('users').where('nickname', '==', nickname).get();
-                if (!snapshot.empty) {
-                    return snapshot.docs[0].data();
-                }
-            }
-
-            return null;
-        } catch (error) {
-            console.error('?ъ슜??遺덈윭?ㅺ린 以??ㅻ쪟:', error);
-            return null;
-        }
-    },
-
-    // ?ъ슜??ID ?앹꽦 (?됰꽕??湲곕컲)
-    generateUserId(nickname) {
-        return 'user_' + nickname.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString(36);
-    },
-
-    // ?뚯썝媛??
-    async register(nickname, age) {
-        try {
-            // ?낅젰 寃利?
-            if (!nickname || nickname.trim().length < 2) {
-                throw new Error('?됰꽕?꾩? 2???댁긽?댁뼱???⑸땲??');
-            }
-            if (!age || age < 8 || age > 120) {
-                throw new Error('?섏씠??8?몃???120?멸퉴吏 ?낅젰 媛?ν빀?덈떎.');
-            }
-
-            // 以묐났 ?뺤씤
-            const exists = await this.isNicknameExists(nickname.trim());
-            if (exists) {
-                throw new Error('?대? 議댁옱?섎뒗 ?됰꽕?꾩엯?덈떎. ?ㅻⅨ ?됰꽕?꾩쓣 ?좏깮?댁＜?몄슂.');
-            }
-
-            // ?ъ슜???곗씠???앹꽦
-            const userData = this.createUserData(nickname.trim(), parseInt(age));
-
-            // ???
-            const userId = await this.saveUser(userData);
-
-            console.log('?뚯썝媛???깃났:', userData);
-            return userData;
-        } catch (error) {
-            console.error('?뚯썝媛???ㅽ뙣:', error);
-            throw error;
-        }
-    },
-
-    // 濡쒓렇??
-    async login(nickname) {
-        try {
-            if (!nickname || nickname.trim().length < 2) {
-                throw new Error('?щ컮瑜??됰꽕?꾩쓣 ?낅젰?댁＜?몄슂.');
-            }
-
-            const user = await this.getUser(nickname.trim());
-            if (!user) {
-                throw new Error('?깅줉?섏? ?딆? ?됰꽕?꾩엯?덈떎. ?뚯썝媛?낆쓣 癒쇱? ?댁＜?몄슂.');
-            }
-
-            // ?몄뀡 ?ㅼ젙
-            currentUser = user;
-            isLoggedIn = true;
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            sessionStorage.setItem('isLoggedIn', 'true');
-
-            console.log('濡쒓렇???깃났:', user);
-            return user;
-        } catch (error) {
-            console.error('濡쒓렇???ㅽ뙣:', error);
-            throw error;
-        }
-    },
-
-    // ?꾩옱 ?ъ슜???뺤씤
-    getCurrentUser() {
-        if (!sessionStorage.getItem('isLoggedIn')) return null;
-        if (!currentUser) {
-            currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-        }
-        return currentUser;
-    },
-
-    // 濡쒓렇?꾩썐
-    logout() {
-        currentUser = null;
-        isLoggedIn = false;
-        localStorage.removeItem('currentUser');
-        sessionStorage.removeItem('isLoggedIn');
-        console.log('濡쒓렇?꾩썐 ?꾨즺');
-    },
-
-    // ?ъ슜???뚯뒪??湲곕줉 異붽?
-    async addTestRecord(testData) {
-        if (!currentUser) return;
-
-        try {
-            // ?꾩옱 ?ъ슜???곗씠???낅뜲?댄듃
-            currentUser.profile.totalTests++;
-
-            // ?뚯뒪????낅퀎 湲곕줉 ?낅뜲?댄듃
-            const testType = testData.testType || 'comprehensive';
-            const typeData = currentUser.profile.testTypes[testType];
-
-            if (testType === 'comprehensive') {
-                typeData.count++;
-                typeData.scores.push(testData.iq);
-                if (testData.iq > typeData.bestIQ) {
-                    typeData.bestIQ = testData.iq;
-                }
-                if (testData.iq > currentUser.profile.bestIQ) {
-                    currentUser.profile.bestIQ = testData.iq;
-                }
-            } else {
-                typeData.count++;
-                typeData.scores.push(testData.score);
-                if (testData.score > typeData.bestScore) {
-                    typeData.bestScore = testData.score;
-                }
-            }
-
-            // ?됯퇏 IQ 怨꾩궛
-            const allIQScores = currentUser.profile.testTypes.comprehensive.scores;
-            if (allIQScores.length > 0) {
-                currentUser.profile.averageIQ = allIQScores.reduce((a, b) => a + b, 0) / allIQScores.length;
-            }
-
-            // ?뚯뒪??湲곕줉 異붽?
-            currentUser.testHistory.push({
-                testId: 'test_' + Date.now(),
-                testType: testType,
-                completedAt: Date.now(),
-                ...testData
-            });
-
-            // ???
-            await this.saveUser(currentUser);
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-            console.log('?뚯뒪??湲곕줉 異붽? ?꾨즺:', testData);
-        } catch (error) {
-            console.error('?뚯뒪??湲곕줉 ????ㅽ뙣:', error);
-        }
-    },
-
-    // ?ъ슜???곗씠???숆린??(Firebase)
-    async syncUserData() {
-        if (!isFirebaseEnabled || !db) return;
-
-        try {
-            // 濡쒖뺄 ?ъ슜???곗씠??媛?몄삤湲?
-            const localUsers = JSON.parse(localStorage.getItem('iqTestUsers') || '{}');
-
-            // Firebase?먯꽌 ?ъ슜???곗씠??媛?몄삤湲?
-            const usersSnapshot = await db.collection('users').get();
-            const cloudUsers = {};
-
-            usersSnapshot.forEach(doc => {
-                cloudUsers[doc.id] = doc.data();
-            });
-
-            // 濡쒖뺄怨??대씪?곕뱶 ?곗씠??蹂묓빀
-            const mergedUsers = { ...cloudUsers };
-
-            // 濡쒖뺄 ?ъ슜??以??대씪?곕뱶???녿뒗 寃껊뱾 異붽?
-            for (const [userId, userData] of Object.entries(localUsers)) {
-                if (!mergedUsers[userId]) {
-                    mergedUsers[userId] = userData;
-                    // Firebase?????
-                    await db.collection('users').doc(userId).set(userData);
-                }
-            }
-
-            // ?대씪?곕뱶 ?ъ슜??以?濡쒖뺄???녿뒗 寃껊뱾 異붽?
-            for (const [userId, userData] of Object.entries(cloudUsers)) {
-                if (!localUsers[userId]) {
-                    mergedUsers[userId] = userData;
-                }
-            }
-
-            // 濡쒖뺄?ㅽ넗由ъ? ?낅뜲?댄듃
-            localStorage.setItem('iqTestUsers', JSON.stringify(mergedUsers));
-
-            console.log('???ъ슜???곗씠???숆린???꾨즺');
-            return mergedUsers;
-        } catch (error) {
-            console.error('?ъ슜???곗씠???숆린???ㅽ뙣:', error);
-            return null;
-        }
-    }
-};
-
-// UI ?낅뜲?댄듃 ?⑥닔??
-function updateUserStatusUI() {
-    const user = UserManager.getCurrentUser();
-
-    if (user) {
-        // 濡쒓렇?몃맂 ?곹깭 UI ?낅뜲?댄듃
-        document.getElementById('notLoggedInSection').style.display = 'none';
-        document.getElementById('loggedInSection').style.display = 'block';
-        document.getElementById('currentUserNickname').textContent = user.nickname;
-        document.getElementById('userTotalTests').textContent = user.profile.totalTests || 0;
-        document.getElementById('userBestIQ').textContent = user.profile.bestIQ || '-';
-
-        // ?뚯뒪???뱀뀡 UI ?낅뜲?댄듃
-        document.getElementById('loggedInUserInfo').style.display = 'block';
-        document.getElementById('testUserNickname').textContent = user.nickname;
-        document.getElementById('testUserAge').textContent = user.age;
-    } else {
-        // 濡쒓렇?몃릺吏 ?딆? ?곹깭 UI ?낅뜲?댄듃
-        document.getElementById('notLoggedInSection').style.display = 'block';
-        document.getElementById('loggedInSection').style.display = 'none';
-
-        // ?뚯뒪???뱀뀡 UI ?낅뜲?댄듃
-        document.getElementById('loggedInUserInfo').style.display = 'none';
-    }
-}
-
-// 濡쒓렇???쒕룄 ?⑥닔
-async function attemptLogin() {
-    const nickname = document.getElementById('loginNickname').value;
-    const age = document.getElementById('loginAge').value;
-
-    try {
-        await UserManager.login(nickname);
-        updateUserStatusUI();
-
-        // ?낅젰 ?꾨뱶 珥덇린??
-        document.getElementById('loginNickname').value = '';
-        document.getElementById('loginAge').value = '';
-
-        alert(`?섏쁺?⑸땲?? ${nickname}?? 濡쒓렇?몃릺?덉뒿?덈떎.`);
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
-// ?뚯썝媛???쒕룄 ?⑥닔
-async function attemptRegister() {
-    const nickname = document.getElementById('loginNickname').value;
-    const age = document.getElementById('loginAge').value;
-
-    try {
-        const userData = await UserManager.register(nickname, age);
-
-        // ?먮룞 濡쒓렇??
-        currentUser = userData;
-        isLoggedIn = true;
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        sessionStorage.setItem('isLoggedIn', 'true');
-
-        updateUserStatusUI();
-
-        // ?낅젰 ?꾨뱶 珥덇린??
-        document.getElementById('loginNickname').value = '';
-        document.getElementById('loginAge').value = '';
-
-        alert(`?섏쁺?⑸땲?? ${nickname}?? ?뚯썝媛?낃낵 濡쒓렇?몄씠 ?꾨즺?섏뿀?듬땲??`);
-    } catch (error) {
-        alert(error.message);
-    }
-}
-
 // 濡쒓렇?꾩썐 ?⑥닔
 function logout() {
     UserManager.logout();
@@ -965,7 +616,7 @@ function selectOption(index) {
     document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
 
     // ???좏깮
-    document.querySelector(`[data-index="${index}"]`).classList.add('selected');
+    document.querySelector(`[data - index= "${index}"]`).classList.add('selected');
     answers[currentQuestionIndex] = index;
     responseTimes[currentQuestionIndex] = Date.now() - startTime;
 
@@ -1417,19 +1068,19 @@ function showResults() {
     document.getElementById('classDesc').textContent = classification.desc;
 
     if (selectedTestType === 'comprehensive') {
-        document.getElementById('percentile').textContent = `?곸쐞 ${(100 - classification.percentile).toFixed(1)}% (諛깅텇??${classification.percentile})`;
+        document.getElementById('percentile').textContent = `? 곸쐞 ${ (100 - classification.percentile).toFixed(1) }% (諛깅텇 ?? ${ classification.percentile })`;
     } else {
         // ?덈줈???뚯뒪????낆? ?곸꽭 ?먯닔 遺꾩꽍 ?쒖떆
-        const scoreDetail = `?뺥솗?? ${results.accuracyScore}??+ ?쒓컙蹂대꼫?? ${results.timeBonus}??= IQ ${iqScore}`;
+        const scoreDetail = `? 뺥솗 ?? ${ results.accuracyScore }?? + ? 쒓컙蹂대꼫 ?? ${ results.timeBonus }??= IQ ${ iqScore } `;
         document.getElementById('percentile').textContent = scoreDetail;
     }
 
     // IRT 湲곕컲 痢≪젙 ?뺣낫 異붽? ?쒖떆 (?덈떎硫?
     if (results.measurementError) {
-        const confidenceInterval = `${Math.round(results.iq - (1.96 * results.measurementError))}-${Math.round(results.iq + (1.96 * results.measurementError))}`;
+        const confidenceInterval = `${ Math.round(results.iq - (1.96 * results.measurementError)) } -${ Math.round(results.iq + (1.96 * results.measurementError)) } `;
         const errorElement = document.getElementById('measurementInfo');
         if (errorElement) {
-            errorElement.textContent = `95% ?좊ː援ш컙: ${confidenceInterval} (痢≪젙?ㅼ감: 짹${Math.round(results.measurementError)})`;
+            errorElement.textContent = `95 % ? 좊ː援ш컙 : ${ confidenceInterval } (痢≪젙 ? ㅼ감 : 짹${ Math.round(results.measurementError) })`;
         }
     }
 
@@ -1438,7 +1089,7 @@ function showResults() {
     if (selectedTestType === 'comprehensive' && results.categoryScores) {
         // 醫낇빀?뚯뒪?몄씪 ?뚮쭔 ?곸뿭蹂?遺꾩꽍 HTML ?앹꽦
         categoryAnalysisElement.innerHTML = `
-                    <h3 style="margin-bottom: 30px; color: #333333;">?곸뿭蹂?遺꾩꽍</h3>
+        < h3 style = "margin-bottom: 30px; color: #333333;" >? 곸뿭蹂 ? 遺꾩꽍</h3 >
                     <div class="result-category">
                         <h4>吏媛?異붾줎 (Perceptual Reasoning)</h4>
                         <div class="result-bar">
@@ -1474,7 +1125,7 @@ function showResults() {
                         </div>
                         <div class="result-score" id="verbalScore">0/5</div>
                     </div>
-                `;
+    `;
         categoryAnalysisElement.style.display = 'block';
 
         setTimeout(() => {
@@ -1483,9 +1134,9 @@ function showResults() {
                 const score = results.categoryScores[cat];
                 if (score) {
                     const percentage = (score.correct / score.total) * 100;
-                    document.getElementById(`${cat}Bar`).style.width = `${percentage}%`;
-document.getElementById(`${cat}Score`).textContent = `${score.correct}/${score.total}`;
-                        }
+                    document.getElementById(`${ cat } Bar`).style.width = `${ percentage }% `;
+document.getElementById(`${ cat } Score`).textContent = `${ score.correct }/${score.total}`;
+}
                     });
                 }, 500);
             } else {
@@ -1857,7 +1508,7 @@ function refreshTestRankingPage(type) {
         const ranking = index + 1;
         const isTopThree = ranking <= 3;
         const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `${ranking}??;
-        const scoreDisplay = type === 'comprehensive' ? `IQ ${rank.iq}` : `${rank.score}??;
+        const scoreDisplay = type === 'comprehensive' ? `IQ ${ rank.iq }` : `${ rank.score }??;
 
         // 諛곌꼍???ㅼ젙 (?좏삎蹂??뚮쭏???곸슜 媛??
         let bgStyle = getRankingBg(index);
@@ -1898,12 +1549,12 @@ function refreshTestRankingPage(type) {
 
             myRankElement.style.display = 'block';
             myRankElement.innerHTML = `
-                        <h4>?렞 ???쒖쐞 (${type === 'comprehensive' ? '醫낇빀' : type})</h4>
-                        <div style="font-size: 1.1rem;">
-                            <strong>${ranking}??/strong> / ${rankings.length}紐?以?
+                < h4 >? 렞 ??? 쒖쐞(${ type === 'comprehensive' ? '醫낇빀' : type})</h4 >
+                    <div style="font-size: 1.1rem;">
+                        <strong>${ranking}??/strong> / ${rankings.length}紐?以?
                             <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">${scoreDisplay}</span>
-                        </div>
-                    `;
+                    </div>
+        `;
         } else {
             myRankElement.style.display = 'none';
         }
@@ -1912,10 +1563,10 @@ function refreshTestRankingPage(type) {
 
 // 硫붿씤 ?붾㈃???좏삎蹂???궧 ?덈줈怨좎묠
 function refreshTypeRankings(type) {
-    const storageKey = `iqTest_${type}_Rankings`;
+    const storageKey = `iqTest_${ type } _Rankings`;
     const rankings = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    const listElement = document.getElementById(`main${type.charAt(0).toUpperCase() + type.slice(1)}Ranking`);
-    const myRankElement = document.getElementById(`my${type.charAt(0).toUpperCase() + type.slice(1)}Rank`);
+    const listElement = document.getElementById(`main${ type.charAt(0).toUpperCase() + type.slice(1) } Ranking`);
+    const myRankElement = document.getElementById(`my${ type.charAt(0).toUpperCase() + type.slice(1) } Rank`);
 
     if (!listElement) return;
 
@@ -1930,26 +1581,26 @@ function refreshTypeRankings(type) {
 
     listElement.innerHTML = top5.map((rank, index) => {
         const ranking = index + 1;
-        const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `<span class="main-rank-number">${ranking}</span>`;
+        const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `< span class="main-rank-number" > ${ ranking }</span > `;
 
         return `
-                    <div class="main-ranking-item">
-                        <div style="display: flex; align-items: center; width: 100%;">
-                            <div style="width: 25px; text-align: center; margin-right: 8px;">${medal}</div>
-                            <div class="main-rank-info">
-                                <div class="main-rank-nickname">${rank.nickname}</div>
-                                <div class="main-rank-score">${rank.score}??(IQ ${rank.iq})</div>
-                            </div>
-                        </div>
+            < div class="main-ranking-item" >
+                <div style="display: flex; align-items: center; width: 100%;">
+                    <div style="width: 25px; text-align: center; margin-right: 8px;">${medal}</div>
+                    <div class="main-rank-info">
+                        <div class="main-rank-nickname">${rank.nickname}</div>
+                        <div class="main-rank-score">${rank.score}??(IQ ${rank.iq})</div>
                     </div>
-                `;
+                </div>
+                    </div >
+            `;
     }).join('');
 
     // ???쒖쐞 ?붿빟 ?쒖떆
     if (userNickname && myRankElement) {
         const myRankIndex = rankings.findIndex(rank => rank.nickname === userNickname);
         if (myRankIndex !== -1) {
-            myRankElement.textContent = `???쒖쐞: ${myRankIndex + 1}??(?곸쐞 ${Math.round(((myRankIndex + 1) / rankings.length) * 100)}%)`;
+            myRankElement.textContent = `??? 쒖쐞 : ${ myRankIndex + 1 }?? (? 곸쐞 ${ Math.round(((myRankIndex + 1) / rankings.length) * 100) }%)`;
         } else {
             myRankElement.textContent = '湲곕줉 ?놁쓬';
         }
@@ -1975,24 +1626,24 @@ function refreshAllTypeRankings() {
             const top5 = rankings.slice(0, 5);
             listElement.innerHTML = top5.map((rank, index) => {
                 const ranking = index + 1;
-                const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `<span class="main-rank-number">${ranking}</span>`;
+                const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `< span class="main-rank-number" > ${ ranking }</span > `;
                 return `
-                            <div class="main-ranking-item">
-                                <div style="display: flex; align-items: center; width: 100%;">
-                                    <div style="width: 25px; text-align: center; margin-right: 8px;">${medal}</div>
-                                    <div class="main-rank-info">
-                                        <div class="main-rank-nickname">${rank.nickname}</div>
-                                        <div class="main-rank-score">IQ ${rank.iq}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+            < div class="main-ranking-item" >
+                <div style="display: flex; align-items: center; width: 100%;">
+                    <div style="width: 25px; text-align: center; margin-right: 8px;">${medal}</div>
+                    <div class="main-rank-info">
+                        <div class="main-rank-nickname">${rank.nickname}</div>
+                        <div class="main-rank-score">IQ ${rank.iq}</div>
+                    </div>
+                </div>
+                            </div >
+            `;
             }).join('');
 
             if (userNickname && myRankElement) {
                 const myRankIndex = rankings.findIndex(rank => rank.nickname === userNickname);
                 if (myRankIndex !== -1) {
-                    myRankElement.textContent = `???쒖쐞: ${myRankIndex + 1}??(?곸쐞 ${Math.round(((myRankIndex + 1) / rankings.length) * 100)}%)`;
+                    myRankElement.textContent = `??? 쒖쐞 : ${ myRankIndex + 1 }?? (? 곸쐞 ${ Math.round(((myRankIndex + 1) / rankings.length) * 100) }%)`;
                 } else {
                     myRankElement.textContent = '湲곕줉 ?놁쓬';
                 }
@@ -2028,7 +1679,7 @@ function refreshAllTimeRankingPage() {
     rankingList.innerHTML = top10.map((rank, index) => {
         const ranking = index + 1;
         const isTopThree = ranking <= 3;
-        const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `${ranking}??;
+        const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `${ ranking }??;
 
         return `
                     <div style="display: flex; align-items: center; padding: 12px 15px; margin-bottom: 8px; background: ${getRankingBg(index)}; border-radius: 12px; border: 1px solid ${getRankingBorder(index)}; box-shadow: ${isTopThree ? '0 4px 12px rgba(0, 212, 255, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.05)'};">
@@ -2079,7 +1730,7 @@ function refreshWeeklyRankingPage() {
         const medal = ranking === 1 ? '?쪍' : ranking === 2 ? '?쪎' : ranking === 3 ? '?쪏' : `${ranking}??;
 
         return `
-                    <div style="display: flex; align-items: center; padding: 12px 15px; margin-bottom: 8px; background: ${getWeeklyRankingBg(index)}; border-radius: 12px; border: 1px solid ${getWeeklyRankingBorder(index)}; box-shadow: ${isTopThree ? '0 4px 12px rgba(0, 212, 255, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.05)'};">
+            < div style = "display: flex; align-items: center; padding: 12px 15px; margin-bottom: 8px; background: ${getWeeklyRankingBg(index)}; border-radius: 12px; border: 1px solid ${getWeeklyRankingBorder(index)}; box-shadow: ${isTopThree ? '0 4px 12px rgba(0, 212, 255, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.05)'};" >
                         <div style="width: 50px; text-align: center; font-size: ${isTopThree ? '1.4rem' : '1rem'}; font-weight: ${isTopThree ? 'bold' : 'normal'};">
                             ${medal}
                         </div>
@@ -2099,8 +1750,8 @@ function refreshWeeklyRankingPage() {
                                 ${new Date(rank.date).toLocaleDateString()}
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div >
+            `;
     }).join('');
 
     // ???쒖쐞 ?쒖떆
@@ -2129,12 +1780,12 @@ function showMyRankInAllTime() {
 
     myRankSection.style.display = 'block';
     myRankSection.innerHTML = `
-                <h4>?렞 ???꾩껜 ?쒖쐞</h4>
+            < h4 >? 렞 ??? 꾩껜 ? 쒖쐞</h4 >
                 <div style="font-size: 1.1rem;">
                     <strong>${ranking}??/strong> / ${rankings.length}紐?以?
-                    <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
+                        <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
                 </div>
-            `;
+        `;
 }
 
 // 二쇨컙 ??궧?먯꽌 ???쒖쐞 ?쒖떆
@@ -2161,12 +1812,12 @@ function showMyRankInWeekly() {
 
     myRankSection.style.display = 'block';
     myRankSection.innerHTML = `
-                <h4>?뱟 ??二쇨컙 ?쒖쐞</h4>
+            < h4 >? 뱟 ?? 二쇨컙 ? 쒖쐞</h4 >
                 <div style="font-size: 1.1rem;">
                     <strong>${ranking}??/strong> / ${currentWeekRankings.length}紐?以?
-                    <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
+                        <span style="color: ${getIQTextColor(myRank.iq)}; font-weight: bold; margin-left: 10px;">IQ ${myRank.iq}</span>
                 </div>
-            `;
+        `;
 }
 
 // ?꾩껜 ??궧 ??蹂닿린 湲곕뒫 (湲곗〈 肄붾뱶? ?곕룞)
@@ -2181,7 +1832,7 @@ function expandAllTimeRanking() {
         } else {
             moreRankings.style.display = 'none';
             const remainingCount = document.querySelectorAll('#moreRankings > div').length;
-            button.textContent = `??留롮? ??궧 蹂닿린 (${remainingCount}紐?`;
+            button.textContent = `?? 留롮 ? ?? 궧 蹂닿린(${ remainingCount }紐 ? `;
         }
     }
 }
@@ -2212,7 +1863,7 @@ const securityLog = {
 
         // ?ш컖??蹂댁븞 ?대깽?몃뒗 肄섏넄??寃쎄퀬 異쒕젰
         if (type === 'SECURITY_VIOLATION' || type === 'SUSPICIOUS_ACTIVITY') {
-            console.warn(`?슚 蹂댁븞 寃쎄퀬 [${type}]: ${message}`, data);
+            console.warn(`? 슚 蹂댁븞 寃쎄퀬[${ type }]: ${ message }`, data);
         }
 
         // 濡쒖뺄 ?ㅽ넗由ъ???蹂댁븞 濡쒓렇 ???(理쒓렐 50媛쒕쭔)
