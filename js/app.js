@@ -1400,19 +1400,31 @@ function generateSampleRankings() {
     testTypes.forEach(testType => {
         const existingData = JSON.parse(localStorage.getItem(testType.key) || '[]');
 
-        // 이미 데이터가 충분히 있으면 건너뛰기
-        if (existingData.length >= 15) return;
+        // 점수가 너무 높은 기존 샘플 데이터는 새로운 현실적인 데이터로 교체
+        const hasHighScores = existingData.some(item => item.iq > 140);
+        if (hasHighScores) {
+            // 사용자가 직접 생성한 실제 데이터만 보존 (최근 1시간 내 생성된 데이터)
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+            const recentRealData = existingData.filter(item =>
+                new Date(item.date) > oneHourAgo && item.iq <= 140
+            );
+            localStorage.setItem(testType.key, JSON.stringify(recentRealData));
+        }
+
+        const currentData = JSON.parse(localStorage.getItem(testType.key) || '[]');
+        // 이미 충분한 현실적인 데이터가 있으면 건너뛰기
+        if (currentData.length >= 15) return;
 
         const sampleData = [];
-        const usedNicknames = new Set(existingData.map(item => item.nickname));
+        const usedNicknames = new Set(currentData.map(item => item.nickname));
 
-        // 난이도별로 IQ 점수 범위 조정
+        // 난이도별로 IQ 점수 범위 조정 (도전 의욕을 위해 현실적으로 조정)
         let iqRange;
         switch (testType.name) {
-            case '쉬움': iqRange = [110, 140]; break;
-            case '보통': iqRange = [120, 150]; break;
-            case '어려움': iqRange = [130, 160]; break;
-            default: iqRange = [115, 155]; // 종합
+            case '쉬움': iqRange = [85, 115]; break;
+            case '보통': iqRange = [90, 125]; break;
+            case '어려움': iqRange = [95, 135]; break;
+            default: iqRange = [88, 120]; // 종합
         }
 
         for (let i = 0; i < 20; i++) {
@@ -1424,10 +1436,10 @@ function generateSampleRankings() {
             usedNicknames.add(nickname);
 
             const iq = Math.floor(Math.random() * (iqRange[1] - iqRange[0] + 1)) + iqRange[0];
-            const classification = iq >= 145 ? '천재급' :
-                                 iq >= 135 ? '영재급' :
-                                 iq >= 125 ? '우수' :
-                                 iq >= 115 ? '평균이상' : '평균';
+            const classification = iq >= 130 ? '천재급' :
+                                 iq >= 120 ? '영재급' :
+                                 iq >= 110 ? '우수' :
+                                 iq >= 100 ? '평균이상' : '평균';
 
             // 날짜를 최근 30일 내에서 랜덤하게 생성
             const randomDays = Math.floor(Math.random() * 30);
@@ -1443,7 +1455,7 @@ function generateSampleRankings() {
         }
 
         // 기존 데이터와 합치고 IQ 점수로 정렬
-        const combinedData = [...existingData, ...sampleData]
+        const combinedData = [...currentData, ...sampleData]
             .sort((a, b) => b.iq - a.iq)
             .slice(0, 50); // 최대 50개로 제한
 
