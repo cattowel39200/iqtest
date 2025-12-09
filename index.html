@@ -77,10 +77,28 @@
 
             header h1 {
                 font-size: 1.8rem !important;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.4) !important;
             }
 
             header p {
                 font-size: 0.9rem !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.4) !important;
+            }
+
+            /* 스마트폰 무료 회원가입 안내 최적화 */
+            header div[style*="backdrop-filter"] {
+                margin: 10px auto 0 auto !important;
+                padding: 10px 15px !important;
+                max-width: 90% !important;
+                border-radius: 20px !important;
+            }
+
+            header div[style*="backdrop-filter"] p:first-child {
+                font-size: 0.9rem !important;
+            }
+
+            header div[style*="backdrop-filter"] p:last-child {
+                font-size: 0.75rem !important;
             }
 
             .test-type-card {
@@ -193,6 +211,11 @@
 
             header h1 {
                 font-size: 2.2rem !important;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+            }
+
+            header p {
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
             }
 
             /* 태블릿 테스트 화면 최적화 */
@@ -308,11 +331,21 @@
     </div>
 
     <!-- 메인 헤더 베너 -->
-    <header style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px;">
+    <header style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px; position: relative;">
         <div style="max-width: 1200px; margin: 0 auto;">
-            <h1 style="margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 700;">🧠 IQZone</h1>
-            <p style="margin: 0; font-size: 1.2rem; opacity: 0.9;">과학적 IQ 측정과 인지능력 평가</p>
-            <p style="margin: 10px 0 0 0; font-size: 1rem; opacity: 0.8;">CHC 이론 기반 다차원 지능 분석 시스템</p>
+            <h1 style="margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🧠 IQZone</h1>
+            <p style="margin: 0; font-size: 1.2rem; font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">과학적 IQ 측정과 인지능력 평가</p>
+            <p style="margin: 10px 0 15px 0; font-size: 1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">CHC 이론 기반 다차원 지능 분석 시스템</p>
+
+            <!-- 무료 회원가입 안내 -->
+            <div style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 12px 25px; margin: 15px auto 0 auto; max-width: 400px; backdrop-filter: blur(10px);">
+                <p style="margin: 0; font-size: 1rem; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); color: #ffffff;">
+                    ✨ 닉네임만으로 <span style="color: #FFD700; font-weight: 700;">무료 회원가입</span> 가능!
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.9; text-shadow: 1px 1px 2px rgba(0,0,0,0.4);">
+                    간편 가입으로 개인 기록 관리 및 랭킹 참여
+                </p>
+            </div>
         </div>
     </header>
 
