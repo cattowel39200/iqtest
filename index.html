@@ -13,90 +13,60 @@
 </head>
 
 <body>
-    <!-- Brain Animation Container -->
-    <div class="brain-container">
-        <canvas id="brainCanvas"></canvas>
-    </div>
+    style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap:
+    10px;">
+    🏆 유형별 랭킹 TOP 10
+    <button onclick="refreshAllTypeRankings()"
+        style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
+    </h2>
 
-    <div class="container">
-        <header>
-            <h1>IQZone</h1>
-            <p>과학적 문제 설계 기반 종합 인지능력 평가</p>
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.2rem;">👤</span>
-                    <strong id="currentUserNickname" style="color: #00d4ff;"></strong>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.2rem;">📝</span>
-                    <span>테스트 <strong id="userTotalTests" style="color: #7b2cbf;">0</strong>회</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.2rem;">🧠</span>
-                    <span>최고 IQ: <strong id="userBestIQ" style="color: #22c55e;">-</strong></span>
-                </div>
-                <button onclick="logout()"
-                    style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">로그아웃</button>
+    <div class="ranking-grid-container">
+
+        <!-- 쉬움테스트 랭킹 -->
+        <div class="intro-section ranking-card" style="margin-bottom: 0;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="color: #22c55e; margin: 0; font-size: 0.95rem;">🟢 쉬움</h3>
+                <div id="myEasyRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
             </div>
-    </div>
-    </div>
-
-    <!-- 4가지 유형별 랭킹 테이블 (한 줄에 모두 표시) -->
-    <div class="main-grid" id="mainDashboard" style="margin-bottom: 40px;">
-        <h2
-            style="text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-            🏆 유형별 랭킹 TOP 10
-            <button onclick="refreshAllTypeRankings()"
-                style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #00d4ff;">🔄</button>
-        </h2>
-
-        <div class="ranking-grid-container">
-
-            <!-- 쉬움테스트 랭킹 -->
-            <div class="intro-section ranking-card" style="margin-bottom: 0;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <h3 style="color: #22c55e; margin: 0; font-size: 0.95rem;">🟢 쉬움</h3>
-                    <div id="myEasyRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-                </div>
-                <div id="mainEasyRanking" class="main-ranking-table">
-                    <!-- 쉬움테스트 랭킹이 여기에 표시됨 -->
-                </div>
+            <div id="mainEasyRanking" class="main-ranking-table">
+                <!-- 쉬움테스트 랭킹이 여기에 표시됨 -->
             </div>
-
-            <!-- 중간테스트 랭킹 -->
-            <div class="intro-section ranking-card" style="margin-bottom: 0;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <h3 style="color: #f97316; margin: 0; font-size: 0.95rem;">🟡 중간</h3>
-                    <div id="myMediumRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-                </div>
-                <div id="mainMediumRanking" class="main-ranking-table">
-                    <!-- 중간테스트 랭킹이 여기에 표시됨 -->
-                </div>
-            </div>
-
-            <!-- 고난도테스트 랭킹 -->
-            <div class="intro-section ranking-card" style="margin-bottom: 0;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <h3 style="color: #ef4444; margin: 0; font-size: 0.95rem;">🔴 고난도</h3>
-                    <div id="myHardRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-                </div>
-                <div id="mainHardRanking" class="main-ranking-table">
-                    <!-- 고난도테스트 랭킹이 여기에 표시됨 -->
-                </div>
-            </div>
-
-            <!-- 종합테스트 랭킹 (마지막 배치) -->
-            <div class="intro-section ranking-card" style="margin-bottom: 0;">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <h3 style="color: #00d4ff; margin: 0; font-size: 0.95rem;">🧠 종합</h3>
-                    <div id="myComprehensiveRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
-                </div>
-                <div id="mainComprehensiveRanking" class="main-ranking-table">
-                    <!-- 종합테스트 랭킹이 여기에 표시됨 -->
-                </div>
-            </div>
-
         </div>
+
+        <!-- 중간테스트 랭킹 -->
+        <div class="intro-section ranking-card" style="margin-bottom: 0;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="color: #f97316; margin: 0; font-size: 0.95rem;">🟡 중간</h3>
+                <div id="myMediumRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
+            </div>
+            <div id="mainMediumRanking" class="main-ranking-table">
+                <!-- 중간테스트 랭킹이 여기에 표시됨 -->
+            </div>
+        </div>
+
+        <!-- 고난도테스트 랭킹 -->
+        <div class="intro-section ranking-card" style="margin-bottom: 0;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="color: #ef4444; margin: 0; font-size: 0.95rem;">🔴 고난도</h3>
+                <div id="myHardRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
+            </div>
+            <div id="mainHardRanking" class="main-ranking-table">
+                <!-- 고난도테스트 랭킹이 여기에 표시됨 -->
+            </div>
+        </div>
+
+        <!-- 종합테스트 랭킹 (마지막 배치) -->
+        <div class="intro-section ranking-card" style="margin-bottom: 0;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="color: #00d4ff; margin: 0; font-size: 0.95rem;">🧠 종합</h3>
+                <div id="myComprehensiveRank" style="font-size: 0.75rem; color: #666; margin-top: 2px;"></div>
+            </div>
+            <div id="mainComprehensiveRanking" class="main-ranking-table">
+                <!-- 종합테스트 랭킹이 여기에 표시됨 -->
+            </div>
+        </div>
+
+    </div>
     </div>
 
     <!-- 시작 화면 -->
