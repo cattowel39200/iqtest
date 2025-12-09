@@ -700,3 +700,236 @@ body {
         font-size: 1.2em;
     }
 }
+
+/* ============================================
+   Enhanced Homepage Layout
+   ============================================ */
+
+/* Main game modes grid */
+.game-modes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin: 30px 0 40px 0;
+}
+
+/* Mode card styling */
+.mode-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.mode-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border-color: #e2e8f0;
+}
+
+.mode-card.classic-mode {
+    background: linear-gradient(135deg, #ebf8ff 0%, #dbeafe 100%);
+    border-color: #bfdbfe;
+}
+
+.mode-card.quiz-mode {
+    background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%);
+    border-color: #bbf7d0;
+}
+
+.mode-card.game-modes {
+    background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+    border-color: #e9d5ff;
+}
+
+/* Mode header */
+.mode-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.mode-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.mode-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin: 0;
+}
+
+.mode-desc {
+    color: #6b7280;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+}
+
+/* Difficulty options in classic mode */
+.difficulty-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.difficulty-options .diff-btn {
+    padding: 15px 10px;
+    font-size: 0.85rem;
+    min-height: auto;
+}
+
+.difficulty-options .diff-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.difficulty-options .diff-title {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.difficulty-options .diff-desc {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.difficulty-options .diff-time {
+    font-size: 0.7rem;
+    margin-top: 5px;
+}
+
+/* Mode features */
+.mode-features {
+    margin: 15px 0;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    color: #4b5563;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Mode stats */
+.mode-stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.stat-badge {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.quiz-mode .stat-badge {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.game-modes .stat-badge {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+/* Info section */
+.info-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.info-section h3 {
+    color: #1f2937;
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.info-item {
+    text-align: center;
+}
+
+.info-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.info-title {
+    font-weight: bold;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.info-desc {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .game-modes-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .mode-card {
+        padding: 20px;
+    }
+
+    .mode-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .mode-icon {
+        font-size: 2.5rem;
+    }
+
+    .mode-title {
+        font-size: 1.3rem;
+    }
+
+    .difficulty-options {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .info-icon {
+        font-size: 2rem;
+    }
+}

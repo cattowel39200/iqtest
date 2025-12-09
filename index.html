@@ -3,43 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 도형 IQ 테스트 - 자동 생성 퍼즐</title>
+    <title>🧠 BrainFun Studio - 도형 IQ 테스트</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <!-- Header Section -->
         <header class="header">
-            <h1>🧠 도형 IQ 테스트</h1>
-            <p>AI가 자동 생성하는 무한 도형 퍼즐</p>
+            <h1>🧠 BrainFun Studio</h1>
+            <p>AI가 자동 생성하는 무한 도형 퍼즐 • 다양한 게임 모드로 두뇌 훈련</p>
         </header>
 
-        <!-- Difficulty Selection -->
+        <!-- Game Mode Selection -->
         <div id="difficultySelection" class="main-content">
-            <h2>난이도를 선택하세요</h2>
-            <p>각 난이도별로 다른 알고리즘이 문제를 자동 생성합니다</p>
+            <h2>🎮 게임 모드를 선택하세요</h2>
+            <p>다양한 방식으로 두뇌를 단련하고 IQ를 측정해보세요</p>
 
-            <div class="difficulty-row">
-                <button class="diff-btn diff-easy" onclick="startQuiz('easy')">
-                    <div class="diff-icon">🟢</div>
-                    <div class="diff-title">초급</div>
-                    <div class="diff-desc">도형 개수/크기만 바뀌는 쉬운 문제</div>
-                    <div class="diff-time">예상 시간: 1-2분</div>
-                </button>
+            <!-- Main Game Modes -->
+            <div class="game-modes-grid">
+                <!-- Classic Mode -->
+                <div class="mode-card classic-mode">
+                    <div class="mode-header">
+                        <div class="mode-icon">🎯</div>
+                        <h3 class="mode-title">클래식 모드</h3>
+                    </div>
+                    <p class="mode-desc">난이도별 단계적 학습으로 기초부터 고급까지</p>
 
-                <button class="diff-btn diff-medium" onclick="startQuiz('medium')">
-                    <div class="diff-icon">🟡</div>
-                    <div class="diff-title">중급</div>
-                    <div class="diff-desc">두 가지 규칙(모양+점, 회전+색상)이 섞인 문제</div>
-                    <div class="diff-time">예상 시간: 2-3분</div>
-                </button>
+                    <div class="difficulty-options">
+                        <button class="diff-btn diff-easy" onclick="startQuiz('easy')">
+                            <div class="diff-icon">🟢</div>
+                            <div class="diff-title">초급</div>
+                            <div class="diff-desc">기본 패턴 인식</div>
+                            <div class="diff-time">1-2분</div>
+                        </button>
 
-                <button class="diff-btn diff-hard" onclick="startQuiz('hard')">
-                    <div class="diff-icon">🔴</div>
-                    <div class="diff-title">고급</div>
-                    <div class="diff-desc">3×3 그리드, 합/차, 복합 규칙 문제</div>
-                    <div class="diff-time">예상 시간: 3-5분</div>
-                </button>
+                        <button class="diff-btn diff-medium" onclick="startQuiz('medium')">
+                            <div class="diff-icon">🟡</div>
+                            <div class="diff-title">중급</div>
+                            <div class="diff-desc">복합 규칙 추론</div>
+                            <div class="diff-time">2-3분</div>
+                        </button>
+
+                        <button class="diff-btn diff-hard" onclick="startQuiz('hard')">
+                            <div class="diff-icon">🔴</div>
+                            <div class="diff-title">고급</div>
+                            <div class="diff-desc">3×3 그리드 고급</div>
+                            <div class="diff-time">3-5분</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Mode -->
+                <div class="mode-card quiz-mode" onclick="location.href='quiz-mode.html'">
+                    <div class="mode-header">
+                        <div class="mode-icon">📝</div>
+                        <h3 class="mode-title">10문제 퀴즈</h3>
+                    </div>
+                    <p class="mode-desc">연속 10문제를 풀고 종합 점수와 IQ 분석 받기</p>
+
+                    <div class="mode-features">
+                        <div class="feature-item">✓ 실시간 진행률 표시</div>
+                        <div class="feature-item">✓ 상세한 채점 결과</div>
+                        <div class="feature-item">✓ IQ 추정치 제공</div>
+                        <div class="feature-item">✓ 문제별 해설 포함</div>
+                    </div>
+
+                    <div class="mode-stats">
+                        <span class="stat-badge">10문제</span>
+                        <span class="stat-badge">5-15분</span>
+                        <span class="stat-badge">종합평가</span>
+                    </div>
+                </div>
+
+                <!-- Game Modes -->
+                <div class="mode-card game-modes" onclick="location.href='game-modes.html'">
+                    <div class="mode-header">
+                        <div class="mode-icon">🎮</div>
+                        <h3 class="mode-title">다양한 게임 모드</h3>
+                    </div>
+                    <p class="mode-desc">타임어택, 레벨업, 문제유형별 전문 훈련</p>
+
+                    <div class="mode-features">
+                        <div class="feature-item">⚡ 타임어택 (60/90/180초)</div>
+                        <div class="feature-item">🧗 레벨업 (6단계 진행)</div>
+                        <div class="feature-item">🧩 유형별 전문 모드</div>
+                        <div class="feature-item">🧠 멘사 스타일 고난도</div>
+                    </div>
+
+                    <div class="mode-stats">
+                        <span class="stat-badge">4가지 모드</span>
+                        <span class="stat-badge">무한 플레이</span>
+                        <span class="stat-badge">실시간 통계</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info Section -->
+            <div class="info-section">
+                <h3>🤖 AI 자동 생성 시스템</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">🔢</div>
+                        <div class="info-title">15+ 알고리즘</div>
+                        <div class="info-desc">다양한 패턴의 무한 문제 생성</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🎯</div>
+                        <div class="info-title">6가지 문제 유형</div>
+                        <div class="info-desc">수열, 비례, 그리드, 대칭, 수식, 다른하나찾기</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📊</div>
+                        <div class="info-title">실시간 분석</div>
+                        <div class="info-desc">정답률, 소요시간, IQ 추정치 제공</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -89,11 +167,6 @@
             </div>
         </div>
 
-        <!-- Navigation to other modes -->
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="game-modes.html" class="btn btn-primary" style="margin: 5px;">🎮 다양한 게임 모드</a>
-            <a href="quiz-mode.html" class="btn btn-secondary" style="margin: 5px;">📝 10문제 퀴즈</a>
-        </div>
     </div>
 
     <script src="js/shape-generator.js"></script>
