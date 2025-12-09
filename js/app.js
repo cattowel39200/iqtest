@@ -1134,10 +1134,10 @@ function refreshRanking() {
         return;
     }
 
-    const top5 = rankings.slice(0, 5);
-    const remaining = rankings.slice(5);
+    const top10 = rankings.slice(0, 10);
+    const remaining = rankings.slice(10);
 
-    let html = top5.map((rank, index) => `
+    let html = top10.map((rank, index) => `
         <div style="display: flex; align-items: center; padding: 12px 15px; margin-bottom: 8px; background: ${getRankingBg(index)}; border-radius: 12px; border: 1px solid ${getRankingBorder(index)};">
             <div style="width: 30px; text-align: center; font-size: 1.2rem; font-weight: bold;">${getMedalIcon(index)}</div>
             <div style="flex: 1; margin-left: 10px;">
@@ -1155,7 +1155,7 @@ function refreshRanking() {
         html += `<div id="moreRankings" style="display: none;">
             ${remaining.map((rank, index) => `
                 <div style="display: flex; align-items: center; padding: 10px 15px; margin-bottom: 8px; background: rgba(0,0,0,0.02); border-radius: 12px;">
-                    <div style="width: 30px; text-align: center; font-weight: bold; color: #666;">${index + 6}</div>
+                    <div style="width: 30px; text-align: center; font-weight: bold; color: #666;">${index + 11}</div>
                     <div style="flex: 1; margin-left: 10px;"><div style="font-weight: 600; color: #555;">${rank.nickname}</div></div>
                     <div style="text-align: right;"><div style="font-weight: 600; color: #555;">IQ ${rank.iq}</div></div>
                 </div>
