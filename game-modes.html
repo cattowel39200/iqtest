@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 도형 IQ 테스트 - 다양한 게임 모드</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .mode-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .mode-card.difficulty { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .mode-card.type { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .mode-card.time-attack { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .mode-card.levelup { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .mode-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .mode-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .sub-modes {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .sub-mode-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .sub-mode-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.1);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .timer-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .level-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .level-progress {
+            background: rgba(255,255,255,0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .level-progress-fill {
+            background: #4ade80;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .time-attack-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .mode-results {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mode-selection {
+                grid-template-columns: 1fr;
+            }
+
+            .sub-modes {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="goBack()" id="backBtn" style="display: none;">← 돌아가기</button>
+        <div class="timer-display" id="timerDisplay">02:30</div>
+
+        <!-- Header -->
+        <header class="header">
+            <h1>🧠 도형 IQ 테스트</h1>
+            <p>다양한 게임 모드로 두뇌를 단련하세요</p>
+        </header>
+
+        <!-- Main Mode Selection -->
+        <div id="mainModeSelection" class="main-content">
+            <h2>게임 모드를 선택하세요</h2>
+
+            <div class="mode-selection">
+                <!-- 난이도별 모드 -->
+                <div class="mode-card difficulty" onclick="showDifficultyModes()">
+                    <div class="mode-icon">🎯</div>
+                    <div class="mode-title">난이도별 모드</div>
+                    <div class="mode-description">
+                        초급부터 고급까지<br>
+                        각 난이도에 특화된 문제 유형으로 구성
+                    </div>
+                </div>
+
+                <!-- 문제 유형별 모드 -->
+                <div class="mode-card type" onclick="showTypeModes()">
+                    <div class="mode-icon">🧩</div>
+                    <div class="mode-title">문제 유형별 모드</div>
+                    <div class="mode-description">
+                        수열, 그리드, 멘사 스타일 등<br>
+                        특정 문제 유형만 집중 학습
+                    </div>
+                </div>
+
+                <!-- 타임어택 모드 -->
+                <div class="mode-card time-attack" onclick="showTimeAttackModes()">
+                    <div class="mode-icon">⚡</div>
+                    <div class="mode-title">타임어택 모드</div>
+                    <div class="mode-description">
+                        제한시간 내 최대한 많이!<br>
+                        60초/90초/180초 선택 가능
+                    </div>
+                </div>
+
+                <!-- 레벨업 모드 -->
+                <div class="mode-card levelup" onclick="showLevelupMode()">
+                    <div class="mode-icon">🧗</div>
+                    <div class="mode-title">레벨업 모드</div>
+                    <div class="mode-description">
+                        스테이지별 도전!<br>
+                        쉬운 문제부터 점진적 난이도 상승
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="index.html" class="btn btn-secondary">기본 모드로 돌아가기</a>
+            </div>
+        </div>
+
+        <!-- 난이도별 모드 선택 -->
+        <div id="difficultyModeSelection" class="main-content" style="display: none;">
+            <h2>🎯 난이도별 모드</h2>
+            <p>각 난이도에 최적화된 문제 유형을 경험하세요</p>
+
+            <div class="sub-modes" style="display: grid;">
+                <div class="sub-mode-btn" onclick="startDifficultyMode('easy')">
+                    <h3>🟢 초급 모드</h3>
+                    <p>수열 + 다른하나 찾기</p>
+                    <small>패턴 인식 기초 훈련</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startDifficultyMode('medium')">
+                    <h3>🟡 중급 모드</h3>
+                    <p>수열 + 비례 + 체스판</p>
+                    <small>논리적 관계 파악</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startDifficultyMode('hard')">
+                    <h3>🔴 고급 모드</h3>
+                    <p>그리드 + 수식 + 복합 비례</p>
+                    <small>고차원 추상적 사고</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 문제 유형별 모드 선택 -->
+        <div id="typeModeSelection" class="main-content" style="display: none;">
+            <h2>🧩 문제 유형별 모드</h2>
+            <p>특정 사고 영역을 집중 트레이닝하세요</p>
+
+            <div class="sub-modes" style="display: grid;">
+                <div class="sub-mode-btn" onclick="startTypeMode('sequence')">
+                    <h3>🔢 수열 모드</h3>
+                    <p>패턴 인식 전문</p>
+                    <small>●→●●→●●● 시리즈</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTypeMode('grid')">
+                    <h3>⬜ 그리드 모드</h3>
+                    <p>공간 논리 전문</p>
+                    <small>체스판, 3×3 퍼즐</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTypeMode('analogy')">
+                    <h3>↔️ 비례 모드</h3>
+                    <p>관계 추론 전문</p>
+                    <small>A→B :: C→? 시리즈</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTypeMode('mensa')">
+                    <h3>🧠 멘사 스타일</h3>
+                    <p>고난도 종합 문제</p>
+                    <small>그리드+비례+수식 혼합</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTypeMode('odd-one-out')">
+                    <h3>🔍 다른하나 찾기</h3>
+                    <p>차이점 식별 전문</p>
+                    <small>■■■● 스타일</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTypeMode('equation')">
+                    <h3>➕ 수식 모드</h3>
+                    <p>도형 수학 전문</p>
+                    <small>△+■=? 계산</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 타임어택 모드 선택 -->
+        <div id="timeAttackModeSelection" class="main-content" style="display: none;">
+            <h2>⚡ 타임어택 모드</h2>
+            <p>제한시간 내 최대한 많은 문제를 풀어보세요!</p>
+
+            <div class="sub-modes" style="display: grid;">
+                <div class="sub-mode-btn" onclick="startTimeAttack(60)">
+                    <h3>⚡ 스프린트</h3>
+                    <p>60초 챌린지</p>
+                    <small>초고속 직감 테스트</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTimeAttack(90)">
+                    <h3>🏃 러닝</h3>
+                    <p>90초 챌린지</p>
+                    <small>빠른 판단력 테스트</small>
+                </div>
+
+                <div class="sub-mode-btn" onclick="startTimeAttack(180)">
+                    <h3>🚴 사이클링</h3>
+                    <p>180초 챌린지</p>
+                    <small>지속적 집중력 테스트</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 레벨업 모드 화면 -->
+        <div id="levelupMode" class="main-content" style="display: none;">
+            <div class="level-info">
+                <h2>🧗 레벨업 모드</h2>
+                <div>
+                    <strong>Stage <span id="currentStage">1</span></strong>
+                    <span id="stageDescription">기초 수열 패턴 마스터</span>
+                </div>
+                <div class="level-progress">
+                    <div id="levelProgressFill" class="level-progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="stageProgress">0/5 클리어</div>
+            </div>
+
+            <!-- 현재 스테이지 문제가 여기에 표시됩니다 -->
+            <div id="levelupPuzzleArea"></div>
+        </div>
+
+        <!-- 게임 플레이 영역 -->
+        <div id="gamePlayArea" class="main-content" style="display: none;">
+            <!-- 타임어택 전용 상태표시 -->
+            <div id="timeAttackStats" class="time-attack-stats" style="display: none;">
+                <div class="stat-card">
+                    <span id="solvedCount" class="stat-value">0</span>
+                    <span class="stat-label">해결한 문제</span>
+                </div>
+                <div class="stat-card">
+                    <span id="correctCount" class="stat-value">0</span>
+                    <span class="stat-label">정답</span>
+                </div>
+                <div class="stat-card">
+                    <span id="accuracyRate" class="stat-value">0%</span>
+                    <span class="stat-label">정답률</span>
+                </div>
+            </div>
+
+            <!-- 문제 표시 영역 -->
+            <div class="puzzle-container">
+                <!-- 문제 유형 표시 -->
+                <div id="problemTypeIndicator" style="text-align: center; margin-bottom: 20px; font-weight: bold; color: #666;"></div>
+
+                <!-- Sequence Display -->
+                <div class="sequence-container">
+                    <h3 id="puzzleTitle">다음 패턴을 보고 빈칸에 들어갈 도형을 선택하세요</h3>
+                    <div id="sequenceDisplay" class="sequence-display"></div>
+                    <div class="sequence-arrow">↓</div>
+                    <div class="missing-indicator">?</div>
+                </div>
+
+                <!-- Grid Display -->
+                <div id="gridContainer" class="grid-container" style="display: none;">
+                    <h3>그리드의 규칙을 찾아 빈칸을 채우세요</h3>
+                    <div id="gridDisplay" class="grid-display"></div>
+                </div>
+
+                <!-- Extended Puzzle Display -->
+                <div id="extendedPuzzleContainer" class="extended-puzzle" style="display: none;">
+                    <h3 id="extendedPuzzleTitle">문제를 풀어보세요</h3>
+                    <div id="extendedPuzzleContent"></div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-section">
+                    <h4>정답을 선택하세요:</h4>
+                    <div id="optionsContainer" class="options-container"></div>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback" class="feedback"></div>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="controls" style="text-align: center; margin-top: 30px;">
+                <button id="nextBtn" class="btn btn-primary" onclick="nextProblem()" style="display: none;">다음 문제</button>
+                <button id="skipBtn" class="btn btn-secondary" onclick="skipProblem()">건너뛰기</button>
+                <button id="pauseBtn" class="btn btn-secondary" onclick="pauseGame()">일시정지</button>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="gameResults" class="mode-results">
+            <h2 id="resultsTitle">🎉 게임 완료!</h2>
+            <div id="resultsContent">
+                <!-- 결과 내용이 동적으로 여기에 추가됩니다 -->
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="restartCurrentMode()">다시 도전</button>
+                <button class="btn btn-secondary" onclick="showMainModes()">모드 선택으로</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/shape-generator.js"></script>
+    <script src="js/game-modes.js"></script>
+</body>
+</html>
