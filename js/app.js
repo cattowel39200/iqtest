@@ -20,14 +20,51 @@ function validateFirebaseAccess() {
         'cattowel39200.github.io',
         'localhost',
         '127.0.0.1',
-        'zrr.kr'
+        'zrr.kr',
+        // GitHub Pages 도메인
+        'github.io',  // 모든 GitHub Pages 서브도메인 허용
+        // 추가 도메인들
+        'file',  // 로컬 파일 시스템 (file://)
+        '',      // 빈 hostname (로컬 파일)
+        '0.0.0.0',
+        '192.168.',  // 로컬 네트워크 (부분 일치)
+        '10.',       // 로컬 네트워크 (부분 일치)
+        '172.',      // 로컬 네트워크 (부분 일치)
     ];
+
     const currentDomain = window.location.hostname;
-    if (!allowedDomains.includes(currentDomain)) {
-        console.warn(`Security Block: Domain ${currentDomain} not allowed.`);
-        return false;
+    const currentProtocol = window.location.protocol;
+
+    // 로컬 파일 시스템 허용
+    if (currentProtocol === 'file:' || !currentDomain || currentDomain === '') {
+        console.log('Firebase: Local file system detected, allowing access');
+        return true;
     }
-    return true;
+
+    // 정확한 도메인 매칭
+    if (allowedDomains.includes(currentDomain)) {
+        console.log(`Firebase: Domain ${currentDomain} allowed`);
+        return true;
+    }
+
+    // GitHub Pages 서브도메인 체크 (*.github.io)
+    if (currentDomain.endsWith('.github.io')) {
+        console.log(`Firebase: GitHub Pages domain ${currentDomain} allowed`);
+        return true;
+    }
+
+    // 로컬 네트워크 IP 범위 체크
+    const localNetworkPatterns = ['192.168.', '10.', '172.'];
+    for (const pattern of localNetworkPatterns) {
+        if (currentDomain.startsWith(pattern)) {
+            console.log(`Firebase: Local network ${currentDomain} allowed`);
+            return true;
+        }
+    }
+
+    console.warn(`Security Block: Domain ${currentDomain} not allowed.`);
+    console.warn(`Protocol: ${currentProtocol}, Full URL: ${window.location.href}`);
+    return false;
 }
 
 // Firebase Helper Functions
@@ -64,45 +101,102 @@ async function saveRankingsToCloud(allTimeRankings, weeklyRankings) {
 }
 
 async function syncRankingsData() {
-    if (!isFirebaseEnabled) return;
+    if (!isFirebaseEnabled) {
+        console.log("Firebase not enabled, skipping cloud sync");
+        return;
+    }
+
+    console.log("Starting rankings data synchronization...");
+
     try {
         const cloudData = await loadRankingsFromCloud();
-        if (cloudData) {
+
+        if (cloudData && cloudData.allTime && cloudData.allTime.length > 0) {
+            console.log(`Found ${cloudData.allTime.length} rankings in cloud`);
             localStorage.setItem('iqTestRankings', JSON.stringify(cloudData.allTime));
-            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(cloudData.weekly));
-            console.log("Rankings synced from cloud.");
+            localStorage.setItem('iqTestWeeklyRankings', JSON.stringify(cloudData.weekly || {}));
+            console.log("Rankings synced from cloud to local storage");
             refreshRanking();
             refreshWeeklyRanking();
         } else {
+            console.log("No cloud data found, checking local data...");
             const localAllTime = JSON.parse(localStorage.getItem('iqTestRankings') || '[]');
             const localWeekly = JSON.parse(localStorage.getItem('iqTestWeeklyRankings') || '{}');
+
             if (localAllTime.length > 0) {
+                console.log(`Uploading ${localAllTime.length} local rankings to cloud`);
                 await saveRankingsToCloud(localAllTime, localWeekly);
-                console.log("Local rankings uploaded to cloud.");
+                console.log("Local rankings uploaded to cloud successfully");
+            } else {
+                console.log("No local rankings to upload");
             }
         }
-        if (UserManager) await UserManager.syncUserData();
+
+        if (UserManager && typeof UserManager.syncUserData === 'function') {
+            await UserManager.syncUserData();
+            console.log("User data sync completed");
+        }
+
     } catch (error) {
-        console.warn("Error during ranking sync:", error);
+        console.error("Error during ranking sync:", error);
+        console.error("Sync error details:", {
+            name: error.name,
+            message: error.message,
+            code: error.code || 'Unknown'
+        });
     }
 }
 
 function initializeFirebase() {
+    console.log('Initializing Firebase...');
+    console.log('Current URL:', window.location.href);
+    console.log('Current Domain:', window.location.hostname);
+    console.log('Current Protocol:', window.location.protocol);
+
     try {
         if (!validateFirebaseAccess()) {
+            console.warn('Firebase: Access validation failed');
             isFirebaseEnabled = false;
             return;
         }
-        if (typeof firebase !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            isFirebaseEnabled = true;
-            syncRankingsData();
-        } else {
-            console.warn("Firebase SDK not loaded.");
+
+        if (typeof firebase === 'undefined') {
+            console.warn("Firebase SDK not loaded. Checking script tags...");
+            const firebaseScripts = document.querySelectorAll('script[src*="firebase"]');
+            console.log('Firebase scripts found:', firebaseScripts.length);
+            isFirebaseEnabled = false;
+            return;
         }
+
+        console.log('Firebase SDK available, initializing...');
+
+        // Firebase 앱이 이미 초기화되어 있는지 확인
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase app initialized');
+        } else {
+            console.log('Firebase app already initialized');
+        }
+
+        db = firebase.firestore();
+        isFirebaseEnabled = true;
+
+        console.log('Firestore initialized successfully');
+        console.log('Starting data synchronization...');
+
+        syncRankingsData().then(() => {
+            console.log('Initial data sync completed');
+        }).catch((error) => {
+            console.error('Initial data sync failed:', error);
+        });
+
     } catch (error) {
         console.error("Firebase initialization error:", error);
+        console.error("Error details:", {
+            name: error.name,
+            message: error.message,
+            code: error.code
+        });
         isFirebaseEnabled = false;
     }
 }
