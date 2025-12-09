@@ -533,3 +533,121 @@ function generatePuzzle(difficulty) {
             return generateEasyCountPuzzle();
     }
 }
+
+// ============================================
+// Extended Puzzle Generation for Game Modes
+// ============================================
+
+// Extended puzzle generator compatible with game modes
+function generateExtendedPuzzle(type, difficulty = 'medium') {
+    switch (type) {
+        case 'odd-one-out':
+            return generateOddOneOutPuzzle(difficulty);
+        case 'analogy':
+            return generateAnalogyPuzzle(difficulty);
+        case 'sequence':
+            return generatePuzzle(difficulty);
+        case 'grid':
+            return generatePuzzle('hard'); // Grid puzzles are typically hard
+        case 'equation':
+            return generateEquationPuzzle(difficulty);
+        default:
+            return generatePuzzle(difficulty);
+    }
+}
+
+// Generate odd-one-out puzzle
+function generateOddOneOutPuzzle(difficulty) {
+    const shapes = ['circle', 'triangle', 'square', 'pentagon', 'hexagon'];
+    const colors = ['black', 'gray', 'white'];
+
+    // Create 3 similar + 1 different
+    const majorityType = randomFromArray(shapes);
+    const minorityType = randomFromArray(shapes.filter(s => s !== majorityType));
+    const commonColor = randomFromArray(colors);
+
+    const options = [];
+    const correctIndex = Math.floor(Math.random() * 4);
+
+    for (let i = 0; i < 4; i++) {
+        options.push(new Shape(
+            i === correctIndex ? minorityType : majorityType,
+            'empty',
+            commonColor,
+            0,
+            'medium'
+        ));
+    }
+
+    return {
+        kind: 'odd-one-out',
+        difficulty: difficulty,
+        options: options,
+        correctIndex: correctIndex,
+        ruleDescription: `3개는 ${majorityType}, 1개만 ${minorityType}`
+    };
+}
+
+// Generate analogy puzzle
+function generateAnalogyPuzzle(difficulty) {
+    const shapes = ['triangle', 'square', 'pentagon', 'hexagon'];
+
+    // A -> B relationship (add 1 side)
+    const A = randomFromArray(shapes.slice(0, -1));
+    const AIndex = shapes.indexOf(A);
+    const B = shapes[AIndex + 1];
+
+    // C -> D (apply same relationship)
+    const C = randomFromArray(shapes.slice(0, -1));
+    const CIndex = shapes.indexOf(C);
+    const D = CIndex < shapes.length - 1 ? shapes[CIndex + 1] : 'circle';
+
+    const makeShape = (type) => new Shape(type, 'empty', 'black', 0, 'medium');
+
+    // Create wrong options
+    const wrongOptions = shapes.filter(s => s !== D).slice(0, 3);
+    const options = [...wrongOptions, D].sort(() => Math.random() - 0.5);
+    const correctIndex = options.indexOf(D);
+
+    return {
+        kind: 'analogy',
+        difficulty: difficulty,
+        analogyPairs: {
+            A: makeShape(A),
+            B: makeShape(B),
+            C: makeShape(C)
+        },
+        options: options.map(makeShape),
+        correctIndex: correctIndex,
+        ruleDescription: `${A}→${B} 관계를 ${C}→? 에 적용`
+    };
+}
+
+// Generate equation puzzle
+function generateEquationPuzzle(difficulty) {
+    const shapes = ['triangle', 'square', 'pentagon'];
+    const values = { triangle: 3, square: 4, pentagon: 5 };
+
+    const shape1 = randomFromArray(shapes);
+    const shape2 = randomFromArray(shapes);
+    const result = values[shape1] + values[shape2];
+
+    // Find shape with closest value to result
+    const resultOptions = Object.keys(values).filter(s => values[s] <= result + 2);
+    const resultShape = resultOptions.find(s => values[s] === result) || 'hexagon';
+
+    const wrongOptions = shapes.filter(s => s !== resultShape).slice(0, 3);
+    const options = [resultShape, ...wrongOptions].sort(() => Math.random() - 0.5);
+    const correctIndex = options.indexOf(resultShape);
+
+    return {
+        kind: 'equation',
+        difficulty: difficulty,
+        equation: {
+            problem: `${shape1}(${values[shape1]}) + ${shape2}(${values[shape2]}) = ?`
+        },
+        options: options.map(type => new Shape(type, 'empty', 'black', 0, 'medium')),
+        correctIndex: correctIndex,
+        ruleDescription: `도형의 변 개수를 더하기: ${values[shape1]} + ${values[shape2]} = ${result}`
+    };
+}
