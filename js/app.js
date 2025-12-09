@@ -1222,10 +1222,10 @@ function refreshMainTypeRanking(type) {
         return;
     }
 
-    const top3Rankings = rankings.slice(0, 3); // 상위 3명만 표시
-    let html = top3Rankings.map((rank, index) => `
+    const top10Rankings = rankings.slice(0, 10); // 상위 10명 표시
+    let html = top10Rankings.map((rank, index) => `
         <div style="display: flex; align-items: center; padding: 4px 6px; margin-bottom: 2px; background: ${index < 3 ? getRankingBg(index) : 'rgba(0,0,0,0.02)'}; border-radius: 4px; font-size: 0.7rem;">
-            <div style="width: 16px; text-align: center; font-weight: bold; color: ${index < 3 ? '#007bff' : '#666'}; font-size: 0.65rem;">${getMedalIcon(index)}</div>
+            <div style="width: 16px; text-align: center; font-weight: bold; color: ${index < 3 ? '#007bff' : '#666'}; font-size: 0.65rem;">${index < 3 ? getMedalIcon(index) : (index + 1)}</div>
             <div style="flex: 1; margin-left: 4px; overflow: hidden;">
                 <div style="font-weight: 600; color: #333; font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rank.nickname}</div>
             </div>
