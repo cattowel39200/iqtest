@@ -65,7 +65,7 @@ class Puzzle {
 // ============================================
 
 const polygonOrder = [ShapeTypes.CIRCLE, ShapeTypes.TRIANGLE, ShapeTypes.SQUARE, ShapeTypes.PENTAGON, ShapeTypes.HEXAGON];
-const fillOrder = [FillTypes.EMPTY, FillTypes.QUARTER, FillTypes.HALF, FillTypes.FULL];
+const fillOrder = [FillTypes.FULL, FillTypes.QUARTER, FillTypes.HALF, FillTypes.FULL];
 const colorOrder = [ColorTypes.BLACK, ColorTypes.GRAY, ColorTypes.WHITE];
 const sizeOrder = [SizeTypes.SMALL, SizeTypes.MEDIUM, SizeTypes.LARGE];
 
@@ -124,7 +124,7 @@ function generateEasyCountPuzzle() {
     for (let i = 0; i < length; i++) {
         sequence.push(new Shape(
             ShapeTypes.CIRCLE,
-            FillTypes.EMPTY,
+            FillTypes.FULL,
             ColorTypes.BLACK,
             0,
             SizeTypes.MEDIUM,
@@ -149,7 +149,7 @@ function generateEasyCountPuzzle() {
 
     const options = dotsArray.map(d => new Shape(
         ShapeTypes.CIRCLE,
-        FillTypes.EMPTY,
+        FillTypes.FULL,
         ColorTypes.BLACK,
         0,
         SizeTypes.MEDIUM,
@@ -173,7 +173,7 @@ function generateEasyShapePuzzle() {
     for (let i = 0; i < length; i++) {
         sequence.push(new Shape(
             polygonOrder[(startIdx + i) % polygonOrder.length],
-            FillTypes.EMPTY,
+            FillTypes.FULL,
             ColorTypes.BLACK,
             0,
             SizeTypes.MEDIUM,
@@ -184,14 +184,14 @@ function generateEasyShapePuzzle() {
     const correctShape = polygonOrder[(startIdx + length) % polygonOrder.length];
 
     // Generate options
-    const correctOption = new Shape(correctShape, FillTypes.EMPTY, ColorTypes.BLACK, 0, SizeTypes.MEDIUM, 1);
+    const correctOption = new Shape(correctShape, FillTypes.FULL, ColorTypes.BLACK, 0, SizeTypes.MEDIUM, 1);
     const wrongOptions = [];
 
     // Add 3 wrong shapes
     for (let i = 1; i <= 3; i++) {
         wrongOptions.push(new Shape(
             polygonOrder[(polygonOrder.indexOf(correctShape) + i) % polygonOrder.length],
-            FillTypes.EMPTY,
+            FillTypes.FULL,
             ColorTypes.BLACK,
             0,
             SizeTypes.MEDIUM,
@@ -258,7 +258,7 @@ function generateMediumShapeDotsPuzzle() {
     for (let i = 0; i < length; i++) {
         sequence.push(new Shape(
             shapeOrder[i % shapeOrder.length],
-            FillTypes.EMPTY,
+            FillTypes.FULL,
             ColorTypes.BLACK,
             0,
             SizeTypes.MEDIUM,
@@ -269,7 +269,7 @@ function generateMediumShapeDotsPuzzle() {
 
     const correctShape = new Shape(
         shapeOrder[length % shapeOrder.length],
-        FillTypes.EMPTY,
+        FillTypes.FULL,
         ColorTypes.BLACK,
         0,
         SizeTypes.MEDIUM,
@@ -315,7 +315,7 @@ function generateMediumRotationColorPuzzle() {
     for (let i = 0; i < length; i++) {
         sequence.push(new Shape(
             ShapeTypes.TRIANGLE,
-            FillTypes.EMPTY,
+            FillTypes.FULL,
             color,
             rotation,
             SizeTypes.MEDIUM
@@ -326,7 +326,7 @@ function generateMediumRotationColorPuzzle() {
 
     const correctShape = new Shape(
         ShapeTypes.TRIANGLE,
-        FillTypes.EMPTY,
+        FillTypes.FULL,
         color,
         rotation,
         SizeTypes.MEDIUM
@@ -379,7 +379,7 @@ function generateHardGridSumPuzzle() {
         [a, b, c].forEach(dots => {
             row.push(new Shape(
                 ShapeTypes.CIRCLE,
-                FillTypes.EMPTY,
+                FillTypes.FULL,
                 ColorTypes.BLACK,
                 0,
                 SizeTypes.MEDIUM,
@@ -395,7 +395,7 @@ function generateHardGridSumPuzzle() {
     const correctDots = grid[missingRow][missingCol].dots;
     grid[missingRow][missingCol] = new Shape(
         ShapeTypes.CIRCLE,
-        FillTypes.EMPTY,
+        FillTypes.FULL,
         ColorTypes.BLACK,
         0,
         SizeTypes.MEDIUM
@@ -416,7 +416,7 @@ function generateHardGridSumPuzzle() {
 
     const options = dotsArray.map(d => new Shape(
         ShapeTypes.CIRCLE,
-        FillTypes.EMPTY,
+        FillTypes.FULL,
         ColorTypes.BLACK,
         0,
         SizeTypes.MEDIUM,
@@ -462,9 +462,9 @@ function generateHardShapeOperationPuzzle() {
             }
         }
 
-        row.push(new Shape(shapeA, FillTypes.EMPTY, ColorTypes.BLACK, 0, SizeTypes.MEDIUM));
-        row.push(new Shape(shapeB, FillTypes.EMPTY, ColorTypes.BLACK, 0, SizeTypes.MEDIUM));
-        row.push(new Shape(resultShape, FillTypes.EMPTY, ColorTypes.BLACK, 0, SizeTypes.MEDIUM));
+        row.push(new Shape(shapeA, FillTypes.FULL, ColorTypes.BLACK, 0, SizeTypes.MEDIUM));
+        row.push(new Shape(shapeB, FillTypes.FULL, ColorTypes.BLACK, 0, SizeTypes.MEDIUM));
+        row.push(new Shape(resultShape, FillTypes.FULL, ColorTypes.BLACK, 0, SizeTypes.MEDIUM));
 
         grid.push(row);
     }
@@ -475,16 +475,16 @@ function generateHardShapeOperationPuzzle() {
     const correctShape = grid[missingRow][missingCol].type;
     grid[missingRow][missingCol] = new Shape(
         null, // No type - represents missing
-        FillTypes.EMPTY,
+        FillTypes.FULL,
         ColorTypes.BLACK,
         0,
         SizeTypes.MEDIUM
     );
 
     // Generate options
-    const correctOption = new Shape(correctShape, FillTypes.EMPTY, ColorTypes.BLACK, 0, SizeTypes.MEDIUM);
+    const correctOption = new Shape(correctShape, FillTypes.FULL, ColorTypes.BLACK, 0, SizeTypes.MEDIUM);
     const wrongOptions = shapes.filter(s => s !== correctShape).slice(0, 3).map(s =>
-        new Shape(s, FillTypes.EMPTY, ColorTypes.BLACK, 0, SizeTypes.MEDIUM)
+        new Shape(s, FillTypes.FULL, ColorTypes.BLACK, 0, SizeTypes.MEDIUM)
     );
 
     const allOptions = shuffleArray([correctOption, ...wrongOptions]);
@@ -609,8 +609,15 @@ function generateAnalogyPuzzle(difficulty) {
 
     // Create wrong options ensuring no duplicates
     const allShapes = ['triangle', 'square', 'pentagon', 'hexagon', 'circle'];
-    const wrongOptions = allShapes.filter(s => s !== D).slice(0, 3);
-    const options = [D, ...wrongOptions].sort(() => Math.random() - 0.5);
+    let wrongOptions = allShapes.filter(s => s !== D);
+
+    // Shuffle and take exactly 3 different options
+    wrongOptions.sort(() => Math.random() - 0.5);
+    wrongOptions = wrongOptions.slice(0, 3);
+
+    // Ensure we have exactly 4 unique options
+    const options = [D, ...wrongOptions];
+    options.sort(() => Math.random() - 0.5);
     const correctIndex = options.indexOf(D);
 
     return {
@@ -629,19 +636,24 @@ function generateAnalogyPuzzle(difficulty) {
 
 // Generate equation puzzle
 function generateEquationPuzzle(difficulty) {
-    const shapes = ['triangle', 'square', 'pentagon'];
-    const values = { triangle: 3, square: 4, pentagon: 5 };
+    const shapes = ['triangle', 'square', 'pentagon', 'hexagon'];
+    const values = { triangle: 3, square: 4, pentagon: 5, hexagon: 6 };
 
     const shape1 = randomFromArray(shapes);
     const shape2 = randomFromArray(shapes);
     const result = values[shape1] + values[shape2];
 
-    // Find shape with closest value to result
-    const resultOptions = Object.keys(values).filter(s => values[s] <= result + 2);
-    const resultShape = resultOptions.find(s => values[s] === result) || 'hexagon';
+    // Find shape with exact value match
+    const resultShape = Object.keys(values).find(s => values[s] === result) || 'hexagon';
 
-    const wrongOptions = shapes.filter(s => s !== resultShape).slice(0, 3);
-    const options = [resultShape, ...wrongOptions].sort(() => Math.random() - 0.5);
+    // Create exactly 3 wrong options, ensuring no duplicates
+    let wrongOptions = shapes.filter(s => s !== resultShape);
+    wrongOptions.sort(() => Math.random() - 0.5);
+    wrongOptions = wrongOptions.slice(0, 3);
+
+    // Ensure 4 unique options
+    const options = [resultShape, ...wrongOptions];
+    options.sort(() => Math.random() - 0.5);
     const correctIndex = options.indexOf(resultShape);
 
     return {

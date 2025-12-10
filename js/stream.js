@@ -446,21 +446,18 @@ class StreamController {
                 shape.style.lineHeight = '1.2';
             }
 
-            // Handle fill types - ensure shapes are visible
-            if (shapeData.fill === 'empty') {
-                // For empty shapes, add border to make them visible
-                if (shapeData.type === 'circle') {
-                    shape.style.backgroundColor = 'transparent';
-                    shape.style.border = '3px solid #3b82f6';
-                } else if (shapeData.type === 'square') {
-                    shape.style.backgroundColor = 'transparent';
-                    shape.style.border = '3px solid #10b981';
-                } else if (shapeData.type === 'triangle') {
-                    // Triangle is handled by CSS border technique
-                }
-            } else {
-                // Default to full/solid shapes which are already styled in CSS
+            // Ensure all shapes are visible and filled
+            // Override any empty fill settings - all shapes should be solid
+            if (shapeData.type === 'circle') {
+                shape.style.backgroundColor = '#3b82f6'; // Blue circle
+            } else if (shapeData.type === 'square') {
+                shape.style.backgroundColor = '#10b981'; // Green square
+            } else if (shapeData.type === 'pentagon') {
+                shape.style.backgroundColor = '#f59e0b'; // Orange pentagon
+            } else if (shapeData.type === 'hexagon') {
+                shape.style.backgroundColor = '#8b5cf6'; // Purple hexagon
             }
+            // Triangle uses CSS border technique, already visible
 
             // Add color styling
             if (shapeData.color === 'gray') {
