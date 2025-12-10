@@ -29,6 +29,52 @@ class StreamController {
             "📱 모바일 최적화 | 🌟 AI 자동 생성 | 🏅 레벨 시스템",
             "🎯 수열/비례/그리드 문제 | 🧠 멘사급 난이도 | 📈 IQ 측정"
         ];
+
+        // Challenge banners based on problem types
+        this.challengeBanners = {
+            'sequence': [
+                "🧠 이 패턴 문제 못 풀면 IQ 100 이하!",
+                "🎯 수열 문제 맞추면 IQ 120 이상 확정!",
+                "🔥 3초 안에 풀면 멘사 회원급!",
+                "⚡ 이것도 못 풀어? 논리적 사고력 점검!",
+                "🧩 패턴 인식력 테스트! 당신의 IQ는?"
+            ],
+            'odd-one-out': [
+                "👀 다른 하나 못 찾으면 관찰력 제로!",
+                "🎯 이것도 못 찾으면 IQ 90 이하!",
+                "🔍 집중력 테스트! 5초 안에 찾기!",
+                "⚡ 다른 하나 찾기 = 천재의 기본기!",
+                "🧠 관찰력 IQ 측정! 도전해보세요!"
+            ],
+            'analogy': [
+                "🧠 비례 문제! IQ 130 이상만 풀 수 있어!",
+                "⚡ 추상적 사고력 테스트! 당신은?",
+                "🎯 관계 파악 못 하면 논리력 의심!",
+                "🔥 멘사 수준 비례 문제! 도전!",
+                "💡 A:B = C:? 이것도 못 풀어?"
+            ],
+            'grid': [
+                "🎯 격자 문제! IQ 140 이상 도전!",
+                "🧠 공간 지각 능력 최고 난이도!",
+                "⚡ 이 그리드 못 풀면 포기하세요!",
+                "🔥 멘사 최고 난이도! 천재만 풀어!",
+                "💎 격자 퍼즐 마스터가 되어보세요!"
+            ],
+            'equation': [
+                "🧮 수식 문제! IQ 125 이상만 풀기!",
+                "⚡ 수리 논리력 테스트! 당신의 IQ는?",
+                "🎯 계산 능력 + 논리력 = 당신은?",
+                "🔥 도형 수식! 천재들의 게임!",
+                "💡 이 수식 못 풀면 수학 포기!"
+            ],
+            'default': [
+                "🧠 이 문제 못 풀면 IQ 100 이하!",
+                "🎯 도전해보세요! IQ 측정 중!",
+                "⚡ 당신의 두뇌 능력을 증명하세요!",
+                "🔥 천재들만 풀 수 있는 문제!",
+                "💡 IQ 테스트 진행 중! 참여하세요!"
+            ]
+        };
     }
 
     // ============================================
@@ -274,6 +320,9 @@ class StreamController {
 
         // Update difficulty display
         this.updateDifficultyDisplay(problem.difficulty);
+
+        // Update challenge banner based on problem type
+        this.updateChallengeBanner(problem.kind || 'default', problem.difficulty);
     }
 
     displayDemoProblem(problem) {
@@ -324,6 +373,9 @@ class StreamController {
         });
 
         this.updateDifficultyDisplay(problem.difficulty);
+
+        // Update challenge banner
+        this.updateChallengeBanner(problem.type || 'sequence', problem.difficulty);
     }
 
     displayAnalogy(analogyPairs, container) {
@@ -462,6 +514,41 @@ class StreamController {
         const problemDisplay = document.getElementById('problemDisplay');
         problemDisplay.classList.remove('difficulty-easy', 'difficulty-medium', 'difficulty-hard');
         problemDisplay.classList.add(`difficulty-${difficulty}`);
+    }
+
+    // Update challenge banner based on problem type
+    updateChallengeBanner(problemType, difficulty) {
+        const bannerElement = document.getElementById('challengeText');
+        const challengeBanner = document.getElementById('challengeBanner');
+
+        // Get appropriate messages for problem type
+        const messages = this.challengeBanners[problemType] || this.challengeBanners['default'];
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+        bannerElement.textContent = randomMessage;
+
+        // Add difficulty-based styling
+        challengeBanner.classList.remove('easy-challenge', 'medium-challenge', 'hard-challenge');
+
+        if (difficulty === 'easy') {
+            challengeBanner.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            challengeBanner.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.4)';
+        } else if (difficulty === 'medium') {
+            challengeBanner.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+            challengeBanner.style.boxShadow = '0 10px 30px rgba(245, 158, 11, 0.4)';
+        } else {
+            challengeBanner.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            challengeBanner.style.boxShadow = '0 10px 30px rgba(239, 68, 68, 0.4)';
+        }
+
+        // Add problem type specific effects
+        if (problemType === 'analogy') {
+            challengeBanner.style.borderLeft = '5px solid #8b5cf6';
+        } else if (problemType === 'grid') {
+            challengeBanner.style.borderLeft = '5px solid #f59e0b';
+        } else {
+            challengeBanner.style.borderLeft = 'none';
+        }
     }
 
     addProblemTransition() {

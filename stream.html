@@ -119,7 +119,11 @@
             color: #1f2937;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
-            min-height: 600px;
+            height: 650px; /* Fixed height */
+            width: 100%;
+            max-width: 800px; /* Fixed max width */
+            margin-left: auto;
+            margin-right: auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -157,6 +161,31 @@
             font-size: 0.8rem;
             color: #6b7280;
             margin-top: 5px;
+        }
+
+        /* Challenge Banner */
+        .challenge-banner {
+            text-align: center;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+            animation: banner-pulse 3s ease-in-out infinite;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .challenge-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes banner-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 15px 40px rgba(239, 68, 68, 0.6); }
         }
 
         /* Next Problem Status */
@@ -400,6 +429,15 @@
             .chat-commands {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .challenge-text {
+                font-size: 1.1rem;
+            }
+
+            .challenge-banner {
+                padding: 15px;
+                margin: 15px 0;
+            }
         }
 
         /* Special Effects */
@@ -440,6 +478,13 @@
     </div>
 
     <div class="stream-container">
+        <!-- IQ Challenge Banner -->
+        <div class="challenge-banner" id="challengeBanner">
+            <div class="challenge-text" id="challengeText">
+                🧠 이 문제를 못 풀면 IQ 100 이하! 도전해보세요!
+            </div>
+        </div>
+
         <!-- Next Problem Status -->
         <div class="next-problem-status">
             <div class="next-problem-text" id="nextProblemText">곧 새로운 문제가 나타납니다!</div>
