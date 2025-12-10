@@ -188,15 +188,6 @@
             50% { transform: scale(1.02); box-shadow: 0 15px 40px rgba(239, 68, 68, 0.6); }
         }
 
-        /* Next Problem Status */
-        .next-problem-status {
-            text-align: center;
-            margin: 20px 0;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 15px;
-            backdrop-filter: blur(10px);
-        }
 
         .problem-title {
             font-size: 2rem;
@@ -350,26 +341,6 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Status Bar */
-        .status-bar {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 15px;
-            margin: 20px 0;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .status-item {
-            display: inline-block;
-            margin: 0 20px;
-            font-size: 1.1rem;
-        }
-
-        .status-value {
-            font-weight: bold;
-            color: #4ade80;
-        }
 
         /* Mobile Optimization */
         @media (max-width: 768px) {
@@ -485,23 +456,7 @@
             </div>
         </div>
 
-        <!-- Next Problem Status -->
-        <div class="next-problem-status">
-            <div class="next-problem-text" id="nextProblemText">곧 새로운 문제가 나타납니다!</div>
-        </div>
 
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-item">
-                문제 번호: <span class="status-value" id="problemNumber">1</span>
-            </div>
-            <div class="status-item">
-                난이도: <span class="status-value" id="currentDifficulty">중급</span>
-            </div>
-            <div class="status-item">
-                시청자: <span class="status-value" id="viewerCount">127</span>명
-            </div>
-        </div>
 
         <!-- Problem Display -->
         <div class="problem-display" id="problemDisplay">

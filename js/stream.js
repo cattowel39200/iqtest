@@ -86,7 +86,6 @@ class StreamController {
         this.startTimer();
         this.generateNewProblem();
         this.startHookRotation();
-        this.simulateViewerCount();
         this.setupEventListeners();
 
         console.log('✅ Stream Active - Problem updates every 60 seconds');
@@ -132,9 +131,6 @@ class StreamController {
             // Add visual effects as timer gets low
             if (this.timer <= 10) {
                 document.getElementById('timer').classList.add('glow');
-                if (this.timer <= 5) {
-                    document.getElementById('nextProblemText').style.animation = 'blink 0.3s infinite';
-                }
             }
 
             // Generate new problem when timer hits 0
@@ -148,7 +144,6 @@ class StreamController {
     resetTimer() {
         this.timer = 60;
         document.getElementById('timer').classList.remove('glow');
-        document.getElementById('nextProblemText').style.animation = 'blink 1s infinite';
     }
 
     updateTimerDisplay() {
@@ -157,15 +152,6 @@ class StreamController {
         document.getElementById('timer').textContent =
             `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-        // Update next problem text based on timer
-        const nextText = document.getElementById('nextProblemText');
-        if (this.timer > 10) {
-            nextText.textContent = '곧 새로운 문제가 나타납니다!';
-        } else if (this.timer > 5) {
-            nextText.textContent = '🔥 새로운 문제 준비중...';
-        } else {
-            nextText.textContent = '⚡ 잠시 후 문제 교체!';
-        }
     }
 
     pauseStream() {
@@ -501,16 +487,11 @@ class StreamController {
     // ============================================
 
     updateProblemCounter() {
-        document.getElementById('problemNumber').textContent = this.currentProblemNumber;
         document.getElementById('displayProblemNumber').textContent = this.currentProblemNumber;
     }
 
     updateDifficultyDisplay(difficulty) {
-        const difficultyNames = { easy: '초급', medium: '중급', hard: '고급' };
-        const difficultyElement = document.getElementById('currentDifficulty');
-        difficultyElement.textContent = difficultyNames[difficulty] || '중급';
-
-        // Add difficulty-specific styling
+        // Add difficulty-specific styling to problem display
         const problemDisplay = document.getElementById('problemDisplay');
         problemDisplay.classList.remove('difficulty-easy', 'difficulty-medium', 'difficulty-hard');
         problemDisplay.classList.add(`difficulty-${difficulty}`);
@@ -591,18 +572,6 @@ class StreamController {
         }, 12000);
     }
 
-    simulateViewerCount() {
-        setInterval(() => {
-            if (!this.isActive) return;
-
-            // Simulate realistic viewer count changes
-            const change = Math.floor(Math.random() * 20) - 8; // ±8 viewers
-            this.viewerCount += change;
-            this.viewerCount = Math.max(50, Math.min(800, this.viewerCount)); // Keep between 50-800
-
-            document.getElementById('viewerCount').textContent = this.viewerCount;
-        }, 5000);
-    }
 
     // ============================================
     // Utility Methods
@@ -622,7 +591,6 @@ class StreamController {
     getStreamStats() {
         return {
             problemNumber: this.currentProblemNumber,
-            viewerCount: this.viewerCount,
             timeRemaining: this.timer,
             isActive: this.isActive,
             currentDifficulty: this.currentProblem?.difficulty
