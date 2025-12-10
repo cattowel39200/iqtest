@@ -559,12 +559,14 @@ function generateExtendedPuzzle(type, difficulty = 'medium') {
 // Generate odd-one-out puzzle
 function generateOddOneOutPuzzle(difficulty) {
     const shapes = ['circle', 'triangle', 'square', 'pentagon', 'hexagon'];
-    const colors = ['black', 'gray', 'white'];
+    const colors = ['black'];
+    const fills = ['full'];
 
     // Create 3 similar + 1 different
     const majorityType = randomFromArray(shapes);
     const minorityType = randomFromArray(shapes.filter(s => s !== majorityType));
     const commonColor = randomFromArray(colors);
+    const commonFill = randomFromArray(fills);
 
     const options = [];
     const correctIndex = Math.floor(Math.random() * 4);
@@ -572,7 +574,7 @@ function generateOddOneOutPuzzle(difficulty) {
     for (let i = 0; i < 4; i++) {
         options.push(new Shape(
             i === correctIndex ? minorityType : majorityType,
-            'empty',
+            commonFill,
             commonColor,
             0,
             'medium'
@@ -598,15 +600,17 @@ function generateAnalogyPuzzle(difficulty) {
     const B = shapes[AIndex + 1];
 
     // C -> D (apply same relationship)
-    const C = randomFromArray(shapes.slice(0, -1));
+    const validC = shapes.slice(0, -1); // Exclude last shape to ensure D exists
+    const C = randomFromArray(validC);
     const CIndex = shapes.indexOf(C);
-    const D = CIndex < shapes.length - 1 ? shapes[CIndex + 1] : 'circle';
+    const D = shapes[CIndex + 1]; // Always valid now
 
-    const makeShape = (type) => new Shape(type, 'empty', 'black', 0, 'medium');
+    const makeShape = (type) => new Shape(type, 'full', 'black', 0, 'medium');
 
-    // Create wrong options
-    const wrongOptions = shapes.filter(s => s !== D).slice(0, 3);
-    const options = [...wrongOptions, D].sort(() => Math.random() - 0.5);
+    // Create wrong options ensuring no duplicates
+    const allShapes = ['triangle', 'square', 'pentagon', 'hexagon', 'circle'];
+    const wrongOptions = allShapes.filter(s => s !== D).slice(0, 3);
+    const options = [D, ...wrongOptions].sort(() => Math.random() - 0.5);
     const correctIndex = options.indexOf(D);
 
     return {
@@ -646,7 +650,7 @@ function generateEquationPuzzle(difficulty) {
         equation: {
             problem: `${shape1}(${values[shape1]}) + ${shape2}(${values[shape2]}) = ?`
         },
-        options: options.map(type => new Shape(type, 'empty', 'black', 0, 'medium')),
+        options: options.map(type => new Shape(type, 'full', 'black', 0, 'medium')),
         correctIndex: correctIndex,
         ruleDescription: `도형의 변 개수를 더하기: ${values[shape1]} + ${values[shape2]} = ${result}`
     };

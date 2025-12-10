@@ -125,6 +125,13 @@
             justify-content: center;
         }
 
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
         .problem-number {
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
@@ -132,8 +139,34 @@
             border-radius: 20px;
             font-size: 1rem;
             font-weight: bold;
-            display: inline-block;
-            margin-bottom: 30px;
+        }
+
+        .problem-timer {
+            text-align: center;
+        }
+
+        .problem-timer .timer-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4ade80;
+            text-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .problem-timer .timer-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        /* Next Problem Status */
+        .next-problem-status {
+            text-align: center;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
         }
 
         .problem-title {
@@ -315,8 +348,14 @@
                 padding: 15px;
             }
 
-            .timer-display {
-                font-size: 2.5rem;
+            .problem-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .problem-timer .timer-display {
+                font-size: 2rem;
             }
 
             .problem-display {
@@ -401,10 +440,8 @@
     </div>
 
     <div class="stream-container">
-        <!-- Timer Section -->
-        <div class="timer-section">
-            <div class="timer-display" id="timer">01:00</div>
-            <div class="timer-label">다음 문제까지</div>
+        <!-- Next Problem Status -->
+        <div class="next-problem-status">
             <div class="next-problem-text" id="nextProblemText">곧 새로운 문제가 나타납니다!</div>
         </div>
 
@@ -423,7 +460,13 @@
 
         <!-- Problem Display -->
         <div class="problem-display" id="problemDisplay">
-            <div class="problem-number">문제 #<span id="displayProblemNumber">1</span></div>
+            <div class="problem-header">
+                <div class="problem-number">문제 #<span id="displayProblemNumber">1</span></div>
+                <div class="problem-timer">
+                    <div class="timer-display" id="timer">01:00</div>
+                    <div class="timer-label">남은 시간</div>
+                </div>
+            </div>
             <div class="problem-title" id="problemTitle">다음 패턴을 보고 빈칸에 들어갈 도형을 선택하세요</div>
 
             <div class="problem-content">
