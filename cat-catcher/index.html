@@ -106,6 +106,24 @@ button { touch-action: manipulation; }
   color: #fff; background: var(--siren); padding: 2px 8px; border-radius: 4px; display: none;
 }
 #reticle.locked .tag { display: block; }
+#calib { position: fixed; inset: 0; z-index: 5; background: rgba(13,17,31,.72); display: flex; align-items: flex-end;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.cal-card { width: 100%; max-width: 440px; margin: 0 auto; background: var(--paper); color: var(--ink); border-radius: 14px; padding: 16px 18px; }
+.cal-step { font: 600 12px var(--f-mono); color: var(--siren); letter-spacing: .06em; }
+.cal-name { font-family: var(--f-display); font-size: 30px; margin: 2px 0 6px; }
+.cal-card p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
+.cal-btns { display: grid; gap: 8px; }
+.cal-btns .alt { margin-top: 0; }
+#reticle { z-index: 6; }
+#reticle.near .tag { background: var(--signal); color: #08231d; }
+#joy {
+  position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 112px);
+  width: 92px; height: 92px; border-radius: 50%; background: var(--glass); border: 2px solid rgba(255,255,255,.25);
+  display: grid; place-items: center; touch-action: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+#joy .knob { width: 38px; height: 38px; border-radius: 50%; background: rgba(243,240,232,.85); pointer-events: none; }
+#joy span { position: absolute; bottom: -18px; font-size: 11px; color: var(--hud-dim); }
+#hud[hidden] ~ #joy { display: none; }
 
 /* sound direction ping */
 #ping {
@@ -213,7 +231,7 @@ button { touch-action: manipulation; }
     <div class="case-chip"><span class="no" id="hudCase">사건 1/3</span><span class="who" id="hudWho">용의자 치즈</span></div>
     <div class="top-right">
       <div class="timer" id="hudTime" aria-live="off">2:00</div>
-      <button class="icon-btn" id="btnCenter" aria-label="정면 다시 맞추기" title="정면 다시 맞추기">
+      <button class="icon-btn" id="btnCenter" aria-label="기준점 다시 맞추기" title="기준점 다시 맞추기">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
       </button>
       <button class="icon-btn" id="btnSound" aria-label="소리 끄기" aria-pressed="true">
@@ -243,6 +261,15 @@ button { touch-action: manipulation; }
   </div>
 </div>
 
+<div id="calib" hidden>
+  <div class="cal-card">
+    <div class="cal-step" id="calStep">기준점 1/3</div>
+    <div class="cal-name" id="calName">큰 창문 가운데</div>
+    <p>실제 집에서 휴대폰 뒷면을 이곳으로 향하게 들고, 정확히 가리키면 누르세요. 세 곳을 모두 맞추면 서 있는 위치도 계산합니다.</p>
+    <div class="cal-btns"><button class="cta" id="calMark">여기 맞춤</button><button class="cta alt" id="calSkip" hidden>2곳으로 끝내기</button></div>
+  </div>
+</div>
+<div id="joy" aria-label="이동 패드"><div class="knob"></div><span>이동</span></div>
 <div id="reticle" hidden><span class="tag">용의자</span></div>
 <div id="ping"><div class="arrow"></div><span class="lbl">야옹</span></div>
 <div id="toast" hidden></div>
@@ -261,7 +288,7 @@ button { touch-action: manipulation; }
       <dt>현장</dt><dd>우리집 거실</dd>
       <dt>제한 시간</dt><dd id="tTime">2분</dd>
     </dl>
-    <p class="how">휴대폰을 들고 <b>몸을 돌려</b> 거실을 둘러보세요. 화면 가운데 조준선에 용의자를 맞추고 <b>맨손</b>으로 잡거나 <b>그물</b>을 던지세요. <b>간식</b>을 바닥에 놓으면 고양이가 밖으로 나옵니다. 울음소리가 나는 쪽을 살피세요.</p>
+    <p class="how">휴대폰을 들고 <b>몸을 돌려</b> 둘러보고, <b>걸어가면</b> 게임 속에서도 앞으로 갑니다(왼쪽 패드로도 이동). <b>맨손은 1m</b>, <b>그물은 3m</b> 안에서만 닿습니다. 화면 가운데 조준선에 용의자를 맞추고 <b>맨손</b>으로 잡거나 <b>그물</b>을 던지세요. <b>간식</b>을 바닥에 놓으면 고양이가 밖으로 나옵니다. 울음소리가 나는 쪽을 살피세요.</p>
     <p class="how" id="embedNote" hidden><b>지금은 Claude 화면 안이라 기울기 센서가 막혀 있습니다.</b> 휴대폰을 돌려서 둘러보려면 게임 주소를 크롬이나 사파리에서 직접 여세요.</p>
     <button class="cta" id="btnStart">수사 시작</button>
   </div>
@@ -692,10 +719,17 @@ const FURN = {
 };
 
 const SPOTS = [];
+const OBST = [];   // 걸어갈 때 부딪히는 가구 (x0, x1, z0, z1)
+const NO_BLOCK = new Set(['rug', 'peePad', 'painting', 'screenBox', 'intercom', 'bowls']);
+// 고양이 이동용 바닥 길(노드) — 가구 사이 빈 바닥
+const NAV = { E1: [-1.5, -3.6], E2: [-1.5, -2.4], E3: [-1.6, -0.8], S1: [-0.5, -3.95], S2: [0.45, -3.72], W1: [1.6, -3.0], W2: [1.65, -1.6],
+  N1: [-1.2, -0.2], N2: [0.2, -0.2], N3: [1.7, -0.2], DE: [-1.1, 1.3], K0: [-1.25, 2.3], K1: [-1.25, 3.6], K2: [0.45, 3.6], D1: [1.6, 1.0], D2: [1.55, 2.35] };
+const NAV_EDGES = 'E1-E2 E2-E3 E3-N1 N1-N2 N2-N3 E1-S1 S1-S2 S2-W1 W1-W2 W2-N3 N1-DE DE-K0 K0-K1 K1-K2 N3-D1 D1-D2 D2-K2'.split(' ').map((e) => e.split('-'));
 for (const f of LAYOUT.furniture) {
   const { group, spots } = FURN[f.type]();
   const rot = f.rot === 'facePlayer' ? Math.atan2(PLAYER.x - f.x, PLAYER.z - f.z) : f.rot;
   group.position.set(f.x, 0, f.z); group.rotation.y = rot; scene.add(group); group.updateMatrixWorld(true);
+  if (!NO_BLOCK.has(f.type)) { const bb = new THREE.Box3().setFromObject(group); if (bb.max.y > 0.25) OBST.push([bb.min.x, bb.max.x, bb.min.z, bb.max.z]); }
   for (const s of spots) {
     const pos = group.localToWorld(s.pos.clone()), exit = group.localToWorld(s.exit.clone());
     const face = s.face !== undefined ? s.face + rot : Math.atan2(PLAYER.x - pos.x, PLAYER.z - pos.z);
@@ -793,6 +827,7 @@ function yawOf(q) { const f = new V3(0, 0, -1).applyQuaternion(q); return Math.a
 function updateCamera(dt) {
   if (look.gyro && (SENS.src === 'sensor' || look.ori)) {
     if (SENS.src === 'sensor') qDev.copy(qRx).multiply(qSensor); else oriToQuat(qDev, look.ori);
+    look.rawYaw = yawOf(qDev);
     if (look.needCenter) { look.yawOffset = 0 - yawOf(qDev); look.needCenter = false; camera.quaternion.copy(qTarget); }
     qYaw.setFromAxisAngle(Y_AXIS, look.yawOffset);
     qTarget.copy(qYaw).multiply(qDev);
@@ -801,6 +836,86 @@ function updateCamera(dt) {
     eul.set(look.pitch, look.yaw, 0, 'YXZ'); camera.quaternion.setFromEuler(eul);
   }
 }
+// 기준점 맞추기 — 실제 집의 두세 곳을 차례로 가리켜 방향(과 3곳이면 내 위치)을 맞춤
+const LANDMARKS = [
+  { name: '큰 창문 가운데', x: 0, z: -4.5 },
+  { name: '원목 장식장', x: 2.26, z: -2.0 },
+  { name: '냉장고', x: -2.07, z: 3.05 },
+];
+const CAL = { i: 0, yaws: [], done: false };
+const angWrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+function startCalib() { if (!look.gyro) return false; CAL.i = 0; CAL.yaws = []; G.phase = 'calib'; showCalib(); return true; }
+function showCalib() {
+  $('#calib').hidden = false; $('#calStep').textContent = `기준점 ${CAL.i + 1}/${LANDMARKS.length}`;
+  $('#calName').textContent = LANDMARKS[CAL.i].name; $('#calSkip').hidden = CAL.i < 2;
+}
+function calMark() { CAL.yaws.push(look.rawYaw ?? 0); CAL.i++; buzz(25); if (CAL.i >= LANDMARKS.length) finishCalib(); else showCalib(); }
+function solveCalib(yaws, fixed) {
+  const n = yaws.length;
+  const fit = (px, pz) => { let sx = 0, sy = 0; const br = LANDMARKS.slice(0, n).map((L) => Math.atan2(-(L.x - px), -(L.z - pz)));
+    br.forEach((b, k) => { sx += Math.cos(b - yaws[k]); sy += Math.sin(b - yaws[k]); });
+    const phi = Math.atan2(sy, sx); let err = 0; br.forEach((b, k) => { const r = angWrap(b - yaws[k] - phi); err += r * r; }); return { phi, err }; };
+  if (n < 3 || fixed) return { x: fixed ? fixed.x : PLAYER.x, z: fixed ? fixed.z : PLAYER.z, ...fit(fixed ? fixed.x : PLAYER.x, fixed ? fixed.z : PLAYER.z) };
+  let best = null;
+  for (let x = -RW / 2 + 0.3; x <= RW / 2 - 0.3; x += 0.08) for (let z = -RD / 2 + 0.3; z <= RD / 2 - 0.3; z += 0.08) {
+    if (blocked(x, z)) continue; const r = fit(x, z); if (!best || r.err < best.err) best = { x, z, ...r };
+  }
+  return best;
+}
+function finishCalib() {
+  const b = solveCalib(CAL.yaws);
+  PLAYER.x = b.x; PLAYER.z = b.z; look.yawOffset = b.phi; look.needCenter = false; CAL.done = true;
+  const deg = Math.sqrt(b.err / CAL.yaws.length) * 180 / Math.PI;
+  $('#calib').hidden = true; G.phase = 'play';
+  toast(CAL.yaws.length >= 3 ? `맞춤 완료 · 위치까지 맞췄어요 (오차 약 ${deg.toFixed(0)}°)` : '방향 맞춤 완료', 'good');
+}
+// 걷기 — 휴대폰 흔들림으로 걸음을 감지해 바라보는 방향으로 0.6m씩 이동. 왼쪽 패드로도 이동 가능
+const HAND_REACH = 1.0, NET_RANGE = 3.0, STEP_LEN = 0.6, BODY_R = 0.22;
+const WALK = { queue: 0, speed: 1.5, steps: 0, lastStep: 0, base: 9.8, lp: 9.8, up: false, motion: false, joy: null, acc: 0 };
+function blocked(x, z) {
+  if (x < -RW / 2 + BODY_R || x > RW / 2 - BODY_R || z < -RD / 2 + BODY_R || z > RD / 2 - BODY_R) return true;
+  for (const [x0, x1, z0, z1] of OBST) if (x > x0 - BODY_R && x < x1 + BODY_R && z > z0 - BODY_R && z < z1 + BODY_R) return true;
+  return false;
+}
+function tryMove(dx, dz) {
+  const x0 = PLAYER.x, z0 = PLAYER.z;
+  if (!blocked(PLAYER.x + dx, PLAYER.z)) PLAYER.x += dx;
+  if (!blocked(PLAYER.x, PLAYER.z + dz)) PLAYER.z += dz;
+  const moved = Math.hypot(PLAYER.x - x0, PLAYER.z - z0);
+  WALK.acc += moved; if (WALK.acc >= STEP_LEN) { WALK.acc = 0; footstepNearCat(); }
+  return moved > 1e-4;
+}
+function heading() { const f = new V3(0, 0, -1).applyQuaternion(camera.quaternion); f.y = 0; return f.lengthSq() < 1e-4 ? null : f.normalize(); }
+function onStep() { if (G.phase !== 'play') return; WALK.queue = Math.min(WALK.queue + STEP_LEN, 1.8); WALK.steps++; }
+addEventListener('devicemotion', (e) => {
+  const a = e.accelerationIncludingGravity; if (!a || a.x == null) return; WALK.motion = true;
+  const mag = Math.hypot(a.x, a.y, a.z); WALK.base = WALK.base * 0.985 + mag * 0.015; WALK.lp = WALK.lp * 0.75 + mag * 0.25;
+  const now = performance.now();
+  if (!WALK.up && WALK.lp > WALK.base + 1.4 && now - WALK.lastStep > 320) { WALK.up = true; WALK.lastStep = now; onStep(); }
+  else if (WALK.up && WALK.lp < WALK.base + 0.4) WALK.up = false;
+});
+function updateWalk(dt) {
+  const h = heading(); let fwd = 0, side = 0;
+  if (WALK.queue > 0) { const d = Math.min(WALK.queue, WALK.speed * dt); WALK.queue -= d; fwd += d; }
+  if (WALK.joy) { fwd += WALK.joy.y * 1.3 * dt; side += WALK.joy.x * 1.0 * dt; }
+  if (h && (fwd || side)) { const r = new V3(-h.z, 0, h.x); if (!tryMove(h.x * fwd + r.x * side, h.z * fwd + r.z * side) && WALK.queue > 0) { WALK.queue = 0; toast('막혀서 더 갈 수 없어요'); } }
+  const bob = WALK.queue > 0 || (WALK.joy && Math.abs(WALK.joy.y) > 0.2) ? Math.sin(performance.now() / 85) * 0.012 : 0;
+  camera.position.set(PLAYER.x, PLAYER.y + bob, PLAYER.z);
+}
+function footstepNearCat() {
+  if (G.phase !== 'play' || C.state !== 'hide') return;
+  const d = Math.hypot(C.model.root.position.x - PLAYER.x, C.model.root.position.z - PLAYER.z);
+  if (d < 1.6 && Math.random() < 0.1 + G.alert * 0.05) startle('발소리에 놀라 도망갑니다!');
+}
+(() => { // 이동 패드
+  const pad = document.getElementById('joy'), knob = pad.querySelector('.knob'); let id = null;
+  const set = (e) => { const r = pad.getBoundingClientRect(); let x = (e.clientX - r.left - r.width / 2) / (r.width / 2), y = (e.clientY - r.top - r.height / 2) / (r.height / 2);
+    const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } WALK.joy = { x, y: -y }; knob.style.transform = `translate(${x * 28}px, ${y * 28}px)`; };
+  pad.addEventListener('pointerdown', (e) => { id = e.pointerId; pad.setPointerCapture(id); set(e); });
+  pad.addEventListener('pointermove', (e) => { if (e.pointerId === id) set(e); });
+  const end = (e) => { if (e.pointerId !== id) return; id = null; WALK.joy = null; knob.style.transform = ''; };
+  pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
+})();
 // 터치: 한 손가락 = 둘러보기, 두 손가락 = 확대
 const pointers = new Map(); let pinch0 = 0, zoom0 = 1;
 canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); zoom0 = look.zoom; } });
@@ -896,7 +1011,8 @@ function setupStage() {
   selectTool('hand'); updateCounts();
   $('#hudCase').textContent = `사건 ${G.stage + 1}/${STAGES.length}`;
   $('#hudWho').textContent = `용의자 ${S.name}`;
-  look.needCenter = true; look.yaw = 0; look.pitch = -0.12; look.zoom = 1;
+  look.yaw = 0; look.pitch = -0.12; look.zoom = 1; WALK.queue = 0; WALK.joy = null;
+  if (!CAL.done) { look.needCenter = true; PLAYER.set(LAYOUT.player.x, LAYOUT.player.eye, LAYOUT.player.z); }
 }
 function placeAtSpot(spot) {
   C.spot = spot; C.state = 'hide'; C.path = null; C.pose = spot.tail === 'out' ? 'tailOut' : 'loaf';
@@ -913,6 +1029,18 @@ function ringArc(from, to) {
   for (let i = 0; i <= n; i++) { const a = a0 + (da * i) / n; out.push(new V3(PLAYER.x + Math.sin(a) * RING_R, 0, PLAYER.z + Math.cos(a) * RING_R)); }
   return out;
 }
+function nearestNode(p) { let best = null, bd = 1e9; for (const [k, [x, z]] of Object.entries(NAV)) { const d = Math.hypot(p.x - x, p.z - z); if (d < bd) { bd = d; best = k; } } return best; }
+function navPath(from, to) {
+  const a = nearestNode(from), b = nearestNode(to); if (a === b) return [new V3(NAV[a][0], 0, NAV[a][1])];
+  const dist = { [a]: 0 }, prev = {}, todo = new Set(Object.keys(NAV));
+  while (todo.size) {
+    let u = null; for (const k of todo) if (dist[k] !== undefined && (u === null || dist[k] < dist[u])) u = k;
+    if (u === null || u === b) break; todo.delete(u);
+    for (const [p, q] of NAV_EDGES) { const v = p === u ? q : q === u ? p : null; if (!v || !todo.has(v)) continue;
+      const nd = dist[u] + Math.hypot(NAV[u][0] - NAV[v][0], NAV[u][1] - NAV[v][1]); if (dist[v] === undefined || nd < dist[v]) { dist[v] = nd; prev[v] = u; } }
+  }
+  const out = []; let k = b; while (k) { out.unshift(new V3(NAV[k][0], 0, NAV[k][1])); k = prev[k]; } return out;
+}
 function buildPath(pts) {
   const clean = [pts[0]]; for (const p of pts.slice(1)) if (p.distanceTo(clean[clean.length - 1]) > 0.02) clean.push(p);
   const segs = []; let total = 0;
@@ -928,7 +1056,7 @@ function moveTo(dest, opts = {}) {
   const pts = [from];
   if (C.state === 'hide' && C.spot) pts.push(C.spot.exit.clone());
   const target = dest.spot ? dest.spot.exit : dest.point;
-  pts.push(...ringArc(pts[pts.length - 1], target));
+  pts.push(...navPath(pts[pts.length - 1], target));
   if (dest.spot) { pts.push(dest.spot.exit.clone(), dest.spot.pos.clone()); }
   else pts.push(dest.point.clone());
   const { segs, total } = buildPath(pts);
@@ -938,7 +1066,11 @@ function moveTo(dest, opts = {}) {
   if (C.spot && dest.spot !== C.spot) C.spot = null;
   G.foundSpot = null;
 }
-function randomSpot(exclude) { return pick(SPOTS.filter((s) => s !== exclude && s !== C.spot)); }
+function randomSpot(exclude) {
+  const c = SPOTS.filter((s) => s !== exclude && s !== C.spot);
+  const far = c.filter((s) => Math.hypot(s.pos.x - PLAYER.x, s.pos.z - PLAYER.z) > 2.5);
+  return pick(far.length ? far : c);
+}
 function startle(msg) {
   hiss(catCenter()); G.alert++;
   const prev = C.spot; moveTo({ spot: randomSpot(prev) }, { boost: 1.35 });
@@ -1046,6 +1178,8 @@ function doGrab() {
     hand.classList.remove('reach', 'close'); G.busy = false;
     if (G.phase !== 'play') return;
     if (!hit) { toast('헛손질! 조준선 안에 용의자를 맞추세요'); return; }
+    const hd = Math.hypot(C.model.root.position.x - PLAYER.x, C.model.root.position.z - PLAYER.z);
+    if (hd > HAND_REACH) { G.tries--; toast(`손이 닿지 않아요 (${hd.toFixed(1)}m). 1m 안으로 다가가세요`); return; }
     if (Math.random() < chanceFor('hand')) arrest('hand');
     else { jingleFail(); startle('놓쳤다! 용의자가 도망갑니다'); }
   }, 430);
@@ -1063,10 +1197,12 @@ function doNet() {
   if (G.nets <= 0) { toast('그물이 없습니다. 맨손이나 간식을 쓰세요'); return; }
   G.nets--; G.tries++; updateCounts(); G.busy = true; whoosh(); buzz(20);
   clearNet();
-  const to = aimPoint(), from = PLAYER.clone().add(new V3(0, -0.35, 0)).add(new V3(0, 0, -0.3).applyQuaternion(camera.quaternion));
+  let to = aimPoint(), short = false;
+  if (to.distanceTo(camera.position) > NET_RANGE) { const dir = to.clone().sub(camera.position).normalize(); to = camera.position.clone().addScaledVector(dir, NET_RANGE); to.y = Math.max(0.05, to.y - 0.6); short = true; }
+  const from = PLAYER.clone().add(new V3(0, -0.35, 0)).add(new V3(0, 0, -0.3).applyQuaternion(camera.quaternion));
   const dist = from.distanceTo(to), dur = 0.3 + dist * 0.11;
   const mesh = makeNetMesh(); mesh.scale.setScalar(0.2); scene.add(mesh);
-  net = { mesh, from, to, t: 0, dur, arc: 0.25 + dist * 0.12, landed: false, fade: 0 };
+  net = { mesh, from, to, t: 0, dur, arc: 0.25 + dist * 0.12, landed: false, fade: 0, short };
 }
 function updateNet(dt) {
   if (!net) return;
@@ -1087,7 +1223,7 @@ function netLanded() {
     jingleFail(); startle('그물을 빠져나갔다!'); return;
   }
   if (d < 1.8 && C.state !== 'move') { jingleFail(); startle('빗나갔다! 놀라서 도망갑니다'); return; }
-  toast('빗나갔다');
+  toast(net.short ? '그물은 3m까지만 날아갑니다. 더 다가가세요' : '빗나갔다');
 }
 function clearNet() { if (net) { scene.remove(net.mesh); net = null; } }
 function doTreat() {
@@ -1169,7 +1305,7 @@ function updateCounts() {
   document.querySelector('[data-tool="treat"]').classList.toggle('empty', G.treats <= 0);
 }
 const ACT_LABEL = { hand: '잡기', net: '던지기', treat: '놓기' };
-const HINT = { hand: '조준선에 용의자를 맞추고 잡기', net: '숨은 곳을 겨냥해서 그물 던지기', treat: '바닥을 보고 간식 놓기' };
+const HINT = { hand: '1m 안으로 다가가서 잡기', net: '3m 안에서 겨냥해 그물 던지기', treat: '바닥을 보고 간식 놓기' };
 function selectTool(t) {
   G.tool = t; document.querySelectorAll('.tool').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tool === t)));
   $('#btnAct').textContent = ACT_LABEL[t]; $('#hint').textContent = HINT[t];
@@ -1180,7 +1316,9 @@ $('#btnAct').addEventListener('click', () => {
   if (G.tool === 'hand') doGrab(); else if (G.tool === 'net') doNet(); else doTreat();
 });
 $('#sensorChip').addEventListener('click', () => { if (EMBED) { toast('주소를 복사해서 크롬이나 사파리에서 여세요'); return; } retrySensor(); });
-$('#btnCenter').addEventListener('click', () => { if (look.gyro) look.needCenter = true; else { look.yaw = 0; look.pitch = -0.12; } toast('정면을 다시 맞췄습니다'); });
+$('#btnCenter').addEventListener('click', () => { if (G.phase !== 'play') return; if (startCalib()) return; look.yaw = 0; look.pitch = -0.12; toast('정면을 다시 맞췄습니다'); });
+$('#calMark').addEventListener('click', calMark);
+$('#calSkip').addEventListener('click', finishCalib);
 $('#btnSound').addEventListener('click', (e) => {
   soundOn = !soundOn; e.currentTarget.setAttribute('aria-pressed', String(soundOn)); e.currentTarget.setAttribute('aria-label', soundOn ? '소리 끄기' : '소리 켜기');
   $('#snd-wave').style.display = soundOn ? '' : 'none';
@@ -1193,9 +1331,9 @@ function fillTitle() {
 }
 async function enableMotion() {
   try {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      return (await DeviceOrientationEvent.requestPermission()) === 'granted';
-    }
+    const o = typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? DeviceOrientationEvent.requestPermission() : null;
+    const m = typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function' ? DeviceMotionEvent.requestPermission() : null;
+    if (o) { const [ro] = await Promise.all([o, m]); return ro === 'granted'; }
   } catch { return false; }
   return true;
 }
@@ -1208,7 +1346,7 @@ $('#btnStart').addEventListener('click', async () => {
   try { await navigator.wakeLock?.request('screen'); } catch {}
   $('#scrTitle').hidden = true; $('#hud').hidden = false; $('#reticle').hidden = false;
   setupStage();
-  setTimeout(updateSensorChip, 1500);
+  setTimeout(() => { updateSensorChip(); if (look.gyro && !CAL.done && G.phase === 'play') startCalib(); }, 900);
 });
 function endStage(win, method) {
   G.phase = 'result'; G.busy = false;
@@ -1246,10 +1384,13 @@ function loop() {
   if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
   camera.updateMatrixWorld();
   if (G.phase === 'play') {
-    G.timeLeft -= dt; G.elapsed += dt;
+    G.timeLeft -= dt; G.elapsed += dt; updateWalk(dt);
     if (C.state !== 'caught') updateCat(dt); else animateCat(dt);
     if ((frame++ & 1) === 0) G.target = C.state === 'caught' ? null : scanTarget();
     $('#reticle').classList.toggle('locked', !!G.target);
+    if (G.target) { const hd = Math.hypot(C.model.root.position.x - PLAYER.x, C.model.root.position.z - PLAYER.z);
+      const tag = $('#reticle .tag'); tag.textContent = hd <= HAND_REACH ? '손 닿음' : hd <= NET_RANGE ? `그물 거리 ${hd.toFixed(1)}m` : `${hd.toFixed(1)}m · 더 가까이`;
+      $('#reticle').classList.toggle('near', hd <= HAND_REACH); }
     if (G.target && C.state === 'hide' && G.foundSpot !== C.spot) { G.foundSpot = C.spot; toast(`${C.spot.name}에서 용의자 발견!`, 'alert'); buzz(30); }
     const tEl = $('#hudTime'); tEl.textContent = fmt(G.timeLeft); tEl.classList.toggle('low', G.timeLeft < 20);
     if (G.timeLeft <= 0 && C.state !== 'caught') endStage(false);
@@ -1264,7 +1405,7 @@ document.addEventListener('dblclick', (e) => e.preventDefault());
 fillTitle();
 if (EMBED) $('#embedNote').hidden = false;
 loop();
-window.__game = { G, C, SPOTS, look, camera, moveTo, placeAtSpot, scanTarget };
+window.__game = { G, C, SPOTS, look, camera, moveTo, placeAtSpot, scanTarget, PLAYER, WALK, CAL, solveCalib, LANDMARKS, OBST };
 </script>
 
 </body>
