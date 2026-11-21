@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#131829">
 <title>고양이 체포 작전</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,6 +68,7 @@ body {
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); cursor: pointer;
 }
 .icon-btn svg { width: 20px; height: 20px; }
+button { touch-action: manipulation; }
 .icon-btn:focus-visible, .tool:focus-visible, .act:focus-visible, .cta:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
 
 #toast {
@@ -191,6 +199,8 @@ body {
 .stats .v { font-family: var(--f-mono); font-weight: 600; font-size: 20px; font-variant-numeric: tabular-nums; }
 </style>
 
+</head>
+<body>
 <canvas id="view" aria-label="거실 3D 화면"></canvas>
 
 <div id="hud" hidden>
@@ -1208,7 +1218,12 @@ function loop() {
   }
   renderer.render(scene, camera);
 }
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('dblclick', (e) => e.preventDefault());
 fillTitle();
 loop();
 window.__game = { G, C, SPOTS, look, camera, moveTo, placeAtSpot, scanTarget };
 </script>
+
+</body>
+</html>
