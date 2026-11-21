@@ -33,4 +33,4 @@ yarn-error.log
 
 # 빌드 파일
 dist/
-build/
+build/cat-catcher/tex/
