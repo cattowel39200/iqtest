@@ -124,6 +124,10 @@ button { touch-action: manipulation; }
 #joy .knob { width: 38px; height: 38px; border-radius: 50%; background: rgba(243,240,232,.85); pointer-events: none; }
 #joy span { position: absolute; bottom: -18px; font-size: 11px; color: var(--hud-dim); }
 #hud[hidden] ~ #joy { display: none; }
+#btnAR { margin-bottom: 8px; background: var(--siren); }
+html.ar, html.ar body { background: transparent !important; }
+html.ar #view, html.ar #joy, html.ar #sensorChip { display: none !important; }
+html.ar #calib { background: transparent; }
 
 /* sound direction ping */
 #ping {
@@ -265,7 +269,7 @@ button { touch-action: manipulation; }
   <div class="cal-card">
     <div class="cal-step" id="calStep">기준점 1/3</div>
     <div class="cal-name" id="calName">큰 창문 가운데</div>
-    <p>실제 집에서 휴대폰 뒷면을 이곳으로 향하게 들고, 정확히 가리키면 누르세요. 세 곳을 모두 맞추면 서 있는 위치도 계산합니다.</p>
+    <p id="calHelp">실제 집에서 휴대폰 뒷면을 이곳으로 향하게 들고, 정확히 가리키면 누르세요.</p>
     <div class="cal-btns"><button class="cta" id="calMark">여기 맞춤</button><button class="cta alt" id="calSkip" hidden>2곳으로 끝내기</button></div>
   </div>
 </div>
@@ -290,6 +294,7 @@ button { touch-action: manipulation; }
     </dl>
     <p class="how">휴대폰을 들고 <b>몸을 돌려</b> 둘러보고, <b>걸어가면</b> 게임 속에서도 앞으로 갑니다(왼쪽 패드로도 이동). <b>맨손은 1m</b>, <b>그물은 3m</b> 안에서만 닿습니다. 화면 가운데 조준선에 용의자를 맞추고 <b>맨손</b>으로 잡거나 <b>그물</b>을 던지세요. <b>간식</b>을 바닥에 놓으면 고양이가 밖으로 나옵니다. 울음소리가 나는 쪽을 살피세요.</p>
     <p class="how" id="embedNote" hidden><b>지금은 Claude 화면 안이라 기울기 센서가 막혀 있습니다.</b> 휴대폰을 돌려서 둘러보려면 게임 주소를 크롬이나 사파리에서 직접 여세요.</p>
+    <button class="cta" id="btnAR" hidden>카메라 AR로 수사 시작</button>
     <button class="cta" id="btnStart">수사 시작</button>
   </div>
 </div>
@@ -311,7 +316,7 @@ button { touch-action: manipulation; }
 </div>
 
 <script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js" } }
 </script>
 <script type="module">
 import * as THREE from 'three';
@@ -385,7 +390,7 @@ const PLAYER = new V3(LAYOUT.player.x, LAYOUT.player.eye, LAYOUT.player.z);
 const RING_R = 0.5;
 
 const canvas = $('#view');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -393,7 +398,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0e1120);
+const BG = new THREE.Color(0x0e1120); scene.background = BG;
 const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 40);
 camera.position.copy(PLAYER);
 
@@ -837,37 +842,120 @@ function updateCamera(dt) {
   }
 }
 // 기준점 맞추기 — 실제 집의 두세 곳을 차례로 가리켜 방향(과 3곳이면 내 위치)을 맞춤
+// 카메라 AR 모드에서는 먼저 바닥을 찍어 높이를 맞추고, 3곳으로 방향·위치를 맞춤
 const LANDMARKS = [
   { name: '큰 창문 가운데', x: 0, z: -4.5 },
   { name: '원목 장식장', x: 2.26, z: -2.0 },
   { name: '냉장고', x: -2.07, z: 3.05 },
 ];
-const CAL = { i: 0, yaws: [], done: false };
+const CAL = { i: 0, yaws: [], marks: [], floorY: null, done: false, ar: false };
 const angWrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
-function startCalib() { if (!look.gyro) return false; CAL.i = 0; CAL.yaws = []; G.phase = 'calib'; showCalib(); return true; }
-function showCalib() {
-  $('#calib').hidden = false; $('#calStep').textContent = `기준점 ${CAL.i + 1}/${LANDMARKS.length}`;
-  $('#calName').textContent = LANDMARKS[CAL.i].name; $('#calSkip').hidden = CAL.i < 2;
+function calSteps() { return CAL.ar ? [{ name: '바닥', floor: true }, ...LANDMARKS] : LANDMARKS; }
+function startCalib() {
+  if (!look.gyro && !AR.on) return false;
+  CAL.ar = AR.on; CAL.i = 0; CAL.yaws = []; CAL.marks = []; CAL.floorY = null; G.phase = 'calib';
+  if (AR.on) { renderer.xr.setReferenceSpace(AR.base); C.model.root.visible = false; }
+  showCalib(); return true;
 }
-function calMark() { CAL.yaws.push(look.rawYaw ?? 0); CAL.i++; buzz(25); if (CAL.i >= LANDMARKS.length) finishCalib(); else showCalib(); }
-function solveCalib(yaws, fixed) {
-  const n = yaws.length;
-  const fit = (px, pz) => { let sx = 0, sy = 0; const br = LANDMARKS.slice(0, n).map((L) => Math.atan2(-(L.x - px), -(L.z - pz)));
-    br.forEach((b, k) => { sx += Math.cos(b - yaws[k]); sy += Math.sin(b - yaws[k]); });
-    const phi = Math.atan2(sy, sx); let err = 0; br.forEach((b, k) => { const r = angWrap(b - yaws[k] - phi); err += r * r; }); return { phi, err }; };
-  if (n < 3 || fixed) return { x: fixed ? fixed.x : PLAYER.x, z: fixed ? fixed.z : PLAYER.z, ...fit(fixed ? fixed.x : PLAYER.x, fixed ? fixed.z : PLAYER.z) };
-  let best = null;
-  for (let x = -RW / 2 + 0.3; x <= RW / 2 - 0.3; x += 0.08) for (let z = -RD / 2 + 0.3; z <= RD / 2 - 0.3; z += 0.08) {
-    if (blocked(x, z)) continue; const r = fit(x, z); if (!best || r.err < best.err) best = { x, z, ...r };
+function showCalib() {
+  const st = calSteps(), cur = st[CAL.i];
+  $('#calib').hidden = false; $('#calStep').textContent = `기준점 ${CAL.i + 1}/${st.length}`; $('#calName').textContent = cur.name;
+  $('#calHelp').textContent = cur.floor ? '휴대폰으로 발 앞 바닥을 비추고 누르세요. 바닥 높이를 맞춥니다.'
+    : CAL.ar ? '화면 가운데 조준선을 실제 ' + cur.name + '에 맞추고 누르세요.'
+    : '실제 집에서 휴대폰 뒷면을 이곳으로 향하게 들고, 정확히 가리키면 누르세요. 세 곳을 모두 맞추면 서 있는 위치도 계산합니다.';
+  $('#calSkip').hidden = CAL.ar || CAL.i < 2;
+}
+function calMark() {
+  if (AC) AC.resume?.();
+  const cur = calSteps()[CAL.i];
+  if (cur.floor) {
+    if (!AR.lastHit) { toast('바닥을 찾는 중이에요. 휴대폰을 천천히 움직이며 바닥을 비춰 주세요'); return; }
+    CAL.floorY = AR.lastHit.transform.position.y;
+  } else if (CAL.ar) CAL.marks.push({ x: camera.position.x, z: camera.position.z, yaw: yawOf(camera.quaternion) });
+  else CAL.yaws.push(look.rawYaw ?? 0);
+  CAL.i++; buzz(25);
+  if (CAL.i >= calSteps().length) finishCalib(); else showCalib();
+}
+function fitBearings(hs, yaws) { // hs: 각 기준점을 찍을 때의 집 좌표, yaws: 그때의 휴대폰 방향
+  let sx = 0, sy = 0; const br = hs.map((h, k) => Math.atan2(-(LANDMARKS[k].x - h.x), -(LANDMARKS[k].z - h.z)));
+  br.forEach((b, k) => { sx += Math.cos(b - yaws[k]); sy += Math.sin(b - yaws[k]); });
+  const phi = Math.atan2(sy, sx); let err = 0; br.forEach((b, k) => { const r = angWrap(b - yaws[k] - phi); err += r * r; }); return { phi, err };
+}
+function solveCalib(yaws, fixed, offsets) {
+  const n = yaws.length, off = offsets || yaws.map(() => ({ x: 0, z: 0 }));
+  const at = (px, pz, phi) => off.map((o) => { const c = Math.cos(phi), s = Math.sin(phi); return { x: px + o.x * c + o.z * s, z: pz - o.x * s + o.z * c }; });
+  if (n < 3 || fixed) { const px = fixed ? fixed.x : PLAYER.x, pz = fixed ? fixed.z : PLAYER.z; return { x: px, z: pz, ...fitBearings(at(px, pz, 0), yaws) }; }
+  let best = null, phi0 = 0;
+  for (let it = 0; it < 2; it++) {
+    best = null;
+    for (let x = -RW / 2 + 0.3; x <= RW / 2 - 0.3; x += 0.08) for (let z = -RD / 2 + 0.3; z <= RD / 2 - 0.3; z += 0.08) {
+      if (blocked(x, z)) continue; const r = fitBearings(at(x, z, phi0), yaws); if (!best || r.err < best.err) best = { x, z, ...r };
+    }
+    phi0 = best.phi;
   }
   return best;
 }
 function finishCalib() {
-  const b = solveCalib(CAL.yaws);
-  PLAYER.x = b.x; PLAYER.z = b.z; look.yawOffset = b.phi; look.needCenter = false; CAL.done = true;
-  const deg = Math.sqrt(b.err / CAL.yaws.length) * 180 / Math.PI;
+  let b;
+  if (CAL.ar) {
+    const m = CAL.marks, pm = { x: m.reduce((a, k) => a + k.x, 0) / m.length, z: m.reduce((a, k) => a + k.z, 0) / m.length };
+    b = solveCalib(m.map((k) => k.yaw), null, m.map((k) => ({ x: k.x - pm.x, z: k.z - pm.z })));
+    // 집 = R(phi)·기기공간 + t  →  기준 공간 오프셋은 그 역변환
+    const phi = b.phi, c = Math.cos(phi), s = Math.sin(phi);
+    const t = { x: b.x - (pm.x * c + pm.z * s), y: -CAL.floorY, z: b.z - (-pm.x * s + pm.z * c) };
+    const ci = Math.cos(-phi), si = Math.sin(-phi), vx = -t.x, vz = -t.z;
+    const q = new THREE.Quaternion().setFromAxisAngle(Y_AXIS, -phi);
+    const offset = new XRRigidTransform({ x: vx * ci + vz * si, y: -t.y, z: -vx * si + vz * ci }, { x: q.x, y: q.y, z: q.z, w: q.w });
+    renderer.xr.setReferenceSpace(AR.base.getOffsetReferenceSpace(offset));
+    C.model.root.visible = true;
+  } else {
+    b = solveCalib(CAL.yaws);
+    PLAYER.x = b.x; PLAYER.z = b.z; look.yawOffset = b.phi; look.needCenter = false;
+  }
+  CAL.done = true;
+  const n = CAL.ar ? CAL.marks.length : CAL.yaws.length, deg = Math.sqrt(b.err / n) * 180 / Math.PI;
   $('#calib').hidden = true; G.phase = 'play';
-  toast(CAL.yaws.length >= 3 ? `맞춤 완료 · 위치까지 맞췄어요 (오차 약 ${deg.toFixed(0)}°)` : '방향 맞춤 완료', 'good');
+  toast(n >= 3 ? `맞춤 완료 · 위치까지 맞췄어요 (오차 약 ${deg.toFixed(0)}°)` : '방향 맞춤 완료', 'good');
+}
+// 카메라 AR — 실제 집이 카메라로 보이고, 우리집 모델은 투명 가림막이 되어 고양이를 가림
+const AR = { on: false, session: null, base: null, hitSrc: null, lastHit: null, depth: false, last: null };
+const OCC = new THREE.MeshBasicMaterial({ colorWrite: false });
+const SHADOW = new THREE.ShadowMaterial({ opacity: 0.3 });
+function setARLook(on) {
+  scene.background = on ? null : BG;
+  scene.traverse((o) => {
+    if (!o.isMesh || o.userData.cat) return;
+    if (on) { if (!o.userData.orig) { o.userData.orig = o.material; o.userData.cast = o.castShadow; } o.material = o === floor ? SHADOW : OCC; o.castShadow = false; o.renderOrder = -1; }
+    else if (o.userData.orig) { o.material = o.userData.orig; o.castShadow = o.userData.cast; o.renderOrder = 0; delete o.userData.orig; }
+  });
+}
+async function arSupported() { try { return !!(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar')); } catch { return false; } }
+async function startAR() {
+  let session;
+  try {
+    session = await navigator.xr.requestSession('immersive-ar', {
+      requiredFeatures: ['local'], optionalFeatures: ['dom-overlay', 'hit-test', 'depth-sensing'],
+      domOverlay: { root: document.body },
+      depthSensing: { usagePreference: ['gpu-optimized', 'cpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
+    });
+  } catch (e) { toast('카메라 AR을 시작할 수 없어요 (' + (e.message || e.name) + ')'); return false; }
+  renderer.xr.enabled = true; renderer.xr.setReferenceSpaceType('local');
+  await renderer.xr.setSession(session);
+  Object.assign(AR, { on: true, session, base: renderer.xr.getReferenceSpace(), depth: (session.enabledFeatures || []).includes('depth-sensing'), last: null });
+  try { const vs = await session.requestReferenceSpace('viewer'); AR.hitSrc = await session.requestHitTestSource({ space: vs }); } catch { AR.hitSrc = null; }
+  document.documentElement.classList.add('ar'); setARLook(true);
+  session.addEventListener('end', () => {
+    Object.assign(AR, { on: false, session: null, hitSrc: null, lastHit: null });
+    document.documentElement.classList.remove('ar'); setARLook(false); renderer.xr.enabled = false; CAL.done = false;
+    if (C.model) C.model.root.visible = true; resize(); toast('카메라 AR을 끝냈어요');
+  });
+  return true;
+}
+function arTrack(xrFrame) {
+  if (xrFrame && AR.hitSrc) { const hits = xrFrame.getHitTestResults(AR.hitSrc); AR.lastHit = hits.length ? hits[0].getPose(renderer.xr.getReferenceSpace()) : null; }
+  PLAYER.copy(camera.position);
+  if (AR.last && G.phase === 'play') { WALK.acc += Math.hypot(PLAYER.x - AR.last.x, PLAYER.z - AR.last.z); if (WALK.acc >= STEP_LEN) { WALK.acc = 0; footstepNearCat(); } }
+  AR.last = PLAYER.clone();
 }
 // 걷기 — 휴대폰 흔들림으로 걸음을 감지해 바라보는 방향으로 0.6m씩 이동. 왼쪽 패드로도 이동 가능
 const HAND_REACH = 1.0, NET_RANGE = 3.0, STEP_LEN = 0.6, BODY_R = 0.22;
@@ -1289,7 +1377,7 @@ function sensorReason() {
 }
 function updateSensorChip() {
   const el = $('#sensorChip'); if (!el || G.phase === 'title') return;
-  if (look.gyro) { el.hidden = true; $('#hint').textContent = HINT[G.tool]; return; }
+  if (look.gyro || AR.on) { el.hidden = true; $('#hint').textContent = HINT[G.tool]; return; }
   el.hidden = false; el.textContent = '센서 꺼짐 · ' + sensorReason();
 }
 async function retrySensor() {
@@ -1338,6 +1426,12 @@ async function enableMotion() {
   return true;
 }
 let motionAsked = false;
+$('#btnAR').addEventListener('click', async () => {
+  if (!(await startAR())) return;
+  if (!AC) initAudio(); else AC.resume?.();
+  $('#scrTitle').hidden = true; $('#hud').hidden = false; $('#reticle').hidden = false;
+  setupStage(); startCalib();
+});
 $('#btnStart').addEventListener('click', async () => {
   if (!AC) initAudio(); else AC.resume?.();
   try { document.documentElement.requestFullscreen?.().then(() => screen.orientation?.lock?.('portrait').catch(() => {})).catch(() => {}); } catch {}
@@ -1371,20 +1465,22 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) cloc
    10. 루프
    ===================================================================== */
 function resize() {
+  if (renderer.xr.isPresenting) return;
   const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false);
   camera.aspect = w / h; camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize); resize();
 let frame = 0;
-function loop() {
-  requestAnimationFrame(loop);
+function loop(time, xrFrame) {
   const dt = Math.min(0.05, clock.getDelta());
-  updateCamera(dt);
-  const baseFov = camera.aspect < 1 ? 86 : 64; const fov = baseFov / look.zoom;
-  if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  if (!AR.on) {
+    updateCamera(dt);
+    const baseFov = camera.aspect < 1 ? 86 : 64; const fov = baseFov / look.zoom;
+    if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  } else arTrack(xrFrame);
   camera.updateMatrixWorld();
   if (G.phase === 'play') {
-    G.timeLeft -= dt; G.elapsed += dt; updateWalk(dt);
+    G.timeLeft -= dt; G.elapsed += dt; if (!AR.on) updateWalk(dt);
     if (C.state !== 'caught') updateCat(dt); else animateCat(dt);
     if ((frame++ & 1) === 0) G.target = C.state === 'caught' ? null : scanTarget();
     $('#reticle').classList.toggle('locked', !!G.target);
@@ -1404,8 +1500,9 @@ document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('dblclick', (e) => e.preventDefault());
 fillTitle();
 if (EMBED) $('#embedNote').hidden = false;
-loop();
-window.__game = { G, C, SPOTS, look, camera, moveTo, placeAtSpot, scanTarget, PLAYER, WALK, CAL, solveCalib, LANDMARKS, OBST };
+arSupported().then((ok) => { if (ok) $('#btnAR').hidden = false; });
+renderer.setAnimationLoop(loop);
+window.__game = { G, C, SPOTS, look, camera, moveTo, placeAtSpot, scanTarget, PLAYER, WALK, CAL, solveCalib, LANDMARKS, OBST, AR, setARLook };
 </script>
 
 </body>
