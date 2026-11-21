@@ -125,6 +125,7 @@ button { touch-action: manipulation; }
 #joy span { position: absolute; bottom: -18px; font-size: 11px; color: var(--hud-dim); }
 #hud[hidden] ~ #joy { display: none; }
 #btnAR { margin-bottom: 8px; background: var(--siren); }
+a.cta { display: grid; place-items: center; text-decoration: none; box-sizing: border-box; }
 html.ar, html.ar body { background: transparent !important; }
 html.ar #view, html.ar #joy, html.ar #sensorChip { display: none !important; }
 html.ar #calib { background: transparent; }
@@ -296,6 +297,7 @@ html.ar #calib { background: transparent; }
     <p class="how" id="embedNote" hidden><b>지금은 Claude 화면 안이라 기울기 센서가 막혀 있습니다.</b> 휴대폰을 돌려서 둘러보려면 게임 주소를 크롬이나 사파리에서 직접 여세요.</p>
     <button class="cta" id="btnAR" hidden>카메라 AR로 수사 시작</button>
     <button class="cta" id="btnStart">수사 시작</button>
+    <a class="cta alt" id="lnkField" href="field.html" hidden>밖에서 하기: 동네 수색 모드</a>
   </div>
 </div>
 
@@ -1499,7 +1501,7 @@ function loop(time, xrFrame) {
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('dblclick', (e) => e.preventDefault());
 fillTitle();
-if (EMBED) $('#embedNote').hidden = false;
+if (EMBED) $('#embedNote').hidden = false; else $('#lnkField').hidden = false;
 arSupported().then((ok) => { if (ok) $('#btnAR').hidden = false; });
 renderer.setAnimationLoop(loop);
 window.__game = { G, C, SPOTS, look, camera, moveTo, placeAtSpot, scanTarget, PLAYER, WALK, CAL, solveCalib, LANDMARKS, OBST, AR, setARLook };

@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#131829">
+<title>동네 고양이 수색</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: full-screen map with a bottom case sheet; AR search swaps to a transparent HUD over the camera. */
+:root {
+  --night: #131829; --paper: #efe8da; --ink: #1d2130; --ink-soft: #5b5f6e;
+  --badge: #e9b949; --siren: #e0464b; --signal: #49c6ae; --glass: rgba(19,24,41,.66); --hud: #f3f0e8;
+  --f-display: "Black Han Sans", "Noto Sans KR", system-ui, sans-serif;
+  --f-body: "Noto Sans KR", system-ui, -apple-system, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--night); color: var(--hud); font-family: var(--f-body); overflow: hidden; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; font-family: var(--f-body); }
+button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
+#map { position: fixed; inset: 0; background: #20263d; }
+#view { position: fixed; inset: 0; width: 100%; height: 100%; display: none; }
+html.ar, html.ar body { background: transparent !important; }
+html.ar #map, html.ar #mapUI { display: none !important; }
+
+/* map UI */
+#mapUI { position: fixed; inset: 0; pointer-events: none; z-index: 500;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; justify-content: space-between; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.chip { pointer-events: auto; padding: 8px 12px; border-radius: 10px; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0; color: var(--hud); font-size: 14px; font-weight: 700; }
+.chip small { display: block; font: 600 11px var(--f-mono); color: var(--badge); letter-spacing: .05em; }
+.sheet { pointer-events: auto; background: var(--paper); color: var(--ink); border-radius: 16px; padding: 14px 16px 16px; box-shadow: 0 10px 40px rgba(0,0,0,.4); max-width: 480px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+.sheet .k { font: 600 12px var(--f-mono); color: var(--siren); letter-spacing: .06em; }
+.sheet h2 { font-family: var(--f-display); font-weight: 400; font-size: 26px; margin: 2px 0 4px; }
+.sheet p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.cta { height: 52px; border: 0; border-radius: 12px; background: var(--siren); color: #fff; font-family: var(--f-display); font-size: 19px; cursor: pointer; padding: 0 16px; }
+.cta:disabled { background: #b9b2a5; color: #f4f1ea; }
+.cta.alt { background: transparent; color: var(--ink); border: 2px solid var(--ink); font-size: 15px; }
+.warn { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 70px); transform: translateX(-50%); z-index: 600; max-width: calc(100% - 32px);
+  background: var(--siren); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 14px; text-align: center; }
+.zone-label { background: var(--paper); color: var(--ink); border: 0; border-radius: 6px; font: 700 12px var(--f-body); padding: 2px 6px; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.zone-label::before { display: none; }
+.me { width: 18px; height: 18px; border-radius: 50%; background: #3d8bff; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(61,139,255,.25); box-sizing: border-box; }
+
+/* start / log overlays */
+.overlay { position: fixed; inset: 0; z-index: 700; background: rgba(13,17,31,.82); display: grid; place-items: center; overflow-y: auto;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.file { width: min(440px, 100%); background: var(--paper); color: var(--ink); border-radius: 14px; padding: 22px 20px; box-sizing: border-box; }
+.file h1 { font-family: var(--f-display); font-weight: 400; font-size: 36px; margin: 4px 0 12px; }
+.file p, .file li { font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+.file ul { padding-left: 18px; margin: 0 0 16px; }
+.file b { color: var(--ink); }
+.file .cta { width: 100%; }
+.log { list-style: none; padding: 0; margin: 0 0 14px; max-height: 50vh; overflow-y: auto; }
+.log li { display: grid; grid-template-columns: 1fr auto; padding: 8px 0; border-bottom: 1px solid #d8ccb4; font-size: 14px; color: var(--ink); }
+.log li span { font: 500 12px var(--f-mono); color: var(--ink-soft); }
+
+/* AR HUD */
+#arUI { position: fixed; inset: 0; pointer-events: none; z-index: 800; display: flex; flex-direction: column; justify-content: space-between;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.tray { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.tools { display: flex; gap: 8px; pointer-events: auto; }
+.tool { position: relative; width: 62px; height: 62px; border-radius: 14px; border: 2px solid transparent; background: var(--glass); color: var(--hud); display: grid; place-items: center; padding: 0; }
+.tool svg { width: 26px; height: 26px; margin-top: -8px; }
+.tool .nm { position: absolute; bottom: 5px; left: 0; right: 0; font-size: 11px; color: rgba(243,240,232,.7); }
+.tool .ct { position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; border-radius: 11px; background: var(--paper); color: var(--ink); font: 600 12px/22px var(--f-mono); padding: 0 5px; }
+.tool[aria-pressed="true"] { border-color: var(--badge); background: rgba(233,185,73,.2); }
+.act { pointer-events: auto; width: 84px; height: 84px; border-radius: 50%; border: 0; background: var(--siren); color: #fff; font-family: var(--f-display); font-size: 21px; box-shadow: 0 0 0 5px rgba(224,70,75,.3); }
+.hint { text-align: center; font-size: 13px; color: #fff; text-shadow: 0 1px 4px #000; margin-bottom: 10px; }
+#reticle { position: fixed; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; border: 2px solid rgba(255,255,255,.85); box-shadow: 0 0 0 1px rgba(0,0,0,.4); pointer-events: none; z-index: 801; }
+#reticle.locked { border-color: var(--siren); transform: scale(.82); }
+#reticle .tag { position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 700; color: #fff; background: var(--siren); padding: 2px 8px; border-radius: 4px; display: none; }
+#reticle.locked .tag { display: block; }
+#reticle.near .tag { background: var(--signal); color: #08231d; }
+#toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 70px); transform: translateX(-50%); z-index: 900; max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 999px; background: var(--paper); color: var(--ink); font-weight: 700; font-size: 15px; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,.35); pointer-events: none; }
+#toast.alert { background: var(--siren); color: #fff; } #toast.good { background: var(--signal); color: #08231d; }
+#ping { position: fixed; width: 60px; height: 60px; margin: -30px 0 0 -30px; z-index: 801; pointer-events: none; display: grid; place-items: center; opacity: 0; transition: opacity .25s; }
+#ping.on { opacity: 1; }
+#ping .arrow { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 18px solid var(--badge); filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+@media (prefers-reduced-motion: reduce) { #ping { transition: none; } }
+</style>
+</head>
+<body>
+<div id="map" aria-label="지도"></div>
+<canvas id="view"></canvas>
+
+<div id="mapUI">
+  <div class="top">
+    <button class="chip" id="btnLog"><small>검거 기록</small><span id="logCount">0마리</span></button>
+    <button class="chip" id="btnMe">내 위치</button>
+  </div>
+  <div class="sheet" id="sheet">
+    <div class="k" id="sKey">수색 대기</div>
+    <h2 id="sTitle">주변 고양이를 찾는 중</h2>
+    <p id="sText">위치를 확인하고 있어요.</p>
+    <div class="row">
+      <button class="cta" id="btnSearch" disabled>카메라 수색</button>
+      <button class="cta alt" id="btnPractice">여기서 시험</button>
+    </div>
+  </div>
+</div>
+<div class="warn" id="speedWarn" hidden>이동이 빨라서 고양이들이 숨었어요. 걸어서 다녀 주세요.</div>
+
+<div class="overlay" id="scrStart">
+  <div class="file">
+    <div style="font:600 12px var(--f-mono);color:var(--siren);letter-spacing:.06em">수사 기밀 · 동네 수색</div>
+    <h1>동네 고양이 수색</h1>
+    <p>지도에 표시된 <b>출몰 구역(동그라미)</b>까지 걸어가세요. 구역 안에 들어가면 <b>카메라 수색</b>이 열리고, 그때부터는 카메라로 주변을 비춰야만 고양이가 보입니다.</p>
+    <ul>
+      <li><b>맨손은 1m</b>, <b>그물은 3m</b> 안에서만 닿습니다.</li>
+      <li>차도, 물가, 공사장에는 들어가지 마세요. 걸을 때는 화면 대신 앞을 보세요.</li>
+      <li>차를 타고 이동하면 고양이가 모두 숨습니다.</li>
+    </ul>
+    <button class="cta" id="btnStart">위치 켜고 시작</button>
+  </div>
+</div>
+
+<div class="overlay" id="scrLog" hidden>
+  <div class="file">
+    <h1 style="font-size:28px">검거 기록</h1>
+    <ul class="log" id="logList"></ul>
+    <button class="cta" id="btnLogClose">닫기</button>
+  </div>
+</div>
+
+<div id="arUI" hidden>
+  <div class="top">
+    <div class="chip"><small id="arKey">카메라 수색</small><span id="arWho">용의자</span></div>
+    <button class="chip" id="btnExitAR">지도로</button>
+  </div>
+  <div>
+    <div class="hint" id="arHint">천천히 주변을 둘러보며 바닥과 담장을 비춰 주세요</div>
+    <div class="tray">
+      <div class="tools">
+        <button class="tool" data-tool="hand" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12V6a1.5 1.5 0 0 1 3 0v5M10 6V4.5a1.5 1.5 0 0 1 3 0V11M13 5.5a1.5 1.5 0 0 1 3 0V11M16 8a1.5 1.5 0 0 1 3 0v6.5a7 7 0 0 1-7 7h-.8a7 7 0 0 1-5.4-2.6L3 15.3a1.6 1.6 0 0 1 2.5-2L7 15"/></svg><span class="nm">맨손</span><span class="ct">∞</span></button>
+        <button class="tool" data-tool="net" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8M9 3.6v16.8M15 3.6v16.8"/></svg><span class="nm">그물</span><span class="ct" id="ctNet">3</span></button>
+      </div>
+      <button class="act" id="btnAct">잡기</button>
+    </div>
+  </div>
+</div>
+<div id="reticle" hidden><span class="tag">용의자</span></div>
+<div id="ping"><div class="arrow"></div></div>
+<div id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+const $ = (s) => document.querySelector(s);
+const V3 = THREE.Vector3;
+
+/* =====================================================================
+   1. 고양이 출몰 구역 생성 — 약 150m 격자마다 3시간 단위로 같은 결과(새로고침해도 유지)
+   ===================================================================== */
+const CATS = [
+  { name: '치즈', color: 0xe0953f, stripe: 0xb0601f },
+  { name: '고등어', color: 0x8d877c, stripe: 0x3c3a37 },
+  { name: '까망', color: 0x1f1d22, stripe: null },
+  { name: '삼색이', color: 0xe8e1d6, stripe: 0xb4672b },
+  { name: '회색이', color: 0x9aa0a6, stripe: null },
+];
+const CELL = 0.0014, ZONE_R = 35, SHOW_R = 450, FAST = 2.8; // 도, m, m, m/s
+function hash(...a) { let h = 2166136261; for (const v of a) { h ^= v & 0xffffffff; h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const epoch = () => Math.floor(Date.now() / (3 * 3600e3));
+function cellZones(ci, cj) {
+  const r = rng(hash(ci, cj, epoch()));
+  if (r() > 0.5) return [];
+  return [{ id: `${ci}_${cj}_${epoch()}`, lat: (ci + 0.15 + r() * 0.7) * CELL, lng: (cj + 0.15 + r() * 0.7) * CELL, cat: CATS[(r() * CATS.length) | 0] }];
+}
+function distM(a, b) { const R = 6371000, t = Math.PI / 180, dLa = (b.lat - a.lat) * t, dLo = (b.lng - a.lng) * t;
+  const x = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * t) * Math.cos(b.lat * t) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
+function bearingName(a, b) { const t = Math.PI / 180, y = Math.sin((b.lng - a.lng) * t) * Math.cos(b.lat * t), x = Math.cos(a.lat * t) * Math.sin(b.lat * t) - Math.sin(a.lat * t) * Math.cos(b.lat * t) * Math.cos((b.lng - a.lng) * t);
+  const deg = (Math.atan2(y, x) / t + 360) % 360; return ['북', '북동', '동', '남동', '남', '남서', '서', '북서'][Math.round(deg / 45) % 8] + '쪽'; }
+
+// 차도·물가 근처는 제외 (OpenStreetMap 도로 정보). 불러오지 못하면 그대로 두고 주의 문구를 띄움
+const roads = { loaded: new Set(), segs: [] };
+async function loadRoads(lat, lng) {
+  const key = `${Math.round(lat / 0.005)}_${Math.round(lng / 0.005)}`; if (roads.loaded.has(key)) return; roads.loaded.add(key);
+  const s = 0.004, bbox = [lat - s, lng - s, lat + s, lng + s].join(',');
+  const q = `[out:json][timeout:15];(way["highway"~"^(motorway|trunk|primary|secondary|tertiary|residential|unclassified)$"](${bbox});way["natural"="water"](${bbox});way["landuse"="construction"](${bbox}););out geom;`;
+  try {
+    const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q) });
+    const js = await res.json();
+    for (const w of js.elements || []) for (let i = 0; i < (w.geometry || []).length - 1; i++) roads.segs.push([w.geometry[i], w.geometry[i + 1]]);
+    renderZones();
+  } catch { roads.loaded.delete(key); }
+}
+function nearRoad(p, m = 14) {
+  const t = Math.PI / 180, kx = 111320 * Math.cos(p.lat * t), ky = 110540;
+  for (const [a, b] of roads.segs) {
+    const ax = (a.lon - p.lng) * kx, ay = (a.lat - p.lat) * ky, bx = (b.lon - p.lng) * kx, by = (b.lat - p.lat) * ky;
+    const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy; let u = L ? -(ax * dx + ay * dy) / L : 0; u = Math.max(0, Math.min(1, u));
+    if (Math.hypot(ax + dx * u, ay + dy * u) < m) return true;
+  }
+  return false;
+}
+
+/* =====================================================================
+   2. 지도
+   ===================================================================== */
+const S = { me: null, acc: 0, speed: 0, last: null, zones: new Map(), practice: null, inZone: null };
+let caught = []; try { caught = JSON.parse(localStorage.getItem('catLog') || '[]'); } catch {}
+const map = L.map('map', { zoomControl: false, attributionControl: true }).setView([37.5665, 126.978], 17);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+const meMarker = L.marker([0, 0], { icon: L.divIcon({ className: '', html: '<div class="me"></div>', iconSize: [18, 18] }) });
+const accCircle = L.circle([0, 0], { radius: 10, color: '#3d8bff', weight: 1, fillOpacity: 0.08 });
+const zoneLayer = L.layerGroup().addTo(map);
+function isCaught(id) { return caught.some((c) => c.id === id); }
+function allZones() {
+  if (!S.me) return [];
+  const ci = Math.floor(S.me.lat / CELL), cj = Math.floor(S.me.lng / CELL), out = [];
+  for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) for (const z of cellZones(ci + i, cj + j)) if (!nearRoad(z) && !isCaught(z.id)) out.push(z);
+  if (S.practice && !isCaught(S.practice.id)) out.push(S.practice);
+  return out.map((z) => ({ ...z, d: distM(S.me, z) })).filter((z) => z.d < SHOW_R).sort((a, b) => a.d - b.d);
+}
+function renderZones() {
+  zoneLayer.clearLayers(); const fast = S.speed > FAST;
+  $('#speedWarn').hidden = !fast;
+  const zs = fast ? [] : allZones(); S.inZone = zs.find((z) => z.d <= ZONE_R) || null;
+  for (const z of zs) {
+    const inside = z === S.inZone;
+    L.circle([z.lat, z.lng], { radius: ZONE_R, color: inside ? '#e0464b' : '#e9b949', weight: 2, fillOpacity: inside ? 0.25 : 0.15 })
+      .bindTooltip(`${z.cat.name} · ${Math.round(z.d)}m`, { permanent: true, direction: 'center', className: 'zone-label' }).addTo(zoneLayer);
+  }
+  const near = zs[0];
+  if (fast) setSheet('이동 중', '고양이들이 숨었어요', '걷는 속도로 다니면 다시 나타납니다.', false);
+  else if (S.inZone) setSheet('출몰 구역 안', `${S.inZone.cat.name} 근처에 왔어요`, '이제 지도에는 안 보여요. 카메라로 주변 담장, 나무, 차 밑을 비춰 찾으세요.', true);
+  else if (near) setSheet('가장 가까운 출몰', `${near.cat.name} · ${Math.round(near.d)}m`, `${bearingName(S.me, near)}으로 걸어가세요. 동그라미 안에 들어가면 카메라 수색이 열립니다.` + (roads.segs.length ? '' : ' (도로 정보를 못 불러와서 차도 근처에도 표시될 수 있어요)'), false);
+  else setSheet('수색 대기', '근처에 고양이가 없어요', '조금 걸어가 보거나 "여기서 시험"을 눌러 보세요.', false);
+}
+function setSheet(k, t, p, can) { $('#sKey').textContent = k; $('#sTitle').textContent = t; $('#sText').textContent = p; $('#btnSearch').disabled = !can || !AR_OK; if (can && !AR_OK) $('#sText').textContent += ' 이 휴대폰은 카메라 AR을 지원하지 않아요.'; }
+function onPos(pos) {
+  const p = { lat: pos.coords.latitude, lng: pos.coords.longitude, t: pos.timestamp };
+  let spd = pos.coords.speed; if ((spd == null || isNaN(spd)) && S.last) { const dt = (p.t - S.last.t) / 1000; if (dt > 1) spd = distM(S.last, p) / dt; }
+  if (spd != null && !isNaN(spd)) S.speed = S.speed * 0.6 + spd * 0.4;
+  const first = !S.me; S.me = p; S.acc = pos.coords.accuracy; S.last = p;
+  meMarker.setLatLng([p.lat, p.lng]); accCircle.setLatLng([p.lat, p.lng]).setRadius(Math.min(S.acc, 60));
+  if (first) { meMarker.addTo(map); accCircle.addTo(map); map.setView([p.lat, p.lng], 18); }
+  loadRoads(p.lat, p.lng); renderZones();
+}
+$('#btnStart').addEventListener('click', () => {
+  $('#scrStart').hidden = true;
+  if (!navigator.geolocation) { setSheet('오류', '위치를 쓸 수 없어요', '이 브라우저는 위치 기능을 지원하지 않아요.', false); return; }
+  navigator.geolocation.watchPosition(onPos, (e) => setSheet('위치 꺼짐', '위치 권한이 필요해요', '브라우저 설정에서 이 사이트의 위치 권한을 허용해 주세요. (' + e.message + ')', false), { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+});
+$('#btnMe').addEventListener('click', () => { if (S.me) map.setView([S.me.lat, S.me.lng], 18); });
+$('#btnPractice').addEventListener('click', () => {
+  if (!S.me) { toast('위치를 먼저 잡는 중이에요'); return; }
+  S.practice = { id: 'practice_' + Date.now(), lat: S.me.lat, lng: S.me.lng, cat: CATS[(Math.random() * CATS.length) | 0], practice: true };
+  renderZones(); toast('지금 자리에 시험용 고양이를 숨겼어요');
+});
+function renderLog() {
+  $('#logCount').textContent = caught.length + '마리';
+  $('#logList').innerHTML = caught.length ? '' : '<li>아직 검거한 고양이가 없어요<span></span></li>';
+  for (const c of [...caught].reverse()) { const li = document.createElement('li'); li.textContent = c.name + (c.practice ? ' (시험)' : ''); const sp = document.createElement('span'); sp.textContent = new Date(c.t).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' · ' + c.method; li.appendChild(sp); $('#logList').appendChild(li); }
+}
+$('#btnLog').addEventListener('click', () => { renderLog(); $('#scrLog').hidden = false; });
+$('#btnLogClose').addEventListener('click', () => { $('#scrLog').hidden = true; });
+renderLog();
+
+/* =====================================================================
+   3. 카메라 수색 (WebXR AR) — 주변 면을 찾아 고양이를 숨기고, 깊이 인식이 되면 실제 물체 뒤로 가려짐
+   ===================================================================== */
+let AR_OK = false;
+(async () => { try { AR_OK = !!(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar')); } catch {} renderZones(); })();
+const canvas = $('#view');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(innerWidth, innerHeight, false);
+renderer.shadowMap.enabled = true; renderer.xr.enabled = true; renderer.xr.setReferenceSpaceType('local');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 60);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x666655, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.castShadow = true; sun.shadow.mapSize.set(512, 512);
+Object.assign(sun.shadow.camera, { left: -1, right: 1, top: 1, bottom: -1, near: 0.1, far: 10 }); scene.add(sun, sun.target);
+const shadowDisc = new THREE.Mesh(new THREE.CircleGeometry(0.5, 24), new THREE.ShadowMaterial({ opacity: 0.35 }));
+shadowDisc.rotation.x = -Math.PI / 2; shadowDisc.receiveShadow = true; scene.add(shadowDisc);
+
+const catMeshes = [];
+function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+function makeCat(st) {
+  catMeshes.length = 0; const root = new THREE.Group();
+  const hex = (n) => '#' + n.toString(16).padStart(6, '0');
+  const tex = st.stripe ? canvasTex(256, 128, (g, w, h) => { g.fillStyle = hex(st.color); g.fillRect(0, 0, w, h); g.fillStyle = hex(st.stripe); for (let i = 0; i < 16; i++) { const x = (i / 16) * w; g.fillRect(x, 0, 6, h * 0.6); } }) : null;
+  const fur = new THREE.MeshStandardMaterial({ color: tex ? 0xffffff : st.color, map: tex, roughness: 0.95 }), plain = new THREE.MeshStandardMaterial({ color: st.color, roughness: 0.95 });
+  const belly = new THREE.MeshStandardMaterial({ color: new THREE.Color(st.color).lerp(new THREE.Color(0xfff4e6), 0.5), roughness: 0.95 });
+  const pink = new THREE.MeshStandardMaterial({ color: 0xe79aa0 }), eyeM = new THREE.MeshStandardMaterial({ color: 0xd8f06a, emissive: 0xc8e34a, emissiveIntensity: 0.6 });
+  const sph = new THREE.SphereGeometry(1, 20, 14);
+  const add = (p, geo, m, pos, sc) => { const o = new THREE.Mesh(geo, m); o.position.copy(pos); if (sc) o.scale.copy(sc); o.castShadow = true; o.userData.cat = true; p.add(o); catMeshes.push(o); return o; };
+  const body = new THREE.Group(); root.add(body); add(body, sph, fur, new V3(), new V3(0.15, 0.13, 0.26)); add(body, sph, belly, new V3(0, -0.03, 0.13), new V3(0.1, 0.09, 0.1));
+  const head = new THREE.Group(); root.add(head); add(head, sph, fur, new V3(), new V3(0.105, 0.095, 0.1)); add(head, sph, belly, new V3(0, -0.03, 0.07), new V3(0.055, 0.04, 0.045));
+  const ear = new THREE.ConeGeometry(0.042, 0.085, 4);
+  for (const sx of [-1, 1]) { const e = add(head, ear, plain, new V3(sx * 0.055, 0.085, -0.01)); e.rotation.set(-0.15, Math.PI / 4, sx * -0.28); }
+  const eyes = []; for (const sx of [-1, 1]) { const e = add(head, sph, eyeM, new V3(sx * 0.04, 0.015, 0.082), new V3(0.021, 0.021, 0.012)); add(e, sph, new THREE.MeshStandardMaterial({ color: 0x0a0a0a }), new V3(0, 0, 0.75), new V3(0.35, 0.85, 0.5)); eyes.push(e); }
+  add(head, sph, pink, new V3(0, -0.012, 0.1), new V3(0.012, 0.009, 0.008));
+  const legs = [], lg = new THREE.CylinderGeometry(0.028, 0.024, 0.17, 8); lg.translate(0, -0.085, 0);
+  for (const [x, z] of [[-0.08, 0.15], [0.08, 0.15], [-0.08, -0.15], [0.08, -0.15]]) { const g = new THREE.Group(); g.position.set(x, 0, z); body.add(g); add(g, lg, plain, new V3()); legs.push(g); }
+  const tail = []; let par = body; for (let i = 0; i < 8; i++) { const s = new THREE.Group(); s.position.set(0, i ? 0 : 0.05, i ? -0.055 : -0.24); par.add(s); const c = add(s, new THREE.CylinderGeometry(0.022, 0.023, 0.066, 8), plain, new V3(0, 0, -0.0275)); c.rotation.x = Math.PI / 2; tail.push(s); par = s; }
+  return { root, body, head, legs, tail, eyes };
+}
+
+const A = { session: null, hitSrcs: [], cands: [], floorY: null, zone: null, cat: null, state: 'scan', path: null, s: 0, t: 0, nextMeow: 3, scanT: 0, nets: 3, tool: 'hand', busy: false, alert: 0, target: null, lastPos: null, walked: 0, net: null, blinkT: 2, face: 0 };
+const ray = new THREE.Raycaster();
+
+async function startSearch() {
+  const zone = S.inZone; if (!zone) return;
+  let session;
+  try {
+    session = await navigator.xr.requestSession('immersive-ar', {
+      requiredFeatures: ['local', 'hit-test'], optionalFeatures: ['dom-overlay', 'depth-sensing'], domOverlay: { root: document.body },
+      depthSensing: { usagePreference: ['gpu-optimized', 'cpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
+    });
+  } catch (e) { toast('카메라 AR을 시작할 수 없어요 (' + (e.message || e.name) + ')', 'alert'); return; }
+  initAudio();
+  await renderer.xr.setSession(session);
+  const viewer = await session.requestReferenceSpace('viewer');
+  // 가운데 + 주변 6방향으로 면 찾기
+  const dirs = [[0, 0], [-0.45, -0.3], [0.45, -0.3], [0, -0.55], [-0.8, -0.1], [0.8, -0.1], [0, 0.15]];
+  A.hitSrcs = [];
+  for (const [x, y] of dirs) { try { A.hitSrcs.push(await session.requestHitTestSource({ space: viewer, offsetRay: new XRRay({ x: 0, y: 0, z: 0 }, { x, y, z: -1 }) })); } catch {} }
+  Object.assign(A, { session, zone, cands: [], floorY: null, state: 'scan', scanT: 0, nets: 3, alert: 0, busy: false, net: null, lastPos: null, walked: 0 });
+  if (A.cat) scene.remove(A.cat.root);
+  A.cat = makeCat(zone.cat); A.cat.root.visible = false; scene.add(A.cat.root); shadowDisc.visible = false;
+  $('#arWho').textContent = '용의자 ' + zone.cat.name; $('#ctNet').textContent = A.nets;
+  $('#arHint').textContent = '천천히 주변을 둘러보며 바닥, 담장, 벤치를 비춰 주세요';
+  document.documentElement.classList.add('ar'); $('#arUI').hidden = false; $('#reticle').hidden = false;
+  session.addEventListener('end', () => { document.documentElement.classList.remove('ar'); $('#arUI').hidden = true; $('#reticle').hidden = true; $('#ping').classList.remove('on'); A.session = null; A.hitSrcs = []; renderZones(); });
+}
+$('#btnSearch').addEventListener('click', startSearch);
+$('#btnExitAR').addEventListener('click', () => A.session && A.session.end());
+
+const tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpUp = new V3();
+function collect(frame) {
+  const ref = renderer.xr.getReferenceSpace(); const cam = camera.position;
+  for (const src of A.hitSrcs) {
+    const r = frame.getHitTestResults(src)[0]; if (!r) continue; const pose = r.getPose(ref); if (!pose) continue;
+    const p = pose.transform.position, o = pose.transform.orientation;
+    tmpQ.set(o.x, o.y, o.z, o.w); tmpUp.set(0, 1, 0).applyQuaternion(tmpQ); if (tmpUp.y < 0.85) continue;        // 수평면만
+    const d = Math.hypot(p.x - cam.x, p.z - cam.z); if (d < 1.2 || d > 9) continue;
+    if (A.cands.some((c) => Math.hypot(c.x - p.x, c.z - p.z) < 0.5 && Math.abs(c.y - p.y) < 0.2)) continue;
+    A.cands.push(new V3(p.x, p.y, p.z)); if (A.cands.length > 120) A.cands.shift();
+  }
+  if (A.cands.length > 4) { const ys = A.cands.map((c) => c.y).sort((a, b) => a - b); A.floorY = ys[Math.floor(ys.length * 0.15)]; }
+}
+function camFwd() { const f = new V3(0, 0, -1).applyQuaternion(camera.quaternion); f.y = 0; return f.normalize(); }
+function pickSpot(excludeNear) {
+  const cam = camera.position, f = camFwd();
+  let pool = A.cands.filter((c) => { const v = new V3(c.x - cam.x, 0, c.z - cam.z), d = v.length(); if (d < 2.2 || d > 8) return false; if (excludeNear && c.distanceTo(excludeNear) < 2.5) return false; return true; });
+  if (!pool.length) pool = A.cands.slice();
+  const ledges = pool.filter((c) => A.floorY != null && c.y > A.floorY + 0.3 && c.y < A.floorY + 2.2);
+  if (ledges.length && Math.random() < 0.5) pool = ledges;
+  pool.sort((a, b) => { const sa = new V3(a.x - cam.x, 0, a.z - cam.z).normalize().dot(f), sb = new V3(b.x - cam.x, 0, b.z - cam.z).normalize().dot(f); return sa - sb; }); // 지금 보는 방향 반대쪽 우선
+  return pool[Math.min(pool.length - 1, (Math.random() * Math.min(4, pool.length)) | 0)];
+}
+function placeCat(p) {
+  A.cat.root.position.copy(p); A.cat.root.visible = true; A.state = 'hide'; A.pose = 'loaf';
+  A.face = Math.atan2(camera.position.x - p.x, camera.position.z - p.z) + (Math.random() - 0.5) * 1.2; A.cat.root.rotation.y = A.face;
+  shadowDisc.position.set(p.x, p.y + 0.003, p.z); shadowDisc.visible = true; sun.position.set(p.x + 0.5, p.y + 3, p.z + 0.4); sun.target.position.copy(p);
+  A.nextMeow = 1.5; A.foundShown = false;
+}
+function runTo(p) {
+  const a = A.cat.root.position.clone(); A.path = { a, b: p.clone(), len: a.distanceTo(p) }; A.s = 0; A.state = 'run'; A.pose = 'run';
+  const d = p.clone().sub(a); A.face = Math.atan2(d.x, d.z);
+}
+function catCenter() { return A.cat.root.position.clone().add(new V3(0, 0.18, 0)); }
+function hDist() { const c = A.cat.root.position; return Math.hypot(c.x - camera.position.x, c.z - camera.position.z); }
+function startle(msg) { A.alert++; hiss(catCenter()); const p = pickSpot(A.cat.root.position) || A.cat.root.position.clone().add(new V3(2, 0, 0)); runTo(p); toast(msg, 'alert'); buzz([40, 60, 40]); }
+
+function updateAR(dt, frame) {
+  if (frame) collect(frame);
+  A.t += dt;
+  if (A.state === 'scan') {
+    A.scanT += dt;
+    if ((A.cands.length >= 12 && A.scanT > 3) || A.scanT > 9) {
+      const p = pickSpot() || camera.position.clone().add(camFwd().multiplyScalar(-4)).setY(camera.position.y - 1.4);
+      placeCat(p); $('#arHint').textContent = '울음소리가 나는 쪽을 찾아보세요';
+    } else $('#arHint').textContent = `주변을 비추는 중… (찾은 면 ${A.cands.length}곳)`;
+    return;
+  }
+  const cat = A.cat;
+  if (A.state === 'run') {
+    A.s += 3.2 * dt; const f = Math.min(1, A.s / Math.max(0.01, A.path.len));
+    const p = A.path.a.clone().lerp(A.path.b, f); p.y += Math.sin(Math.PI * f) * Math.min(0.6, 0.15 + Math.abs(A.path.a.y - A.path.b.y) * 0.4);
+    cat.root.position.copy(p); shadowDisc.position.set(p.x, Math.min(A.path.a.y, A.path.b.y) + 0.003, p.z);
+    if (f >= 1) placeCat(A.path.b);
+  } else if (A.state === 'hide') {
+    A.nextMeow -= dt; if (A.nextMeow <= 0) { meow(catCenter()); pingUntil = performance.now() + 1600; A.nextMeow = 7 + Math.random() * 4; }
+    // 1.5m 안에서 걸으면 발소리에 도망
+    const cp = camera.position; if (A.lastPos) { A.walked += Math.hypot(cp.x - A.lastPos.x, cp.z - A.lastPos.z); if (A.walked > 0.6) { A.walked = 0; if (hDist() < 1.5 && Math.random() < 0.1 + A.alert * 0.05) startle('발소리에 놀라 도망갑니다!'); } }
+  }
+  A.lastPos = camera.position.clone();
+  animateCat(dt);
+  // 조준
+  ray.setFromCamera({ x: 0, y: 0 }, camera); let hit = ray.intersectObjects(catMeshes, false)[0];
+  if (!hit) for (const [x, y] of [[0.05, 0], [-0.05, 0], [0, 0.04], [0, -0.04]]) { ray.setFromCamera({ x, y }, camera); hit = ray.intersectObjects(catMeshes, false)[0]; if (hit) break; }
+  A.target = A.state === 'caught' ? null : hit || null;
+  const ret = $('#reticle'); ret.classList.toggle('locked', !!A.target);
+  if (A.target) { const d = hDist(); ret.querySelector('.tag').textContent = d <= 1 ? '손 닿음' : d <= 3 ? `그물 거리 ${d.toFixed(1)}m` : `${d.toFixed(1)}m · 더 가까이`; ret.classList.toggle('near', d <= 1);
+    if (!A.foundShown && A.state === 'hide') { A.foundShown = true; toast(`${A.zone.cat.name} 발견!`, 'alert'); buzz(30); } }
+  updateNet(dt); updatePing(); updateListener();
+}
+function animateCat(dt) {
+  const m = A.cat, t = A.t; let dy = A.face - m.root.rotation.y; while (dy > Math.PI) dy -= Math.PI * 2; while (dy < -Math.PI) dy += Math.PI * 2; m.root.rotation.y += dy * Math.min(1, dt * 12);
+  const run = A.pose === 'run'; m.body.position.y = run ? 0.22 + Math.abs(Math.sin(t * 16)) * 0.02 : 0.12; m.body.scale.y = run ? 1 : 0.88;
+  m.legs.forEach((l, i) => { l.visible = run; l.rotation.x = run ? Math.sin(t * 16 + (i % 2 ? Math.PI : 0) + (i > 1 ? Math.PI / 2 : 0)) * 0.75 : 0; });
+  m.head.position.set(0, run ? 0.33 : 0.22, run ? 0.27 : 0.22); m.head.rotation.y = run ? 0 : Math.sin(t * 0.5) * 0.35;
+  m.tail.forEach((s, i) => s.rotation.set(run ? (i ? 0.08 : -0.7) : (i ? 0 : 0.2), run ? Math.sin(t * 10 - i * 0.6) * 0.12 : (i ? 0.32 + Math.sin(t * 2.5 - i * 0.5) * 0.06 : 0.5), 0));
+  A.blinkT -= dt; const bl = A.blinkT < 0.12; if (A.blinkT < 0) A.blinkT = 2 + Math.random() * 3; m.eyes.forEach((e) => (e.scale.y = bl ? 0.003 : 0.021));
+}
+
+/* ---------- 체포: 맨손 1m, 그물 3m ---------- */
+document.querySelectorAll('.tool').forEach((b) => b.addEventListener('click', () => { A.tool = b.dataset.tool; document.querySelectorAll('.tool').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('#btnAct').textContent = A.tool === 'hand' ? '잡기' : '던지기'; }));
+$('#btnAct').addEventListener('click', () => {
+  if (!A.session || A.busy || A.state === 'scan' || A.state === 'caught') return;
+  if (AC) AC.resume?.();
+  if (A.tool === 'hand') {
+    if (!A.target) { toast('조준선 안에 고양이를 맞추세요'); return; }
+    const d = hDist(); if (d > 1.0) { toast(`손이 닿지 않아요 (${d.toFixed(1)}m). 1m 안으로 다가가세요`); return; }
+    A.busy = true; setTimeout(() => { A.busy = false; if (Math.random() < Math.max(0.1, (A.state === 'run' ? 0.2 : 0.45) - A.alert * 0.05)) arrest('맨손'); else startle('놓쳤다! 도망갑니다'); }, 380);
+  } else {
+    if (A.nets <= 0) { toast('그물이 없어요. 맨손으로 잡으세요'); return; }
+    A.nets--; $('#ctNet').textContent = A.nets; whoosh(); buzz(20);
+    ray.setFromCamera({ x: 0, y: 0 }, camera); const h = ray.intersectObjects(catMeshes, false)[0];
+    let to = h ? h.point : ray.ray.at(Math.min(3, hDist() + 0.5), new V3()); let short = false;
+    if (to.distanceTo(camera.position) > 3) { to = camera.position.clone().addScaledVector(ray.ray.direction, 3); to.y = Math.max(A.floorY ?? to.y - 1, to.y - 1); short = true; }
+    throwNet(to, short);
+  }
+});
+function makeNet() { const g = new THREE.Group(), R = 0.55, pts = []; for (let i = -4; i <= 4; i++) { const v = (i / 4) * R, h = Math.sqrt(R * R - v * v); pts.push(new V3(v, 0, -h), new V3(v, 0, h), new V3(-h, 0, v), new V3(h, 0, v)); } g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xf1e6c8 }))); return g; }
+function throwNet(to, short) {
+  if (A.net) scene.remove(A.net.mesh); A.busy = true;
+  const from = camera.position.clone().add(new V3(0, -0.3, 0)), dur = 0.3 + from.distanceTo(to) * 0.12, mesh = makeNet(); mesh.scale.setScalar(0.2); scene.add(mesh);
+  A.net = { mesh, from, to, t: 0, dur, short, landed: false, fade: 0 };
+}
+function updateNet(dt) {
+  const n = A.net; if (!n) return;
+  if (!n.landed) { n.t += dt; const f = Math.min(1, n.t / n.dur); const p = n.from.clone().lerp(n.to, f); p.y += Math.sin(Math.PI * f) * 0.4; n.mesh.position.copy(p); n.mesh.rotation.y += dt * 9; n.mesh.scale.setScalar(0.2 + f * 0.8);
+    if (f >= 1) { n.landed = true; A.busy = false; const d = catCenter().distanceTo(n.to);
+      if (d < 0.75 && A.state !== 'caught') { if (Math.random() < (A.state === 'run' ? 0.6 : 0.85) - A.alert * 0.03) arrest('그물'); else startle('그물을 빠져나갔다!'); }
+      else if (d < 1.8) startle('빗나갔다! 놀라서 도망갑니다'); else toast(n.short ? '그물은 3m까지만 날아가요. 더 다가가세요' : '빗나갔다'); } }
+  else if (A.state !== 'caught') { n.fade += dt; if (n.fade > 1.3) { scene.remove(n.mesh); A.net = null; } }
+}
+function arrest(method) {
+  A.state = 'caught'; A.pose = 'loaf'; jingle(); buzz([60, 40, 120]); meow(catCenter(), 1.3);
+  toast(`${A.zone.cat.name} 검거! (${method})`, 'good');
+  caught.push({ id: A.zone.id, name: A.zone.cat.name, method, t: Date.now(), practice: !!A.zone.practice }); try { localStorage.setItem('catLog', JSON.stringify(caught)); } catch {}
+  renderLog(); setTimeout(() => A.session && A.session.end(), 2200);
+}
+
+/* ---------- 소리 / 방향 표시 ---------- */
+let AC = null, master = null, noiseBuf = null;
+function initAudio() { if (AC) { AC.resume?.(); return; } try { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.connect(AC.destination); noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.6, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } catch { AC = null; } }
+function setP(n, p) { if (n.positionX) { n.positionX.value = p.x; n.positionY.value = p.y; n.positionZ.value = p.z; } else n.setPosition(p.x, p.y, p.z); }
+function updateListener() { if (!AC) return; const L = AC.listener, f = new V3(0, 0, -1).applyQuaternion(camera.quaternion), u = new V3(0, 1, 0).applyQuaternion(camera.quaternion), p = camera.position;
+  if (L.positionX) { L.positionX.value = p.x; L.positionY.value = p.y; L.positionZ.value = p.z; L.forwardX.value = f.x; L.forwardY.value = f.y; L.forwardZ.value = f.z; L.upX.value = u.x; L.upY.value = u.y; L.upZ.value = u.z; } else { L.setPosition(p.x, p.y, p.z); L.setOrientation(f.x, f.y, f.z, u.x, u.y, u.z); } }
+function spatial(at) { const p = AC.createPanner(); p.panningModel = 'HRTF'; p.refDistance = 1; p.rolloffFactor = 0.5; setP(p, at); p.connect(master); return p; }
+function meow(at, pitch = 1) { if (!AC) return; const t = AC.currentTime, o = AC.createOscillator(), f = AC.createBiquadFilter(), g = AC.createGain(); o.type = 'sawtooth'; f.type = 'bandpass'; f.Q.value = 5; const b = 430 * pitch;
+  o.frequency.setValueAtTime(b, t); o.frequency.linearRampToValueAtTime(b * 1.9, t + 0.2); o.frequency.linearRampToValueAtTime(b * 1.3, t + 0.6); f.frequency.setValueAtTime(800, t); f.frequency.linearRampToValueAtTime(1500, t + 0.22);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.6, t + 0.07); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.66); o.connect(f).connect(g).connect(spatial(at)); o.start(t); o.stop(t + 0.7); }
+function noise(dur, type, f0, f1, vol, at) { if (!AC) return; const t = AC.currentTime, s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain(); s.buffer = noiseBuf; f.type = type; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(f).connect(g).connect(at ? spatial(at) : master); s.start(t); s.stop(t + dur); }
+const hiss = (at) => noise(0.5, 'highpass', 2500, 5000, 0.5, at), whoosh = () => noise(0.45, 'bandpass', 500, 2200, 0.35);
+function jingle() { if (!AC) return; let t = AC.currentTime; for (const f of [523, 659, 784, 1047]) { const o = AC.createOscillator(), g = AC.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); o.connect(g).connect(master); o.start(t); o.stop(t + 0.3); t += 0.12; } }
+const buzz = (ms) => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
+let pingUntil = 0;
+function updatePing() {
+  const el = $('#ping'); if (performance.now() > pingUntil || A.state === 'caught' || A.state === 'scan') { el.classList.remove('on'); return; }
+  const v = catCenter().project(camera), behind = v.z > 1; let x = v.x, y = v.y; if (behind) { x = -x; y = -y; }
+  if (!behind && Math.abs(x) < 0.9 && Math.abs(y) < 0.9) { el.classList.remove('on'); return; }
+  const ang = Math.atan2(y, x), m = 1 / Math.max(Math.abs(Math.cos(ang)), Math.abs(Math.sin(ang)));
+  el.style.left = ((Math.cos(ang) * m * 0.86 + 1) / 2) * innerWidth + 'px'; el.style.top = ((1 - Math.sin(ang) * m * 0.78) / 2) * innerHeight + 'px';
+  el.querySelector('.arrow').style.transform = `rotate(${90 - (ang * 180) / Math.PI}deg)`; el.classList.add('on');
+}
+let toastT = 0;
+function toast(msg, kind = '') { const el = $('#toast'); el.textContent = msg; el.className = kind; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (el.hidden = true), 2000); }
+
+const clock = new THREE.Clock();
+renderer.setAnimationLoop((time, frame) => {
+  const dt = Math.min(0.05, clock.getDelta());
+  if (!A.session || !renderer.xr.isPresenting) return;
+  camera.updateMatrixWorld(); updateAR(dt, frame); renderer.render(scene, camera);
+});
+window.__field = { S, A, allZones, cellZones, renderZones, onPos };
+</script>
+</body>
+</html>
