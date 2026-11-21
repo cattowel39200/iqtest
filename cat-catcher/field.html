@@ -318,10 +318,11 @@ async function startSearch() {
   try {
     session = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['local', 'hit-test'], optionalFeatures: ['dom-overlay', 'depth-sensing'], domOverlay: { root: document.body },
-      depthSensing: { usagePreference: ['gpu-optimized', 'cpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
+      depthSensing: { usagePreference: ['gpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
     });
   } catch (e) { toast('카메라 AR을 시작할 수 없어요 (' + (e.message || e.name) + ')', 'alert'); return; }
   initAudio();
+  guardXR(session, xrErr);
   await renderer.xr.setSession(session);
   const viewer = await session.requestReferenceSpace('viewer');
   // 가운데 + 주변 6방향으로 면 찾기
@@ -339,6 +340,17 @@ async function startSearch() {
 $('#btnSearch').addEventListener('click', startSearch);
 $('#btnExitAR').addEventListener('click', () => A.session && A.session.end());
 
+// AR 프레임 보호: 한 프레임에서 오류가 나도 다음 프레임을 계속 요청(카메라 화면이 멈추지 않게).
+// 가림(깊이) 기능이 이 폰에서 맞지 않으면 자동으로 끔.
+function guardXR(session, onErr) {
+  const raf = session.requestAnimationFrame.bind(session); let errs = 0;
+  const strip = () => { try { const f = [...(session.enabledFeatures || [])].filter((x) => x !== 'depth-sensing'); Object.defineProperty(session, 'enabledFeatures', { value: f, configurable: true }); } catch {} };
+  let usage = null; try { usage = session.depthUsage; } catch {}
+  if (usage !== 'gpu-optimized') strip();
+  session.requestAnimationFrame = (cb) => raf(function g(t, f) { try { cb(t, f); } catch (e) { errs++; if (errs === 2) strip(); onErr(e, errs); raf(g); } });
+}
+let xrErrShown = 0;
+function xrErr(e) { console.error(e); if (xrErrShown++ < 2) toast('화면 오류: ' + (e && e.message ? e.message : e), 'alert'); }
 const tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpUp = new V3();
 function collect(frame) {
   const ref = renderer.xr.getReferenceSpace(); const cam = camera.position;
@@ -487,7 +499,8 @@ const clock = new THREE.Clock();
 renderer.setAnimationLoop((time, frame) => {
   const dt = Math.min(0.05, clock.getDelta());
   if (!A.session || !renderer.xr.isPresenting) return;
-  camera.updateMatrixWorld(); updateAR(dt, frame); renderer.render(scene, camera);
+  try { camera.updateMatrixWorld(); updateAR(dt, frame); } catch (e) { xrErr(e); }
+  renderer.render(scene, camera);
 });
 window.__field = { S, A, allZones, cellZones, renderZones, onPos };
 </script>

@@ -938,10 +938,11 @@ async function startAR() {
     session = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['local'], optionalFeatures: ['dom-overlay', 'hit-test', 'depth-sensing'],
       domOverlay: { root: document.body },
-      depthSensing: { usagePreference: ['gpu-optimized', 'cpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
+      depthSensing: { usagePreference: ['gpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
     });
   } catch (e) { toast('카메라 AR을 시작할 수 없어요 (' + (e.message || e.name) + ')'); return false; }
   renderer.xr.enabled = true; renderer.xr.setReferenceSpaceType('local');
+  guardXR(session, xrErr);
   await renderer.xr.setSession(session);
   Object.assign(AR, { on: true, session, base: renderer.xr.getReferenceSpace(), depth: (session.enabledFeatures || []).includes('depth-sensing'), last: null });
   try { const vs = await session.requestReferenceSpace('viewer'); AR.hitSrc = await session.requestHitTestSource({ space: vs }); } catch { AR.hitSrc = null; }
@@ -953,6 +954,17 @@ async function startAR() {
   });
   return true;
 }
+// AR 프레임 보호: 한 프레임에서 오류가 나도 다음 프레임을 계속 요청(카메라 화면이 멈추지 않게).
+// 가림(깊이) 기능이 이 폰에서 맞지 않으면 자동으로 끔.
+function guardXR(session, onErr) {
+  const raf = session.requestAnimationFrame.bind(session); let errs = 0;
+  const strip = () => { try { const f = [...(session.enabledFeatures || [])].filter((x) => x !== 'depth-sensing'); Object.defineProperty(session, 'enabledFeatures', { value: f, configurable: true }); } catch {} };
+  let usage = null; try { usage = session.depthUsage; } catch {}
+  if (usage !== 'gpu-optimized') strip();
+  session.requestAnimationFrame = (cb) => raf(function g(t, f) { try { cb(t, f); } catch (e) { errs++; if (errs === 2) strip(); onErr(e, errs); raf(g); } });
+}
+let xrErrShown = 0;
+function xrErr(e) { console.error(e); if (xrErrShown++ < 2) toast('화면 오류: ' + (e && e.message ? e.message : e), 'alert'); }
 function arTrack(xrFrame) {
   if (xrFrame && AR.hitSrc) { const hits = xrFrame.getHitTestResults(AR.hitSrc); AR.lastHit = hits.length ? hits[0].getPose(renderer.xr.getReferenceSpace()) : null; }
   PLAYER.copy(camera.position);
